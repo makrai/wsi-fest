@@ -10,7 +10,9 @@ from scipy.spatial.distance import pdist
 from sklearn.linear_model import LinearRegression
 from gensim.models import KeyedVectors
 
-logging.basicConfig(format="%(asctime)s %(module)s (%(lineno)s) %(levelname)s %(message)s", level=logging.DEBUG)
+logging.basicConfig(
+    format="%(asctime)s %(module)s (%(lineno)s) %(levelname)s %(message)s",
+    level=logging.INFO)
 
 class MultiSenseLinearTranslator():
     def __init__(self,
@@ -67,16 +69,21 @@ class MultiSenseLinearTranslator():
             ambig_neighbors |= set(sense_neighbors)
         return ambig_neighbors
 
-
-    def test(self):
+    def read_test_dict(self):
         test_dict = defaultdict(set)
         for line in self.seed_f.readlines():
             tg, sr = line.split()
             test_dict[sr].add(tg)
+        return test_dict 
+
+    def test(self):
+        test_dict = self.read_test_dict()
         with open(self.source_mse_filen) as source_mse:
             logging.info(
                 'skipping header: {}'.format(source_mse.readline().strip()))
             test_size = 0
+            score_at10 = 0
+            good_ambig = 0
             sr_word = ''
             sr_vecs = []
             good_trans = set()
@@ -89,27 +96,41 @@ class MultiSenseLinearTranslator():
                 new_sr_word, vect_str = line.strip().split(maxsplit=1)
                 if new_sr_word != sr_word:
                     if sr_word in test_dict:
+                        self.log_prec(score_at10, test_size, good_ambig) 
                         test_size += 1
                         sr_vecs = np.concatenate(sr_vecs)
                         tg_vecs = sr_vecs.dot(self.regression.coef_.T)
                         ambig_neighbors = self.translate_one_vector(tg_vecs)
                         good_trans = list(
                             test_dict[sr_word].intersection(ambig_neighbors))
+                        if good_trans:
+                            score_at10 += 1
                         if len(good_trans) > 1:
+                            good_ambig += 1
                             good_vecs = np.concatenate([
                                 self.target_embed[w].reshape((1,-1))
                                 for w in good_trans])
                             if len(good_vecs) > 2:
-                                #logging.warning( 'Handling of more than two good translations is not tested')
                                 sim_mx = good_vecs.dot(good_vecs.T)
                                 ij = np.unravel_index(
                                     np.argmin(sim_mx), sim_mx.shape)
                                 tgw1, tgw2 = [good_trans[i] for i in ij]
                                 logging.debug((sr_word, good_trans, tgw1,
                                                tgw2))
+                            else:
+                                tgw1, tgw2 = good_trans
+                            print('\t'.join(['{}'.format(
+                                self.target_embed.similarity(tgw1, tgw2)),
+                                sr_word, tgw1, tgw2]))
                     sr_word = new_sr_word
                     sr_vecs = []
                 sr_vecs.append(np.fromstring(vect_str, sep=' ').reshape((1,-1)))
+
+    def log_prec(self, score_at10, test_size, good_ambig):
+        if not test_size % 1000 and test_size:
+            logging.info(
+                'prec after testing on {} words: {:%}, good_ambig: {}'.format(
+                    test_size, float(score_at10)/test_size, good_ambig))
 
     def test_baseline(self):
         test_size = 0
@@ -121,23 +142,16 @@ class MultiSenseLinearTranslator():
             except:
                 logging.err(line)
             if sr in self.source_firsts:
-                #if not test_size % 100:
-                #    logging.info('testing... ({} tested)'.format(test_size))
                 tg_vec = self.regression.coef_.dot(self.source_firsts[sr])
                 tg_10, _ = zip(*self.target_embed.similar_by_vector(tg_vec,
                                                                        restrict_vocab=self.restrict_vocab))
                 test_size += 1
                 if tg in tg_10:
-                    score_at10 += 1
-                    if not score_at10 % 100:
-                        logging.info(
-                            'prec@10 {:%}, test size {} {} {}'.format(
-                                float(score_at10)/test_size, test_size, sr,
-                                tg_10))
+                    score_at10 += 1 
         prec_at10 = float(score_at10)/test_size
         logging.info('final prec@10 is {:%} on {} items'.format(prec_at10, test_size))
         return prec_at10
 
 if __name__ == '__main__':
-    print(MultiSenseLinearTranslator(#target_embed=sys.argv[1]
-                                    ).main())
+    MultiSenseLinearTranslator(#target_embed=sys.argv[1]
+                              ).main()
