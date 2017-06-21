@@ -20,27 +20,30 @@ class MultiSenseLinearTranslator():
         parser = argparse.ArgumentParser()
         parser.add_argument(
             '--source_mse',
-            default='/mnt/permanent/Language/Hungarian/Embed/multiprot/adagram/mnsz/adagram-mnsz-600d-a.05-5p-m100_sense.mse')
+            default='/mnt/permanent/Language/Hungarian/Embed/multiprot/adagram/mnsz/'
+            'adagram-mnsz-600d-a.05-5p-m100_sense.mse')
         parser.add_argument(
             '--target_embed',
             default='/mnt/permanent/Language/English/Embed/glove.840B.300d.gensim')
         parser.add_argument(
             '--seed_dict',
-            default='/mnt/store/makrai/data/language/hungarian/dict/wikt2dict-en-hu.by-freq',
+            default='/mnt/store/makrai/data/language/hungarian/dict/' 
+            'wikt2dict-en-hu.by-freq',
             help='Name of the seed dictionary file. The order of the source'
             ' and the target language in the arguments for embedding and in'
             ' the words in the seed file is opposite')
+        parser.add_argument(
+            '--general-linear-mapping', dest='orthog', action='store_false')
+        parser.add_argument('--translate_all', action='store_true')
         return parser.parse_args()
 
     def __init__(self):
-        args = self.parse_args()
-        self.source_mse_filen = args.source_mse
-        self.source_firsts = self.get_first_vectors(args.source_mse)
+        self.args = self.parse_args()
+        self.source_firsts = self.get_first_vectors(self.args.source_mse)
         logging.basicConfig(
             format="%(asctime)s %(module)s (%(lineno)s) %(levelname)s %(message)s",
             level=logging.DEBUG)
-        self.target_embed = self.get_first_vectors(args.target_embed)
-        self.seed_filen = args.seed_dict
+        self.target_embed = self.get_first_vectors(self.args.target_embed)
 
     def get_first_vectors(self, filen):
         root, ext = os.path.splitext(filen)
@@ -56,7 +59,7 @@ class MultiSenseLinearTranslator():
                 return embed
 
     def main(self):
-        with open(self.seed_filen) as self.seed_f:
+        with open(self.args.seed_dict) as self.seed_f:
             self.train()
             return self.test()
 
@@ -72,25 +75,34 @@ class MultiSenseLinearTranslator():
                 self.train_tg[train_size] = self.target_embed[tg]
                 train_size += 1
         logging.info('trained on {} words'.format(len(self.train_sr)))
-        self.regression = LinearRegression(n_jobs=-2)
-        self.regression.fit(self.train_sr, self.train_tg)
+        if self.args.orthog:
+            # formula taken from https://github.com/hlt-bme-hu/eval-embed
+            m = self.train_sr.T.dot(self.train_tg)
+            u, _, v = np.linalg.svd(m, full_matrices=True)
+            s = np.zeros((v.shape[0], u.shape[1]))
+            np.fill_diagonal(s, 1)
+            self.regression = LinearRegression()
+            self.regression.coef_ = v.T.dot(s).dot(u.T)
+        else:
+            self.regression = LinearRegression(n_jobs=-2)
+            self.regression.fit(self.train_sr, self.train_tg)
 
     def test(self):
         self.test_size_goal = 1000
         self.restrict_vocab = 10000
         self.test_dict = self.read_test_dict()
-        with open(self.source_mse_filen) as source_mse:
+        with open(self.args.source_mse) as source_mse:
             logging.info(
                 'skipping header: {}'.format(source_mse.readline().strip()))
             self.test_size_act = 0
             self.score_at10 = 0
-            self.good_ambig = 0
+            self.good_disambig = 0
             sr_word = ''
             sr_vecs = []
-            while self.test_size_act < self.test_size_goal:
+            while self.args.translate_all or self.test_size_act < self.test_size_goal:
                 line = source_mse.readline()
                 if not line:
-                    logging.warning(
+                    logging.info(
                         'tested on {} items'.format(self.test_size_act))
                     break
                 new_sr_word, vect_str = line.strip().split(maxsplit=1)
@@ -103,7 +115,7 @@ class MultiSenseLinearTranslator():
         return float(self.score_at10)/self.test_size_act
 
     def read_test_dict(self):
-        with open(self.seed_filen) as seed_f:
+        with open(self.args.seed_dict) as seed_f:
             self.test_dict = defaultdict(set)
             for line in seed_f.readlines():
                 tg, sr = line.split()
@@ -111,20 +123,25 @@ class MultiSenseLinearTranslator():
             return self.test_dict
 
     def eval_word(self, sr_word, sr_vecs):
+        # TODO monitor the neighborhood rank of the good translations
         self.log_prec()
         self.test_size_act += 1
         tg_vecs = np.concatenate(sr_vecs).dot(self.regression.coef_.T)
-        word_neighbors = [self.neighbors_by_vector(v) for v in tg_vecs]
-        good_trans = [ns.intersection(self.test_dict[sr_word])
-                      for ns in word_neighbors]
-        all_good_trans = reduce(set.union, good_trans, set())
-        if all_good_trans:
+        neighbor_by_vec = [self.neighbors_by_vector(v) for v in tg_vecs]
+        hit_by_vec = [ns.intersection(self.test_dict[sr_word]) 
+                      for ns in neighbor_by_vec]
+        if reduce(set.union, hit_by_vec):
             self.score_at10 += 1
-            if len(all_good_trans) > 1:
-                self.good_ambig += 1
-                good_ambig_trans = [s for s in good_trans if s]
-                if len(good_ambig_trans) > 1:
-                    logging.debug((sr_word, good_ambig_trans))
+            common_hits = reduce(set.intersection, [n for n in hit_by_vec if n])
+            uniq_hits_by_vec = [trans - common_hits for trans in hit_by_vec]
+            uniq_hit_sets = set(' '.join(s) for s in uniq_hits_by_vec if s)
+            uniq_hit_sets = [neigh.split(' ') for neigh in uniq_hit_sets]
+            uniq_hit_sets.sort(key=len, reverse=True)
+            if len(uniq_hit_sets) > 1:
+                self.good_disambig += 1
+                #if len(uniq_hit_sets) ==2:
+                logging.debug(( sr_word, uniq_hit_sets,
+                               '_'.join(common_hits), self.good_disambig))
 
     def neighbors_by_vector(self, vect):
         sense_neighbors, _ = zip(*self.target_embed.similar_by_vector(
@@ -134,8 +151,10 @@ class MultiSenseLinearTranslator():
     def log_prec(self):
         if not self.test_size_act % 1000 and self.test_size_act:
             logging.info(
-                'prec after testing on {} words: {:%}, self.good_ambig: {}'.format(
-                    self.test_size_act, float(self.score_at10)/self.test_size_act, self.good_ambig))
+                'prec after testing on {} words: {:%} (good_disambig: {})'.format(
+                    self.test_size_act,
+                    float(self.score_at10)/self.test_size_act,
+                    self.good_disambig))
 
 
 if __name__ == '__main__':
@@ -145,6 +164,6 @@ if __name__ == '__main__':
 if len(good_vecs) > 2:
     sim_mx = good_vecs.dot(good_vecs.T)
     ij = np.unravel_index( np.argmin(sim_mx), sim_mx.shape)
-    tgw1, tgw2 = [good_trans[i] for i in ij]
-    logging.debug((sr_word, good_trans, tgw1, tgw2))
+    tgw1, tgw2 = [hit_by_vec[i] for i in ij]
+    logging.debug((sr_word, hit_by_vec, tgw1, tgw2))
     """
