@@ -122,7 +122,7 @@ class MultiSenseLinearTranslator():
             self.log_prec()
 
         read_test_dict()
-        logging.info('testing...')
+        logging.info('Testing...')
         self.test_size_goal = 1000
         self.test_size_act = 0
         self.score_at10 = 0
@@ -163,26 +163,34 @@ class MultiSenseLinearTranslator():
         Instead of the nearest neighbors of the computed point in target space,
         we rank source words by the distance of their translations to each
         target word. Source words are translated to the target word for which
-        they have the lowest neighbor rank. See Dinu et al (2015), and, more
-        generally, Radovanović (2010).
+        they have the lowest neighbor rank, following Dinu et al (2015).
 
         G. Dinu, A. Lazaridou and M. Baroni
         Improving zero-shot learning by mitigating the hubness problem.
         Proceedings of ICLR 2015, workshop track
+        """ 
+        def read_sr_eembed():
+            vocab_size, dim = open(self.args.source_mse).readline().strip().split()
+            logging.info('Reading source mx...')
+            source_mse = np.genfromtxt(
+                self.args.source_mse, skip_header=1, max_rows=vocab_limit,
+                usecols=np.arange(1, int(dim)+1), dtype='float16', comments=None)
+            sr_vocab = [line.split()[0] for line in
+                        open(self.args.source_mse).readlines()[:vocab_limit]]
+            logging.debug('Source vocab and mx read {}'.format(
+                (len(sr_vocab), source_mse.shape)))
+            return sr_vocab, source_mse
 
-        Radovanović, Miloš, Nanopoulos, Alexandros, and Ivanović, Mirjana. 
-        Hubs in space: Popular nearest neighbors in high-dimensional data.
-        Journal of Machine Learning Research, 11:2487–2531, 2010
-        """
         def get_rev_rank():
-            logging.info('populating reverse neighbor rank mx ')
+            logging.info('Populating reverse neighbor rank mx...')
             rev_rank_col_blocks = [] 
             batch_size = 10000
             n_batch = int(min(self.target_embed.syn0.shape[0], vocab_limit) /
                           batch_size)
             for i in range(n_batch):
                 tg_batch = self.target_embed.syn0[i*batch_size:(i+1)*batch_size]
-                block = np.argsort(-translated_points.dot(tg_batch.T),
+                block = np.argsort(np.argsort(-translated_points.dot(tg_batch.T),
+                                   axis=0).astype('int16'),
                                    axis=0).astype('int16')
                 #32768
                 rev_rank_col_blocks.append(block)
@@ -191,15 +199,7 @@ class MultiSenseLinearTranslator():
                         float(i+1)/n_batch, block.dtype, block.shape))
             return np.concatenate(rev_rank_col_blocks, axis=1)
 
-        vocab_size, dim = open(self.args.source_mse).readline().strip().split()
-        logging.info('Reading source mx...')
-        source_mse = np.genfromtxt(
-            self.args.source_mse, skip_header=1, max_rows=vocab_limit,
-            usecols=np.arange(1, int(dim)+1), dtype='float16', comments=None)
-        sr_vocab = [line.split()[0] for line in
-                    open(self.args.source_mse).readlines()[:vocab_limit]]
-        logging.debug('Source mx read {}'.format((source_mse.shape,
-                                                  len(sr_vocab))))
+        sr_vocab, source_mse = read_sr_eembed()
         translated_points = source_mse.dot(self.regression.coef_.T)
         rev_rank_mx = get_rev_rank()
         test_size_act = 0
@@ -208,8 +208,9 @@ class MultiSenseLinearTranslator():
             if sr_word in self.test_dict:
                 test_size_act += 1
                 tg_words = [self.target_embed.index2word[i] 
-                            for  i in rev_rank_row[:prec_level]]
-                logging.debug((sr_word, tg_words))
+                            for  i in np.argsort(rev_rank_row)[:prec_level]]
+                if not test_size_act % 100:
+                    logging.debug((sr_word, tg_words))
                 if self.test_dict[sr_word].intersection(set(tg_words)):
                     score_at10 += 1
                 if test_size_act == self.test_size_goal:
