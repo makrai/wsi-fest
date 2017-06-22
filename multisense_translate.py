@@ -141,7 +141,7 @@ class MultiSenseLinearTranslator():
                     logging.info(
                         'tested on {} items'.format(self.test_size_act))
                     break
-                new_sr_word, vect_str = line.strip().split(' ', 1)
+                new_sr_word, vect_str = line.strip().split(maxsplit=1)
                 if new_sr_word != sr_word:
                     if sr_word in self.test_dict:
                         eval_word(sr_word, sr_vecs)
@@ -178,8 +178,8 @@ class MultiSenseLinearTranslator():
             logging.info('populating reverse neighbor rank mx ')
             rev_rank_col_blocks = [] 
             batch_size = 10000
-            n_batch = min(self.target_embed.syn0.shape[
-                0], vocab_limit)/ batch_size
+            n_batch = int(min(self.target_embed.syn0.shape[0], vocab_limit) /
+                          batch_size)
             for i in range(n_batch):
                 tg_batch = self.target_embed.syn0[i*batch_size:(i+1)*batch_size]
                 block = np.argsort(-translated_points.dot(tg_batch.T),
@@ -187,19 +187,19 @@ class MultiSenseLinearTranslator():
                 #32768
                 rev_rank_col_blocks.append(block)
                 logging.debug( 
-                    '{:.1%} of reverse neighbor rank mx populated {}'.format(
-                        float(i+1)/n_batch,
-                        (block.dtype, block.shape)))
+                    '{:.1%} of reverse neighbor rank mx populated, {} {}'.format(
+                        float(i+1)/n_batch, block.dtype, block.shape))
             return np.concatenate(rev_rank_col_blocks, axis=1)
 
-        with open(self.args.source_mse) as source_mse_f:
-            vocab_size, dim = source_mse_f.readline().strip().split()
-            source_mse = np.genfromtxt(source_mse_f.readlines()[:vocab_limit], 
-                                       usecols=np.arange(1, int(dim)+1),
-                                       comments=None, dtype='float16')
-            #TODO python 3
-        sr_vocab = [line.split()[0] for line in open(self.args.source_mse)]
-        logging.debug((source_mse.shape, len(sr_vocab)))
+        vocab_size, dim = open(self.args.source_mse).readline().strip().split()
+        logging.info('Reading source mx...')
+        source_mse = np.genfromtxt(
+            self.args.source_mse, skip_header=1, max_rows=vocab_limit,
+            usecols=np.arange(1, int(dim)+1), dtype='float16', comments=None)
+        sr_vocab = [line.split()[0] for line in
+                    open(self.args.source_mse).readlines()[:vocab_limit]]
+        logging.debug('Source mx read {}'.format((source_mse.shape,
+                                                  len(sr_vocab))))
         translated_points = source_mse.dot(self.regression.coef_.T)
         rev_rank_mx = get_rev_rank()
         test_size_act = 0
