@@ -24,7 +24,8 @@ class MultiSenseLinearTranslator():
             'adagram-mnsz-600d-a.05-5p-m100_sense.mse')
         parser.add_argument(
             '--target_embed',
-            default='/mnt/permanent/Language/English/Embed/glove.840B.300d.gensim')
+            default='/mnt/permanent/Language/English/Embed/'
+            'glove.840B.300d.gensim')
         parser.add_argument(
             '--seed_dict',
             default='/mnt/store/makrai/data/language/hungarian/dict/' 
@@ -63,8 +64,10 @@ class MultiSenseLinearTranslator():
             return self.test()
 
     def train(self, train_size_goal = 5000):
-        self.train_sr = np.zeros((train_size_goal, self.source_firsts.syn0.shape[1]))
-        self.train_tg = np.zeros((train_size_goal, self.target_embed.syn0.shape[1]))
+        self.train_sr = np.zeros((train_size_goal,
+                                  self.source_firsts.syn0.shape[1]))
+        self.train_tg = np.zeros((train_size_goal,
+                                  self.target_embed.syn0.shape[1]))
         train_size_act = 0
         while train_size_act < train_size_goal:
             tg, sr = self.seed_f.readline().strip().split()
@@ -102,31 +105,31 @@ class MultiSenseLinearTranslator():
             self.test_size_act += 1
             tg_vecs = np.concatenate(sr_vecs).dot(self.regression.coef_.T)
             neighbor_by_vec = [neighbors_by_vector(v) for v in tg_vecs]
-            if not self.test_size_act % 100:
-                logging.debug((sr_word, neighbor_by_vec))
             hit_by_vec = [ns.intersection(self.test_dict[sr_word]) 
                           for ns in neighbor_by_vec]
             if reduce(set.union, hit_by_vec):
                 self.score_at10 += 1
-                common_hits = reduce(set.intersection, [n for n in hit_by_vec if n])
-                uniq_hits_by_vec = [trans - common_hits for trans in hit_by_vec]
+                common_hits = reduce(set.intersection, hit_by_vec)
+                uniq_hits_by_vec = [trans - common_hits 
+                                    for trans in hit_by_vec]
                 uniq_hit_sets = set(' '.join(s) for s in uniq_hits_by_vec if s)
-                uniq_hit_sets = [neigh.split(' ') for neigh in uniq_hit_sets]
-                uniq_hit_sets.sort(key=len, reverse=True)
                 if len(uniq_hit_sets) > 1:
                     self.good_disambig += 1
-                    #if len(uniq_hit_sets) ==2:
+                    uniq_hit_sets = [neigh.split(' ') 
+                                     for neigh in uniq_hit_sets]
+                    uniq_hit_sets.sort(key=len, reverse=True)
                     logging.debug(( sr_word, uniq_hit_sets,
                                    '_'.join(common_hits), self.good_disambig))
-            self.log_prec()
+            if not self.test_size_act % 1000 and self.test_size_act:
+                self.log_prec()
 
-        read_test_dict()
         logging.info('Testing...')
         self.test_size_goal = 1000
         self.test_size_act = 0
         self.score_at10 = 0
         if self.args.reverse:
             return self.reverse_nn()
+        read_test_dict()
         self.restrict_vocab = restrict_vocab
         with open(self.args.source_mse) as source_mse:
             logging.info(
@@ -134,7 +137,8 @@ class MultiSenseLinearTranslator():
             self.good_disambig = 0
             sr_word = ''
             sr_vecs = []
-            while self.args.translate_all or self.test_size_act < self.test_size_goal:
+            while (self.args.translate_all 
+                   or self.test_size_act < self.test_size_goal):
                 line = source_mse.readline()
                 if not line:
                     logging.info(
@@ -150,12 +154,10 @@ class MultiSenseLinearTranslator():
         return float(self.score_at10)/self.test_size_act
 
     def log_prec(self):
-        if not self.test_size_act % 1000 and self.test_size_act:
-            logging.info(
-                'prec after testing on {} words: {:%} (good_disambig: {})'.format(
-                    self.test_size_act,
-                    float(self.score_at10)/self.test_size_act,
-                    self.good_disambig))
+        logging.info(
+            'prec after testing on {} words: {:%} (good_disambig: {})'.format(
+                self.test_size_act, float(self.score_at10)/self.test_size_act,
+                self.good_disambig))
 
     def reverse_nn(self, prec_level=10, vocab_limit = 50000):
         """
@@ -169,15 +171,16 @@ class MultiSenseLinearTranslator():
         Proceedings of ICLR 2015, workshop track
         """ 
         def read_sr_eembed():
-            vocab_size, dim = open(self.args.source_mse).readline().strip().split()
+            _, dim = open(self.args.source_mse).readline().strip().split()
             logging.info(
                 'Reading source mx from {}...'.format(self.args.source_mse))
             source_mse = np.genfromtxt(
                 self.args.source_mse, skip_header=1, max_rows=vocab_limit,
-                usecols=np.arange(1, int(dim)+1), dtype='float16', comments=None)
+                usecols=np.arange(1, int(dim)+1), dtype='float16',
+                comments=None)
             sr_vocab = [line.split()[0] for line in
                         open(self.args.source_mse).readlines()[:vocab_limit]]
-            logging.debug(
+            logging.info(
                 'Source vocab and mx read with shapes {} and {}'.format(
                     len(sr_vocab), source_mse.shape))
             return sr_vocab, source_mse
@@ -190,12 +193,11 @@ class MultiSenseLinearTranslator():
                           batch_size)
             for i in range(n_batch):
                 tg_batch = self.target_embed.syn0[i*batch_size:(i+1)*batch_size]
-                block = np.argsort(-translated_points.dot(tg_batch.T), axis=0).astype('int16'),
-                logging.debug(block)
-                logging.debug(block[0][0])
-                logging.debug(sr_vocab[block[0][0]])
-                logging.debug((self.target_embed.index2word[0],
-                               sr_vocab[block[0][0]]))
+                block = (-translated_points.dot(tg_batch.T)).argsort(axis=0).astype('int16')
+                for tg_i in range(100,110):
+                    logging.debug((
+                        self.target_embed.index2word[i*batch_size+tg_i],
+                        [sr_vocab[block[j,tg_i]] for j in range(10)]))
                 block = np.argsort(block, axis=0).astype('int16')
                 #32768
                 rev_rank_col_blocks.append(block)
@@ -211,6 +213,7 @@ class MultiSenseLinearTranslator():
         score_at10 = 0
         for sr_word, rev_rank_row in zip(sr_vocab, rev_rank_mx):
             if sr_word in self.test_dict:
+                # TODO skip training items
                 test_size_act += 1
                 tg_words = [self.target_embed.index2word[i] 
                             for  i in np.argsort(rev_rank_row)[:prec_level]]
