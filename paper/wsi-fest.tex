@@ -59,7 +59,7 @@
 %\end{abstract}
 
 \emph{Word sense induction} (WSI) is the task of discovering senses of words
-without supervision \citep{Schutze:1998}. Recent appraoches include multi-sense
+without supervision \citep{Schutze:1998}. Recent approaches include multi-sense
 word embeddings (MSEs), vector space models of word distribution with more
 vectors for ambiguous words, each vector corresponding to some word sense.
 \cite{Borbely:2016} proposed a cross-lingual method for the evaluation of MSEs
@@ -73,7 +73,7 @@ will very often translate to different words in the target language.
 
 \url{https://github.com/makrai/wsi-fest}
 
-\section{Monosemy: a less delicions sense inventory}
+\section{Monosemy: a less delicious sense inventory}
 
 Youn
 
@@ -82,14 +82,14 @@ Youn
 MSEs originate with \cite{Reisinger:2010,Huang:2012} who use a uniform number
 of clusters for all words that are selected as potentially ambiguous.
 adaptive sense numbers \citep{Neelakantan:2014}, new senses are introduced during training.
-Dirichlet process, AdaGram \citep{Bartunov:2015}, wheresenses may be merged as
+Dirichlet process, AdaGram \citep{Bartunov:2015}, where senses may be merged as
 well as allocated during training; and and mutli-sense skip-gram \citep{Li:2015}
 % mi a fő különbség Reisinger és Huang között?
 MSEs are yet in research phase, as \cite{Li:2015}  demonstrate that, when
 meta-parameters are carefully controlled for, MSEs introduce a slight
 performance boost in semantics-related tasks (semantic similarity for words and
 sentences, semantic relation identification, part-of-speech tagging), but
-similar improvements can be ahieved by increasing the dimension of a
+similar improvements can be achieved by increasing the dimension of a
 single-sense embedding.
 
 semantic resolution
@@ -164,7 +164,7 @@ as source model, and a single-sense embedding as target model.
 We evaluate a specific source MSE model in two ways 
 referred as \emph{single}, and \emph{multiple}.
 
-The tools that generate MSEs all provide fallbacks to singe-sense embeddings
+The tools that generate MSEs all provide fall-backs to singe-sense embeddings
 in the form of so called global vectors. The method \emph{single} can be
 considered as a baseline; a traditional, single-sense translation between the
 global vectors and the target vectors.  Note that the seed dictionary may
@@ -200,15 +200,15 @@ seed dictionary, extracted with
 
 \section{Acknowledgments}
 
-1957 has been an influential year in linguistics: \cite{Harris:1957} developed
-the frequency-aware variant of the distributional method, \cite{Osgood:1957}
-pioneerd vector space models, and the author of a more recent conceptual
+1957 was an influential year in linguistics: \cite{Harris:1957} developed the
+frequency-aware variant of the distributional method, \cite{Osgood:1957}
+pioneered vector space models, and the author of a more recent conceptual
 meaning representation framework \citep{Kornai:2010,Kornai:2017} was born.
 Fifty years later (more precisely in fall 2006) I learned András during a class
 he taught on the book he was writing \citep{Kornai:2007}. I heard about
 \emph{deep cases} and \emph{k\={a}rakas} sooner than I did about \emph{thematic
 roles}. The fact that he taught me computational linguistics in a master and
-disciple fashion comes at no surprise as there have been no such PhD scool in
+disciple fashion comes at no surprise as there have been no such PhD school in
 Hungary, not to mention mathematical linguistics proper.  
 % He advised my so called \emph{topic labor} and MSc at the Budapest University
 % of Technology and Economics, and 
@@ -227,7 +227,8 @@ lessons to learn in efficiency.
 
 % \cite{Swadesh:1955}
 
-\bibliographystyle{acl_natbib} \bibliography{ml}  
+\bibliographystyle{acl_natbib} 
+\bibliography{ml}  
 
 \end{document}
 
