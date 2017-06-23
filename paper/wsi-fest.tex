@@ -1,0 +1,234 @@
+\documentclass[11pt]{article}
+\usepackage{acl2016}
+\usepackage{url}
+%\usepackage{latexsym}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{natbib}
+\usepackage{hyperref}
+\usepackage{amsmath,amssymb,amsfonts,amsthm,amstext,amscd}
+\usepackage{color}
+\newcommand{\jiweil}{\texttt{jiweil}}
+\newcommand{\huang}{\texttt{huang}}
+\newcommand{\neelakantan}{\texttt{neela}}
+\newcommand{\Ro}{\mathbb{R}^{d_1}}
+\newcommand{\Rt}{\mathbb{R}^{d_2}}
+\usepackage{tikz}
+\usepackage{booktabs}
+%\usepackage{multirow,multicol}
+\usepackage{cleveref}
+%\usepackage{graphicx}
+%\usepackage{dblfloatfix}
+%\usepackage{array}
+%\usepackage{changepage}
+
+\hyphenation{poly-semy}
+%\usepackage{dcolumn}
+%\newcolumntype{d}[1]{D{.}{.}{#1}}
+
+%\usepackage{todonotes}
+
+\aclfinalcopy % Uncomment this line for the final submission
+\def\aclpaperid{28} %  Enter the acl Paper ID here
+
+\setlength\titlebox{8cm}
+%\setlength\titlebox{50ex}  % Vertical space allocated for \Authors 
+% You can expand the titlebox if you need extra space
+% to show all the authors. Please do not make the titlebox
+% smaller than 5cm (the original size); we will check this
+% in the camera-ready version and ask you to change it back.
+
+\title{Cross-lingual word sense induction with multi-sense word embeddings}
+\author{
+  Márton Makrai \\
+  %Institute for Linguistics\\ 
+  %Hungarian Academy of Sciences \\
+  %Bencz\'ur u. 33 \\ 1068 Budapest, Hungary \\
+  %{\tt makrai.marton@nytud.mta.hu} \\
+}
+\date{}
+
+\begin{document}
+\maketitle
+
+\hspace{2cm}
+
+%\begin{abstract}
+%\end{abstract}
+
+\emph{Word sense induction} (WSI) is the task of discovering senses of words
+without supervision \citep{Schutze:1998}. Recent appraoches include multi-sense
+word embeddings (MSEs), vector space models of word distribution with more
+vectors for ambiguous words, each vector corresponding to some word sense.
+\cite{Borbely:2016} proposed a cross-lingual method for the evaluation of MSEs
+exploiting the principle that words may be ambiguous as far as the postulated
+senses translate to different words in some other language. We follow
+\cite{Xing:2015} in formulating transformation as an orthogonal mapping from
+the source language embedding to the target one, trained on a seed of a few
+thousand word pairs. In the multi-sense setup, we perform such translations
+from MSEs, with the idea that what are different senses in the source language
+will very often translate to different words in the target language.
+
+\url{https://github.com/makrai/wsi-fest}
+
+\section{Monosemy: a less delicions sense inventory}
+
+Youn
+
+\section{Multi-sense word embeddings}
+
+MSEs originate with \cite{Reisinger:2010,Huang:2012} who use a uniform number
+of clusters for all words that are selected as potentially ambiguous.
+adaptive sense numbers \citep{Neelakantan:2014}, new senses are introduced during training.
+Dirichlet process, AdaGram \citep{Bartunov:2015}, wheresenses may be merged as
+well as allocated during training; and and mutli-sense skip-gram \citep{Li:2015}
+% mi a fő különbség Reisinger és Huang között?
+MSEs are yet in research phase, as \cite{Li:2015}  demonstrate that, when
+meta-parameters are carefully controlled for, MSEs introduce a slight
+performance boost in semantics-related tasks (semantic similarity for words and
+sentences, semantic relation identification, part-of-speech tagging), but
+similar improvements can be ahieved by increasing the dimension of a
+single-sense embedding.
+
+semantic resolution
+
+\section{Linear translation}
+
+ \cite{Mikolov:2013x} discovered that embeddings of different languages are so
+ similar that a linear transformation can map vectors of the source language
+ words to the vectors of their translations.  
+
+\begin{figure}[b]
+    \centering
+    \resizebox{\columnwidth}{!} {
+        \begin{tikzpicture}[line width=2pt] %[&gt;=stealth']
+            \tikzstyle{every node}=[font=\huge]
+            %\tikzset{every edge thick}
+            \node          (hf) at (2, 2)  {finom};
+            \node          (hf) at (1.7, 1.4)  {értelmezés};
+            \node          (hs) at (5, 4)  {finom};
+            \node          (hs) at (4.5, 4.6)  {tanulmány};
+            \node          (gf) at (11, 2) {fine};
+            \node          (gf) at (11, 1.4) {interpretation};
+            \node		 (gs) at (14, 4) {delicions};
+            \node		 (gs) at (15.5, 3.4) {memorandum };
+            \node (ho) at (0, 0) {};
+            \node (hx) at (8, 0) {};
+            \node (hy) at (0, 6) {};
+            \node (go) at (9,0) {};
+            \node (gx) at (17,0) {};
+            \node (gy) at (9,6) {};
+
+            \draw[->] (ho) edge (hx);
+            \draw[->] (ho) edge (hy);
+            \draw[->] (go) edge (gx);
+            \draw[->] (go) edge (gy);
+        \end{tikzpicture}
+    }
+    \caption{Linear translation of word senses. The Hungarian word
+        \emph{finom} is ambiguous between `fine' and `delicions'.  The two
+        senses are identified by the ``neighboring'' words \emph{értelmezés}
+    `interpretation' and \emph{tanulmány} `memorandum'.
+    } \label{fig:AdaGram}
+\end{figure}
+
+The method uses a seed dictionary of a few thousand words to learn translation
+as a linear mapping $W: \mathbb{R}^{d_1}\rightarrow \mathbb{R}^{d_2}$ from the
+source (monolingual) embedding to the target: the translation $z_i \in \Rt$ of
+a source word $x_i \in \Ro$ is approximately its image $Wx_i$ by the mapping.
+The translation model is trained with linear regression on the seed dictionary
+
+\[\min_W \sum_i || Wx_i - z_i ||^2 \]
+
+\noindent and can be used to collect translations for the whole vocabulary by
+choosing $z_i$ to be the nearest neighbor of $Wx_i$.
+
+% TODO We follow \cite{Mikolov:2013x} in using different metrics, Euclidean
+% distance in training and cosine similarity in collection of translations.
+% Though this choice is theoretically unmotivated, it seems to work better than
+% more consistent use of metrics; but see \citep{Xing:2015} for opposing
+% results.
+
+A common error in linear translation is when there are \emph{hubs}, target
+words returned as the translation of many words, which is wrong in most of the
+cases.  \cite{Dinu:2015} propose a method they call \emph{global correction}
+for decreasing the importance of such target words. Our experiments use this
+method.
+% Borbely:2016-ban nem használtuk a Dinu-nak a "global correction"-jét memória
+% problémák miatt
+
+In a multi-sense embedding scenario, we take a multi-sense embedding
+as source model, and a single-sense embedding as target model.
+We evaluate a specific source MSE model in two ways 
+referred as \emph{single}, and \emph{multiple}.
+
+The tools that generate MSEs all provide fallbacks to singe-sense embeddings
+in the form of so called global vectors. The method \emph{single} can be
+considered as a baseline; a traditional, single-sense translation between the
+global vectors and the target vectors.  Note that the seed dictionary may
+contain overlapping translation pairs: one word can have multiple translations
+in the gold data, and more than one word can have the same translation.  In
+the \emph{multiple} method we used the same translation matrix, trained on the
+global vectors, and inspected the translations of the different senses of the
+same source word.  Exploiting the multiple sense vectors one word can have
+more than one translation.
+
+\section{Data}
+
+\section{Experiments}
+
+restrict the vocabulary
+
+Two evaluation metrics were considered, \emph{lax} and \emph{strict}. In lax
+evaluation a translation is taken to be correct if any of the source word's
+senses are translated into any of its gold translations.  In strict evaluation
+the translations of the source word are expected to cover all of its gold
+translations.  For example if {\it finom} has two gold translations, {\it
+  delicions} and {\it fine}, and its actual translations are `delicions' and some
+word other than `fine', then it has a lax score of $2$, but a strict score
+of $1$.
+
+The quality of the translation was measured by training on the most frequent 5k
+word pairs and evaluating on another 1k seed pairs.  We used Witionary as our
+seed dictionary, extracted with
+\texttt{wikt2dict}\footnote{\url{https://github.com/juditacs/wikt2dict}}
+\citep{Acs:2016}. 
+% TODO shows the percentage of correctly translated words for {\bf
+% s}ingle-sense and {\bf m}ulti-sense translation. 
+
+\section{Acknowledgments}
+
+1957 has been an influential year in linguistics: \cite{Harris:1957} developed
+the frequency-aware variant of the distributional method, \cite{Osgood:1957}
+pioneerd vector space models, and the author of a more recent conceptual
+meaning representation framework \citep{Kornai:2010,Kornai:2017} was born.
+Fifty years later (more precisely in fall 2006) I learned András during a class
+he taught on the book he was writing \citep{Kornai:2007}. I heard about
+\emph{deep cases} and \emph{k\={a}rakas} sooner than I did about \emph{thematic
+roles}. The fact that he taught me computational linguistics in a master and
+disciple fashion comes at no surprise as there have been no such PhD scool in
+Hungary, not to mention mathematical linguistics proper.  
+% He advised my so called \emph{topic labor} and MSc at the Budapest University
+% of Technology and Economics, and 
+I started my PhD as a member of the 4lang project at the Institute for Computer
+Science and Control of the Hungarian Academy of Sciences. 
+
+Laozi says that a good leader does not leave a footprint, and András encouraged
+us to be independent and effective. One of his remarkable citations is that
+``It's easier to ask forgiveness than it is to get permission''. The proverb is
+sometimes attributed to the Jesuit, who are similar to András in having had a
+great impact on what I've become in the past ten years. The real source of the
+proverb is Grace Hopper, a computer scientist and US navy admiral who invented
+the first compiler and popularized the idea of machine-independent programming
+languages. Both the alleged and the real source remind me to that I still have
+lessons to learn in efficiency.
+
+% \cite{Swadesh:1955}
+
+\bibliographystyle{acl_natbib} \bibliography{ml}  
+
+\end{document}
+
+%\section{Ten years of semi-supervised word sense induction} 
