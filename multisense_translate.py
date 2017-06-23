@@ -72,7 +72,7 @@ class MultiSenseLinearTranslator():
                 self.train_sr[train_size_act] = self.source_firsts[sr]
                 self.train_tg[train_size_act] = self.target_embed[tg]
                 train_size_act += 1
-        logging.info('trained on {} words'.format(len(self.train_sr)))
+        logging.info('Trained on {} words'.format(len(self.train_sr)))
         if self.args.orthog:
             # formula taken from https://github.com/hlt-bme-hu/eval-embed
             m = self.train_sr.T.dot(self.train_tg)
@@ -87,11 +87,10 @@ class MultiSenseLinearTranslator():
 
     def test(self, restrict_vocab=10000):
         def read_test_dict():
-            with open(self.args.seed_dict) as seed_f:
-                self.test_dict = defaultdict(set)
-                for line in seed_f.readlines():
-                    tg, sr = line.split()
-                    self.test_dict[sr].add(tg)
+            self.test_dict = defaultdict(set)
+            for line in self.seed_f.readlines():
+                tg, sr = line.split()
+                self.test_dict[sr].add(tg)
 
         def neighbors_by_vector(vect):
             sense_neighbors, _ = zip(*self.target_embed.similar_by_vector(
@@ -171,14 +170,16 @@ class MultiSenseLinearTranslator():
         """ 
         def read_sr_eembed():
             vocab_size, dim = open(self.args.source_mse).readline().strip().split()
-            logging.info('Reading source mx...')
+            logging.info(
+                'Reading source mx from {}...'.format(self.args.source_mse))
             source_mse = np.genfromtxt(
                 self.args.source_mse, skip_header=1, max_rows=vocab_limit,
                 usecols=np.arange(1, int(dim)+1), dtype='float16', comments=None)
             sr_vocab = [line.split()[0] for line in
                         open(self.args.source_mse).readlines()[:vocab_limit]]
-            logging.debug('Source vocab and mx read {}'.format(
-                (len(sr_vocab), source_mse.shape)))
+            logging.debug(
+                'Source vocab and mx read with shapes {} and {}'.format(
+                    len(sr_vocab), source_mse.shape))
             return sr_vocab, source_mse
 
         def get_rev_rank():
@@ -189,9 +190,13 @@ class MultiSenseLinearTranslator():
                           batch_size)
             for i in range(n_batch):
                 tg_batch = self.target_embed.syn0[i*batch_size:(i+1)*batch_size]
-                block = np.argsort(np.argsort(-translated_points.dot(tg_batch.T),
-                                   axis=0).astype('int16'),
-                                   axis=0).astype('int16')
+                block = np.argsort(-translated_points.dot(tg_batch.T), axis=0).astype('int16'),
+                logging.debug(block)
+                logging.debug(block[0][0])
+                logging.debug(sr_vocab[block[0][0]])
+                logging.debug((self.target_embed.index2word[0],
+                               sr_vocab[block[0][0]]))
+                block = np.argsort(block, axis=0).astype('int16')
                 #32768
                 rev_rank_col_blocks.append(block)
                 logging.debug( 
