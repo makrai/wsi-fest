@@ -133,7 +133,7 @@ class MultiSenseLinearTranslator():
         if self.args.reverse:
             return self.reverse_nn()
         with open(self.args.source_mse) as source_mse:
-            logging.info(
+            logging.debug(
                 'skipping header: {}'.format(source_mse.readline().strip()))
             self.good_disambig = 0
             sr_word = ''
@@ -207,8 +207,8 @@ class MultiSenseLinearTranslator():
             logging.info('Populating reverse neighbor rank mx...')
             rev_rank_col_blocks = [] 
             batch_size = 10000
-            n_batch = int(min(self.target_embed.syn0.shape[0], self.args.restrict_vocab) /
-                          batch_size)
+            n_batch = max(int(min(self.target_embed.syn0.shape[0], self.args.restrict_vocab) /
+                          batch_size),1)
             for i in range(n_batch):
                 tg_batch = self.target_embed.syn0[i*batch_size:(i+1)*batch_size]
                 block = translated_points.dot(tg_batch.T)
@@ -237,7 +237,7 @@ class MultiSenseLinearTranslator():
                             for  i in rev_rank_row[:prec_level]]
                 if not test_size_act % 100:
                     logging.debug((sr_word, self.test_dict[sr_word],
-                                   set(tg_words),
+                                   tg_words[:5],
                                    self.test_dict[sr_word].intersection(set(tg_words))))
                 if self.test_dict[sr_word].intersection(set(tg_words)):
                     score_at10 += 1
