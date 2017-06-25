@@ -36,9 +36,12 @@ class MultiSenseLinearTranslator():
         parser.add_argument(
             '--general-linear-mapping', dest='orthog', action='store_false')
         parser.add_argument('--translate_all', action='store_true')
-        parser.add_argument('--reverse', action='store_true')
+        parser.add_argument('--vanilla-nn-search', dest='reverse',
+                            action='store_false', 
+                            help='Do not compute reverse NNs')
         parser.add_argument('--restrict_vocab', type=int, default=2**16,
                             help='default is 2^16, cca 66 K')
+        parser.add_argument('--prec_level', type=int, default=10)
         return parser.parse_args()
 
     def __init__(self):
@@ -90,7 +93,7 @@ class MultiSenseLinearTranslator():
             self.regression = LinearRegression(n_jobs=-2)
             self.regression.fit(self.train_sr, self.train_tg)
 
-    def test(self, prec_level=10):
+    def test(self):
         """
         In reverse mode, instead of ranking the nearest neighbors of the
         computed point in target space, we rank source words by the distance of
@@ -113,7 +116,7 @@ class MultiSenseLinearTranslator():
             logging.info(
                 'prec after testing on {} words: {:%} (good_disambig: {})'.format(
                     self.test_size_act,
-                    float(self.score_at10)/self.test_size_act,
+                    float(self.score)/self.test_size_act,
                     self.good_disambig))
 
         def eval_word(sr_word, neighbor_by_vec):
@@ -121,7 +124,7 @@ class MultiSenseLinearTranslator():
             hit_by_vec = [ns.intersection(self.test_dict[sr_word])
                           for ns in neighbor_by_vec]
             if reduce(set.union, hit_by_vec):
-                self.score_at10 += 1
+                self.score += 1
                 common_hits = reduce(set.intersection, hit_by_vec)
                 uniq_hits_by_vec = [trans - common_hits
                                     for trans in hit_by_vec]
@@ -133,9 +136,8 @@ class MultiSenseLinearTranslator():
                     uniq_hit_sets.sort(key=len, reverse=True)
                     sim = ''
                     if len(uniq_hit_sets) == 2:
-                        w1, w2 = [hits.pop for hits in uniq_hit_sets]
-                        # sim = self.target_embed.similarity(w1, w2)
-                    if not self.good_disambig % 10:
+                        w1, w2 = [list(hits)[0] for hits in uniq_hit_sets]
+                        sim = self.target_embed.similarity(w1, w2)
                         logging.debug(( sr_word, uniq_hit_sets, sim,
                                        '_'.join(common_hits),
                                        self.good_disambig))
@@ -145,7 +147,7 @@ class MultiSenseLinearTranslator():
         # Inner functions used only in the vanilla (non-reverse) version
         def neighbors_by_vector(vect):
             sense_neighbors, _ = zip(*self.target_embed.similar_by_vector(
-                vect, restrict_vocab=self.args.restrict_vocab, topn=prec_level))
+                vect, restrict_vocab=self.args.restrict_vocab, topn=self.args.prec_level))
             return set(sense_neighbors)
             # We loose the order of neighbors. Keeping it have been tried and
             # brought no improvement.
@@ -195,7 +197,7 @@ class MultiSenseLinearTranslator():
         def init_test():
             self.test_size_goal = 1000
             self.test_size_act = 0
-            self.score_at10 = 0
+            self.score = 0
             self.good_disambig = 0
             read_test_dict()
             if self.args.reverse:
@@ -231,7 +233,7 @@ class MultiSenseLinearTranslator():
                             rev_rank_row_block = self.rev_rank_mx[act_sense_indices]
                             neighbor_by_vec = [
                                 set(self.target_embed.index2word[i] 
-                                 for  i in rev_rank_row[:prec_level]) 
+                                 for  i in rev_rank_row[:self.args.prec_level]) 
                                 for rev_rank_row in rev_rank_row_block]
                         else:
                             tg_vecs = np.concatenate(sr_vecs).dot(self.regression.coef_.T)
@@ -244,16 +246,8 @@ class MultiSenseLinearTranslator():
                     self.sr_i += 1
                 else:
                     sr_vecs.append(np.fromstring(vect_str, sep=' ').reshape((1,-1)))
-        return float(self.score_at10)/self.test_size_act
+        return float(self.score)/self.test_size_act
 
 
 if __name__ == '__main__':
     print(MultiSenseLinearTranslator().main())
-
-"""
-if len(good_vecs) > 2:
-    sim_mx = good_vecs.dot(good_vecs.T)
-    ij = np.unravel_index( np.argmin(sim_mx), sim_mx.shape)
-    tgw1, tgw2 = [hit_by_vec[i] for i in ij]
-    logging.debug((sr_word, hit_by_vec, tgw1, tgw2))
-    """
