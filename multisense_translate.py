@@ -101,6 +101,8 @@ class MultiSenseLinearTranslator():
             sense_neighbors, _ = zip(*self.target_embed.similar_by_vector(
                 vect, restrict_vocab=self.args.restrict_vocab))
             return set(sense_neighbors)
+            # We loose the order of neighbors. Keeping it have been tried and
+            # brought no improvement.
 
         def eval_word(sr_word, sr_vecs):
             # TODO monitor the neighborhood rank of the good translations
@@ -120,7 +122,11 @@ class MultiSenseLinearTranslator():
                     uniq_hit_sets = [neigh.split(' ') 
                                      for neigh in uniq_hit_sets]
                     uniq_hit_sets.sort(key=len, reverse=True)
-                    logging.debug(( sr_word, uniq_hit_sets,
+                    sim = ''
+                    if len(uniq_hit_sets) == 2:
+                        w1, w2 = [hits.pop for hits in uniq_hit_sets]
+                        #sim = self.target_embed.similarity(w1, w2) 
+                    logging.debug(( sr_word, uniq_hit_sets, sim,
                                    '_'.join(common_hits), self.good_disambig))
             if not self.test_size_act % 1000 and self.test_size_act:
                 self.log_prec()
@@ -224,7 +230,13 @@ class MultiSenseLinearTranslator():
             rev_rank_mx = rev_rank_mx.argsort().astype('uint16')
             return rev_rank_mx
 
+        def normalize(vecs):
+            vecs /= np.apply_along_axis(np.linalg.norm, 1,
+                                        vecs).reshape((-1,1))
+
         sr_vocab, source_mse = read_sr_embed()
+        normalize(source_mse)
+        normalize(self.target_embed.syn0) 
         translated_points = source_mse.dot(self.regression.coef_.T)
         rev_rank_mx = get_rev_rank()
         test_size_act = 0
