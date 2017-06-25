@@ -28,7 +28,7 @@ class MultiSenseLinearTranslator():
             'glove.840B.300d.gensim')
         parser.add_argument(
             '--seed_dict',
-            default='/mnt/store/makrai/data/language/hungarian/dict/' 
+            default='/mnt/store/makrai/data/language/hungarian/dict/'
             'wikt2dict-en-hu.by-freq',
             help='Name of the seed dictionary file. The order of the source'
             ' and the target language in the arguments for embeddings and in'
@@ -104,28 +104,25 @@ class MultiSenseLinearTranslator():
             # We loose the order of neighbors. Keeping it have been tried and
             # brought no improvement.
 
-        def eval_word(sr_word, sr_vecs):
+        def eval_word(sr_word, neighbor_by_vec):
             # TODO monitor the neighborhood rank of the good translations
-            self.test_size_act += 1
-            tg_vecs = np.concatenate(sr_vecs).dot(self.regression.coef_.T)
-            neighbor_by_vec = [neighbors_by_vector(v) for v in tg_vecs]
-            hit_by_vec = [ns.intersection(self.test_dict[sr_word]) 
+            hit_by_vec = [ns.intersection(self.test_dict[sr_word])
                           for ns in neighbor_by_vec]
             if reduce(set.union, hit_by_vec):
                 self.score_at10 += 1
                 common_hits = reduce(set.intersection, hit_by_vec)
-                uniq_hits_by_vec = [trans - common_hits 
+                uniq_hits_by_vec = [trans - common_hits
                                     for trans in hit_by_vec]
                 uniq_hit_sets = set(' '.join(s) for s in uniq_hits_by_vec if s)
                 if len(uniq_hit_sets) > 1:
                     self.good_disambig += 1
-                    uniq_hit_sets = [neigh.split(' ') 
+                    uniq_hit_sets = [neigh.split(' ')
                                      for neigh in uniq_hit_sets]
                     uniq_hit_sets.sort(key=len, reverse=True)
                     sim = ''
                     if len(uniq_hit_sets) == 2:
                         w1, w2 = [hits.pop for hits in uniq_hit_sets]
-                        #sim = self.target_embed.similarity(w1, w2) 
+                        #sim = self.target_embed.similarity(w1, w2)
                     logging.debug(( sr_word, uniq_hit_sets, sim,
                                    '_'.join(common_hits), self.good_disambig))
             if not self.test_size_act % 1000 and self.test_size_act:
@@ -144,7 +141,7 @@ class MultiSenseLinearTranslator():
             self.good_disambig = 0
             sr_word = ''
             sr_vecs = []
-            while (self.args.translate_all 
+            while (self.args.translate_all
                    or self.test_size_act < self.test_size_goal):
                 line = source_mse.readline()
                 if not line:
@@ -154,7 +151,10 @@ class MultiSenseLinearTranslator():
                 new_sr_word, vect_str = line.strip().split(maxsplit=1)
                 if new_sr_word != sr_word:
                     if sr_word in self.test_dict:
-                        eval_word(sr_word, sr_vecs)
+                        self.test_size_act += 1
+                        tg_vecs = np.concatenate(sr_vecs).dot(self.regression.coef_.T)
+                        neighbor_by_vec = [neighbors_by_vector(v) for v in tg_vecs]
+                        eval_word(sr_word, neighbor_by_vec)
                     sr_word = new_sr_word
                     sr_vecs = []
                 sr_vecs.append(np.fromstring(vect_str, sep=' ').reshape((1,-1)))
@@ -176,7 +176,7 @@ class MultiSenseLinearTranslator():
         G. Dinu, A. Lazaridou and M. Baroni
         Improving zero-shot learning by mitigating the hubness problem.
         Proceedings of ICLR 2015, workshop track
-        """ 
+        """
         def read_sr_embed():
             logging.info(
                 'Reading source mx from {}...'.format(self.args.source_mse))
@@ -196,22 +196,22 @@ class MultiSenseLinearTranslator():
             start_debug_word = 500
             show_level = 8
             for debug_word_i in range(start_debug_word, start_debug_word+10):
-                if sort_fwd: 
+                if sort_fwd:
                     translation = (
                         sr_vocab[debug_word_i],
-                        [self.target_embed.index2word[i*batch_size+block[debug_word_i,j]] 
+                        [self.target_embed.index2word[i*batch_size+block[debug_word_i,j]]
                          for j in range(show_level)])
                 else:
                     translation = (
                         self.target_embed.index2word[i*batch_size+debug_word_i],
-                        [sr_vocab[block[j,debug_word_i]] 
+                        [sr_vocab[block[j,debug_word_i]]
                          for j in range(show_level)]
                     )
                 logging.debug(translation)
 
         def get_rev_rank(debug=False):
             logging.info('Populating reverse neighbor rank mx...')
-            rev_rank_col_blocks = [] 
+            rev_rank_col_blocks = []
             batch_size = 10000
             n_batch = max(int(min(self.target_embed.syn0.shape[0], self.args.restrict_vocab) /
                           batch_size),1)
@@ -221,7 +221,7 @@ class MultiSenseLinearTranslator():
                 block = (-block).argsort(axis=0).astype('uint16')
                 block = block.argsort(axis=0).astype('uint16')
                 rev_rank_col_blocks.append(block)
-                logging.debug( 
+                logging.debug(
                     '{:.1%} of reverse neighbor rank mx populated, {} {}'.format(
                         float(i+1)/n_batch, block.dtype, block.shape))
             rev_rank_mx = np.concatenate(rev_rank_col_blocks,
@@ -236,7 +236,7 @@ class MultiSenseLinearTranslator():
 
         sr_vocab, source_mse = read_sr_embed()
         normalize(source_mse)
-        normalize(self.target_embed.syn0) 
+        normalize(self.target_embed.syn0)
         translated_points = source_mse.dot(self.regression.coef_.T)
         rev_rank_mx = get_rev_rank()
         test_size_act = 0
@@ -245,7 +245,7 @@ class MultiSenseLinearTranslator():
             if sr_word in self.test_dict:
                 # TODO skip training items
                 test_size_act += 1
-                tg_words = [self.target_embed.index2word[i] 
+                tg_words = [self.target_embed.index2word[i]
                             for  i in rev_rank_row[:prec_level]]
                 if not test_size_act % 100:
                     logging.debug((sr_word, self.test_dict[sr_word],
