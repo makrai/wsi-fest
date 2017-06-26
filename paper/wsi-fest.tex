@@ -75,15 +75,123 @@ will very often translate to different words in the target language.
 
 \section{Monosemy: a less delicious sense inventory}
 
-Youn
+The differentiation of word senses, as already noted in \cite{Borbely:2016}, is
+fraught with difficulties, especially when we wish to distinguish homophony,
+using the same written or spoken form to express different concepts, such as
+Russian {\it mir} `world' and {\it mir} `peace' from polysemy, where speakers
+feel that the two senses are very strongly connected, such as in Hungarian {\it
+nap} `day' and {\it nap} `sun'.  To quote \cite{Zgusta:1971} ``Of course it is
+a pity that we have to rely on the subjective interpretations of the speakers,
+but we have hardly anything else on hand''. Etymology makes clear that
+different languages make different lump/split decisions in the conceptual
+space, so much so that translational relatedness can, to a remarkable extent,
+be used to recover the universal clustering \citep{Youn:2016}.
 
+\subsection{Lexical ambiguity (Veronika Lipp)}
+
+Lexical ambiguity is linguistically subdivided into two main categories:
+\emph{homonymy and polysemy} \citep{Cruse:2004}. Homonymous words have semantically
+unrelated and mutually incompatible meanings, such as \emph{punch$_1$} , which
+means `a blow with a fist', and \emph{punch$_2$}, which means `a drink'. Some
+have described such homonymous word meanings as essentially distinct words that
+accidentally have the same phonology (e.g., Murphy, 2002). Polysemous words, on
+the other hand, have semantically related or overlapping senses (\cite{Cruse:2004,Jackendoff:02, Pustejovsky:19995}), such as \emph{mouth} meaning both `organ
+of body' and `entrance of cave'.
+
+Two criteria have been proposed for the distinction between homonymy and
+polysemy. The first criterion has to do with the \emph{etymological} derivation
+of words. Words that are historically derived from distinct lexical items are
+taken to be homonymous. However, the etymological criterion is not always
+decisive. One reason is that there are many words whose historical derivation
+is uncertain. Another reason is that it is not always very clear how far back
+we should go in tracing the history of words \citep{Lyons:1977}.  
+
+The second criterion for the distinction between homonymy and polysemy has to
+do with the \emph{relatedness/unrelatedness of meaning}.  The distinction
+between homonymy and polysemy seems to correlate with the native speaker’s
+feeling that certain meanings are connected and that others are not. Generally,
+unrelatedness in meaning points to homonymy, whereas relatedness in meaning
+points to polysemy. 
+% Marci: ez utóbbi mondat fontos a projekt szempontjából. Ha húzunk, akkor
+% inkább a %teljes etymological bekezdést hagyjuk el.
+% However, it seems that ``relatedness of meaning'' is not an all-or-nothing
+% relation, but rather a matter of degree.
+However, in a large number of cases, there does not seem to be an agreement among native
+speakers as to whether the meanings of the words are related. So, it seems that
+there is not a clear dichotomy between homonymy and polysemy, but rather a
+continuum from ‘‘pure’’ homonymy to ‘‘pure’’ polysemy \citep{Lyons:1977}.
+
+Most discussions about lexical ambiguity, within theoretical and computational
+linguistics, concentrate on polysemy, which can be further divided into two
+types (c.f. \cite{apr:1974} and \cite{pus:19995}). The first type of polysemy is motivated by
+\emph{metaphor (irregular polysemy)}. In metaphorical polysemy, a relation of analogy is assumed to
+hold between the senses of the word. The basic sense of metaphorical polysemy
+is literal, whereas its secondary sense is figurative. For example, the
+ambiguous word \emph{eye} has the literal basic sense  `organ of the body' and
+the figurative secondary sense `hole in a needle.' The other type of polysemy
+is motivated by \emph{metonymy (regular polysemy)}. In metonymy, the relation that is assumed to
+hold between the senses of the word is that of contiguity or connectedness.
+%Apresjan argued that metonymically motivated polysemy respects the usual
+%notion of polysemy, which is the ability of a word to have several distinct
+%but related meanings. 
+In metonymic polysemy, both the basic and the secondary senses are literal. For
+example, the ambiguous word \emph{chicken} has the literal basic sense
+referring to the animal and the literal secondary sense of the meat of that
+animal. 
+
+% It is customary in the literature to distinguish between regular or logical
+% polysemy, on the one hand, and irregular or accidental polysemy, on the other
+% (Apresjan, 1974; Pustejovsky, 1995). 
+
+``After centuries of practical lexicography, there is still hardly any
+consensus on how to divide the semantic space of a lexical item''
+\citep{mee:2006}. This is reflected in the fact that dictionaries, even those for
+the same types of users and of similar size, offer (very) different sense
+division of many words. As \citet{moo:1987} says, there is no absolute answer on
+how many senses a word has and in which order they should be presented. Senses
+of polysemous words can be described at different levels of granularity, either
+more towards broader categories (lumping) of fine-grained ones (splitting),
+depending on the purpose of the dictionary, its size, target users etc.
+
+One of the problems of dictionaries is their approach to meaning description,
+i.e.~presenting words in isolation using the numbered lists of definitions
+%(which are actually a metalexicographic construct), fails to reflect actual
+language use \citep{han:2000}. Sue Atkins, a well-known lexicographer, has
+famously said that she does not believe in word senses \citep{kil:19997}.
+Similarly, researchers in translation theory (\cite{nid:19997}) have argued that
+words have no meaning without context. Context is the key for describing word
+meanings and disambiguating between them, an idea that goes back to Firth and
+his famous quote ``You shall know by the company it keeps'' \citep{Firth:1957}.
+Another theory that is based on this view is lexical
+priming by \citet{hoe:2005} whose research shows that collocations, semantic
+associations and colligations of a word play a decisive role in differentiating
+between its senses.
+%In relation to this, it is particularly important to mention Hanks' theory of Norms and Exploitations (Hanks 2013), which has at its core the idea that isolated words do not have meanings, but rather meaning potentials. According to Hanks, word meanings do exist, ``but traditional descriptions are misleading'' (ibid.: 82). Hanks goes on to suggest that a major future task in addressing meaning ``will be to identify meaning components, the ways in which they combine, relations with the meaning components of semantically related words, and the phraseological circumstances in which they are activated'' (ibid.: 82). This is highly relevant not only for lexicography, but also for linguistics in general, as well as other disciplines such as natural language processing.
+Word ambiguity may pose great problems in language understanding both by humans and computers.
+%T may pose great problems of 
+%T legyünk szerényebbek: önamgában az hogy a szavaknak több jelentésük van nem feltétlenül okoz problémát a beszélőknek. A megfelelő kontextusban ugyanis fel sem tűnik nekik, hogy más jelentései is vannak a szavaknak, amelyeket használnak. 
+%The underlying reason for this is twofold: first, lexicons may comprise overlapping meanings, which render the unique assignment of the right meaning to the given word impossible even for human annotators (above chance assignment). Secondly, the granularity of senses in the lexicon may differ, which, to the extreme, may result in one sense being completely subsumed under the other.
+As discussed above, homonymy, metonymy and polysemy have fuzzy borders 
+%where co-occurrence statistics and cross-lingual comparison provide two independent sources of information. 
+therefore, a methodology is needed that is able to clear-cut the fuzzy border of overlapping meanings and is able to find the right grain-size for the specific task.
+
+%Moreover, listing as many senses of an ambiguous word (or frames attaching to a verb) as we can, misses the information that some meanings (and frames) are related. It is standard to distinguish \emph{homonymy}, arbitrary coincidence of word forms e.g.~Hungarian \emph{vár} `wait; castle', \emph{metonymy} (e.g.~\emph{school} and many other institution nouns are used to express both the building and the people involved), and  \emph{polysemy} (word forms with related but remarkably different senses e.g.~Hungarian \emph{nap} `day; Sun` or \emph{gerinc} `spine; ridge').
+%E.:information for what. 
+%The three categories have fuzzy borders where 
+Co-occurrence statistics and cross-lingual comparison provide two independent sources of information.
+\citet{Youn:2016} analyses the universal structure of lexical semantics, and show
+that some concepts are more prone to polysemy than others, and that there are
+clusters of concepts within which polysemy is significantly more frequent
+than across the clusters. 
+% While homonyms are usually considered to be non-overlapping semantic fields that easily lend themselves to sense-tagging, polysemic meanings pose real challenge for sense-tagging as they are more likely to be overlapping entities.
 \section{Multi-sense word embeddings}
 
 MSEs originate with \cite{Reisinger:2010,Huang:2012} who use a uniform number
-of clusters for all words that are selected as potentially ambiguous.
-adaptive sense numbers \citep{Neelakantan:2014}, new senses are introduced during training.
-Dirichlet process, AdaGram \citep{Bartunov:2015}, where senses may be merged as
-well as allocated during training; and and mutli-sense skip-gram \citep{Li:2015}
+of clusters for all words that are selected as potentially ambiguous.  adaptive
+sense numbers \citep{Neelakantan:2014}, new senses are introduced during
+training.  Dirichlet process, AdaGram \citep{Bartunov:2015}, where senses may
+be merged as well as allocated during training; and and mutli-sense skip-gram
+\citep{Li:2015}
 % mi a fő különbség Reisinger és Huang között?
 MSEs are yet in research phase, as \cite{Li:2015}  demonstrate that, when
 meta-parameters are carefully controlled for, MSEs introduce a slight
@@ -198,6 +306,10 @@ seed dictionary, extracted with
 % TODO shows the percentage of correctly translated words for {\bf
 % s}ingle-sense and {\bf m}ulti-sense translation. 
 
+``forward'' neighbor search: precision increases with vocabulary cut-off
+(tryied up to $2^16=65536$
+
+
 \section{Acknowledgments}
 
 1957 was an influential year in linguistics: \cite{Harris:1957} developed the
@@ -228,7 +340,7 @@ lessons to learn in efficiency.
 % \cite{Swadesh:1955}
 
 \bibliographystyle{acl_natbib} 
-\bibliography{ml}  
+\bibliography{snn}  
 
 \end{document}
 
