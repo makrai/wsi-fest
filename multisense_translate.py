@@ -135,10 +135,10 @@ class MultiSenseLinearTranslator():
                                      for neigh in uniq_hit_sets]
                     uniq_hit_sets.sort(key=len, reverse=True)
                     sim = ''
-                    if len(uniq_hit_sets) == 2:
-                        w1, w2 = [list(hits)[0] for hits in uniq_hit_sets]
+                    if len(uniq_hit_sets) > 1:
+                        w1, w2 = [list(hits)[0] for hits in uniq_hit_sets[:2]]
                         sim = self.target_embed.similarity(w1, w2)
-                        logging.debug(( sr_word, uniq_hit_sets, sim,
+                        print((sim, sr_word, uniq_hit_sets, 
                                        '_'.join(common_hits),
                                        self.good_disambig))
             if not self.test_size_act % 1000 and self.test_size_act:
@@ -250,4 +250,4 @@ class MultiSenseLinearTranslator():
 
 
 if __name__ == '__main__':
-    print(MultiSenseLinearTranslator().main())
+    print('{:.1%}'.format(MultiSenseLinearTranslator().main()))
