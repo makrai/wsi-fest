@@ -16,35 +16,10 @@ class MultiSenseLinearTranslator():
     Cross-lingual word sense induction experiments: linear translation (Mikolov
     2013: Exploiting...) from multi-sense word embeddings (MSEs)
     """
-    def parse_args(self):
-        parser = argparse.ArgumentParser()
-        parser.add_argument(
-            '--source_mse',
-            default='/mnt/permanent/Language/Hungarian/Embed/multiprot/adagram/mnsz/'
-            'adagram-mnsz-600d-a.05-5p-m100_sense.mse')
-        parser.add_argument(
-            '--target_embed',
-            default='/mnt/permanent/Language/English/Embed/'
-            'glove.840B.300d.gensim')
-        parser.add_argument(
-            '--seed_dict',
-            default='/mnt/store/makrai/data/language/hungarian/dict/'
-            'wikt2dict-en-hu.by-freq',
-            help='Name of the seed dictionary file. The order of the source'
-            ' and the target language in the arguments for embeddings and in'
-            ' the word pairs in the seed file is opposite')
-        parser.add_argument(
-            '--general-linear-mapping', dest='orthog', action='store_false')
-        parser.add_argument('--translate_all', action='store_true')
-        parser.add_argument('--vanilla-nn-search', dest='reverse',
-                            action='store_false', 
-                            help='Do not compute reverse NNs')
-        parser.add_argument('--restrict_vocab', type=int, default=2**16,
-                            help='default is 2^16, cca 66 K')
-        parser.add_argument('--prec_level', type=int, default=10)
-        return parser.parse_args()
 
-    def __init__(self):
+    def __init__(self, args=None, source_mse=None, target_embed=None,
+                 seed_dict=None, orthog=None, translate_all=None, reverse=None,
+                 restrict_vocab=None, prec_level=None):
         def get_first_vectors(filen):
             root, ext = os.path.splitext(filen)
             gens_fn = '{}.gensim'.format(root)
@@ -55,13 +30,23 @@ class MultiSenseLinearTranslator():
                 embed.save(gens_fn)
                 return embed
 
-        self.args = self.parse_args()
+        if args:
+            self.args = args
+        else:
+            self.args = argparse.Namespace()
+            self.args.source_mse = source_mse if source_mse else '/mnt/permanent/Language/Hungarian/Embed/multiprot/adagram/mnsz/adagram-mnsz-600d-a.05-5p-m100_sense.mse'
+            self.args.target_embed = target_embed if target_embed else '/mnt/permanent/Language/English/Embed/glove.840B.300d.gensim'
+            self.args.seed_dict = seed_dict if seed_dict else '/mnt/store/makrai/data/language/hungarian/dict/wikt2dict-en-hu.by-freq'
+            self.args.orthog = orthog if orthog else  False
+            self.args.translate_all = translate_all if translate_all else  False
+            self.args.reverse = reverse if reverse else  True
+            self.args.restrict_vocab = restrict_vocab if restrict_vocab else  2**16
+            self.args.prec_level = prec_level if prec_level else  10
         self.source_firsts = get_first_vectors(self.args.source_mse)
         logging.basicConfig(
             format="%(asctime)s %(module)s (%(lineno)s) %(levelname)s %(message)s",
             level=logging.DEBUG)
-        self.target_embed = get_first_vectors(self.args.target_embed)
-
+        self.target_embed = get_first_vectors(self.args.target_embed) 
 
     def main(self):
         with open(self.args.seed_dict) as self.seed_f:
@@ -134,13 +119,14 @@ class MultiSenseLinearTranslator():
                     uniq_hit_sets = [neigh.split(' ')
                                      for neigh in uniq_hit_sets]
                     uniq_hit_sets.sort(key=len, reverse=True)
-                    sim = ''
                     if len(uniq_hit_sets) > 1:
                         w1, w2 = [list(hits)[0] for hits in uniq_hit_sets[:2]]
                         sim = self.target_embed.similarity(w1, w2)
-                        print((sim, sr_word, uniq_hit_sets, 
-                                       '_'.join(common_hits),
-                                       self.good_disambig))
+                        self.sims.append(sim)
+                        #print
+                        logging.debug('{} {} {} {} {}'.format(
+                            sim, sr_word, uniq_hit_sets, '_'.join(common_hits),
+                            self.good_disambig))
             if not self.test_size_act % 1000 and self.test_size_act:
                 log_prec()
 
@@ -217,6 +203,7 @@ class MultiSenseLinearTranslator():
             sr_word = ''
             sr_vecs = [] # sr_vecs is NOT used in reverse mode
             act_sense_indices = []
+            self.sims = []
             while (self.args.translate_all
                    or self.test_size_act < self.test_size_goal):
                 line = source_mse.readline()
@@ -246,8 +233,38 @@ class MultiSenseLinearTranslator():
                     self.sr_i += 1
                 else:
                     sr_vecs.append(np.fromstring(vect_str, sep=' ').reshape((1,-1)))
-        return float(self.score)/self.test_size_act
+        print('{:.1%}'.format(float(self.score)/self.test_size_act))
+        return self.sims
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--source_mse',
+        default='/mnt/permanent/Language/Hungarian/Embed/multiprot/adagram/mnsz/'
+        'adagram-mnsz-600d-a.05-5p-m100_sense.mse')
+    parser.add_argument(
+        '--target_embed',
+        default='/mnt/permanent/Language/English/Embed/'
+        'glove.840B.300d.gensim')
+    parser.add_argument(
+        '--seed_dict',
+        default='/mnt/store/makrai/data/language/hungarian/dict/'
+        'wikt2dict-en-hu.by-freq',
+        help='Name of the seed dictionary file. The order of the source'
+        ' and the target language in the arguments for embeddings and in'
+        ' the word pairs in the seed file is opposite')
+    parser.add_argument(
+        '--general-linear-mapping', dest='orthog', action='store_false')
+    parser.add_argument('--translate_all', action='store_true')
+    parser.add_argument('--vanilla-nn-search', dest='reverse',
+                        action='store_false', 
+                        help='Do not compute reverse NNs')
+    parser.add_argument('--restrict_vocab', type=int, default=2**16,
+                        help='default is 2^16, cca 66 K')
+    parser.add_argument('--prec_level', type=int, default=10)
+    return parser.parse_args()
 
 
 if __name__ == '__main__':
-    print('{:.1%}'.format(MultiSenseLinearTranslator().main()))
+    MultiSenseLinearTranslator(args=parse_args()).main()
