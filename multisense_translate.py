@@ -250,4 +250,4 @@ class MultiSenseLinearTranslator():
 
 
 if __name__ == '__main__':
-    print(MultiSenseLinearTranslator().main())
+    print('{:.1%}'.format(MultiSenseLinearTranslator().main()))
