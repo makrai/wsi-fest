@@ -111,7 +111,9 @@ different languages make different lump/split decisions in the conceptual
 space, so much so that translational relatedness can, to a remarkable extent,
 be used to recover the universal clustering \citep{Youn:2016}.
 
-\subsection{Background in lexicography}
+\subsection{Lexicographic Background (Veronika Lipp)}
+
+\label{sec:bground}
 
 Lexical ambiguity is linguistically subdivided into two main categories:
 \emph{homonymy and polysemy} \citep{Cruse:2004}. Homonymous words have
@@ -316,8 +318,26 @@ seed dictionary, extracted with
 % TODO shows the percentage of correctly translated words for {\bf
 % s}ingle-sense and {\bf m}ulti-sense translation. 
 
-``forward'' neighbor search: precision increases with vocabulary cut-off
-(tryied up to $2^{16}=65536$
+``forward'' neighbor search: precision increases with vocabulary cut-off, see
+\autoref{tab:prec}
+
+\begin{table}
+  \begin{tabular}{c|rrr|rrr}
+    \toprule
+    \\
+    \midrule
+    00.0\% & 00.0\% & 00.0\% & 03.9\% & 13.1\% & 23.6\% & \\ &
+    00.3\% & 00.6\% & 00.7\% & 11.4\% & 25.5\% & 36.9\% & \\ &
+    07.2\% & 11.5\% & 13.2\% & 15.8\% & 36.1\% & 44.0\% & \\ &
+    17.2\% & 29.9\% & 34 \%& 22.9\% & 45.5\% & 52.4\% & \\ &
+    22.2\% & 4 .&\% 45.4\% & \textbf{26.1\%} & 47.3\% & 53.5\% & \\ &
+    23.7\% & 42.8\% & 49.5\% & 20.1\% & \textbf{50.6\%} & \textbf{62.8\%} & \\ &
+    24 \%& 43.3\% & 49.7\% & 14.7\% & 40.7\% & 55 \%& \\
+    \bottomrule
+\end{tabular}
+  \caption{Precision of linear translation from MSE}
+  \label{tab:prec}
+\end{table}
 
 \subsection{Qualitative analysis}
 
@@ -377,6 +397,9 @@ figyel	& \{watch, listen\}, \{watch\}, \{listen\}	\\
 \end{table}
 
 \section{Acknowledgments}
+
+\autoref{bground} was written by Veronika Lipp (Research Institute for
+Linguistics of the Hungarian Academy of Sciences).  
 
 1957 was an influential year in linguistics: \cite{Harris:1957} developed the
 frequency-aware variant of the distributional method, \cite{Osgood:1957}
