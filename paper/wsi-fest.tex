@@ -40,7 +40,8 @@
 % smaller than 5cm (the original size); we will check this
 % in the camera-ready version and ask you to change it back.
 
-\title{Cross-lingual word sense induction with multi-sense word embeddings}
+\title{Do multi-sense embedding learn more senses? \\ An evalutaion in linear
+translation}
 \author{
   Márton Makrai \\
   %Institute for Linguistics\\ 
@@ -61,19 +62,40 @@
 \emph{Word sense induction} (WSI) is the task of discovering senses of words
 without supervision \citep{Schutze:1998}. Recent approaches include multi-sense
 word embeddings (MSEs), vector space models of word distribution with more
-vectors for ambiguous words, each vector corresponding to some word sense.
-\cite{Borbely:2016} proposed a cross-lingual method for the evaluation of MSEs
-exploiting the principle that words may be ambiguous as far as the postulated
-senses translate to different words in some other language. We follow
-\cite{Xing:2015} in formulating transformation as an orthogonal mapping from
-the source language embedding to the target one, trained on a seed of a few
-thousand word pairs. In the multi-sense setup, we perform such translations
-from MSEs, with the idea that what are different senses in the source language
-will very often translate to different words in the target language.
+vectors for ambiguous words, each vector corresponding ideally to a different
+word sense.  
+
+In \cite{Borbely:2016}, we proposed a cross-lingual method for the evaluation
+of MSEs based on the principle that words may be ambiguous as far as the
+postulated senses translate to different words in some other language.  We
+applied the method by \citet{Mikolov:2013x} who train a translation mapping
+from the source languages embedding to the target as a least-squares regression
+supervised by a seed dictionary of the  few thousand most frequent words. The
+translation of a source word vector is the nearest neighbor of its image by the
+mapping in the target space. In the multi-sense setting, we translated from an
+MSE (the target embedding remaining single-sense).  
+
+Now we develop the eveluation further. Part of the eveluation task is to decide
+on empirical grounds whether different good translations of a word are synonyms
+or translations in different senses.  We propose analysis as follows.  Because
+of the nearest neighbor search, the distance between the translations is not
+determined by the distance of the sense vectors in the source space.  We
+analyze the distances between the translations of different senses of each
+word. If the distribution turns out to be multi-modal (i.e.~some words have
+stipulated meanings with similar translations and others have senses with
+greater distance, but intermediate distances are less frequent), we can
+separate synonyms from true ambiguity. Then we say that the MSE discovered a
+real ambiguous word, if two sense vectors have such translations that are
+licensed by the gold dictionary, and the distance of these words in the target
+space is above the threshold judged significant by the analysis of the distance
+distribution.  
 
 \url{https://github.com/makrai/wsi-fest}
 
-\section{Monosemy: a less delicious sense inventory}
+\section{%Monosemy: 
+  Towards a less delicious 
+  %sense
+  inventory}
 
 The differentiation of word senses, as already noted in \cite{Borbely:2016}, is
 fraught with difficulties, especially when we wish to distinguish homophony,
@@ -87,16 +109,17 @@ different languages make different lump/split decisions in the conceptual
 space, so much so that translational relatedness can, to a remarkable extent,
 be used to recover the universal clustering \citep{Youn:2016}.
 
-\subsection{Lexical ambiguity (Veronika Lipp)}
+\subsection{Background in lexicography}
 
 Lexical ambiguity is linguistically subdivided into two main categories:
-\emph{homonymy and polysemy} \citep{Cruse:2004}. Homonymous words have semantically
-unrelated and mutually incompatible meanings, such as \emph{punch$_1$} , which
-means `a blow with a fist', and \emph{punch$_2$}, which means `a drink'. Some
-have described such homonymous word meanings as essentially distinct words that
-accidentally have the same phonology (e.g., Murphy, 2002). Polysemous words, on
-the other hand, have semantically related or overlapping senses (\cite{Cruse:2004,Jackendoff:02, Pustejovsky:19995}), such as \emph{mouth} meaning both `organ
-of body' and `entrance of cave'.
+\emph{homonymy and polysemy} \citep{Cruse:2004}. Homonymous words have
+semantically unrelated and mutually incompatible meanings, such as
+\emph{punch$_1$} , which means `a blow with a fist', and \emph{punch$_2$},
+which means `a drink'. Some have described such homonymous word meanings as
+essentially distinct words that accidentally have the same phonology (e.g.,
+Murphy, 2002). Polysemous words, on the other hand, have semantically related
+or overlapping senses (\cite{Cruse:2004,Jackendoff:2002, Pustejovsky:1995}),
+such as \emph{mouth} meaning both `organ of body' and `entrance of cave'.
 
 Two criteria have been proposed for the distinction between homonymy and
 polysemy. The first criterion has to do with the \emph{etymological} derivation
@@ -111,79 +134,60 @@ do with the \emph{relatedness/unrelatedness of meaning}.  The distinction
 between homonymy and polysemy seems to correlate with the native speaker’s
 feeling that certain meanings are connected and that others are not. Generally,
 unrelatedness in meaning points to homonymy, whereas relatedness in meaning
-points to polysemy. 
-% Marci: ez utóbbi mondat fontos a projekt szempontjából. Ha húzunk, akkor
-% inkább a %teljes etymological bekezdést hagyjuk el.
-% However, it seems that ``relatedness of meaning'' is not an all-or-nothing
-% relation, but rather a matter of degree.
-However, in a large number of cases, there does not seem to be an agreement among native
-speakers as to whether the meanings of the words are related. So, it seems that
-there is not a clear dichotomy between homonymy and polysemy, but rather a
-continuum from ‘‘pure’’ homonymy to ‘‘pure’’ polysemy \citep{Lyons:1977}.
+points to polysemy.  However, in a large number of cases, there does not seem
+to be an agreement among native speakers as to whether the meanings of the
+words are related. So, it seems that there is not a clear dichotomy between
+homonymy and polysemy, but rather a continuum from ‘‘pure’’ homonymy to
+‘‘pure’’ polysemy \citep{Lyons:1977}.
 
 Most discussions about lexical ambiguity, within theoretical and computational
 linguistics, concentrate on polysemy, which can be further divided into two
-types (c.f. \cite{apr:1974} and \cite{pus:19995}). The first type of polysemy is motivated by
-\emph{metaphor (irregular polysemy)}. In metaphorical polysemy, a relation of analogy is assumed to
-hold between the senses of the word. The basic sense of metaphorical polysemy
-is literal, whereas its secondary sense is figurative. For example, the
-ambiguous word \emph{eye} has the literal basic sense  `organ of the body' and
-the figurative secondary sense `hole in a needle.' The other type of polysemy
-is motivated by \emph{metonymy (regular polysemy)}. In metonymy, the relation that is assumed to
-hold between the senses of the word is that of contiguity or connectedness.
-%Apresjan argued that metonymically motivated polysemy respects the usual
-%notion of polysemy, which is the ability of a word to have several distinct
-%but related meanings. 
+types (c.f. \cite{Apresjan:1974,Pustejovsky:1995}). The first type of polysemy
+is motivated by \emph{metaphor (irregular polysemy)}. In metaphorical polysemy,
+a relation of analogy is assumed to hold between the senses of the word. The
+basic sense of metaphorical polysemy is literal, whereas its secondary sense is
+figurative. For example, the ambiguous word \emph{eye} has the literal basic
+sense  `organ of the body' and the figurative secondary sense `hole in a
+needle.' The other type of polysemy is motivated by \emph{metonymy (regular
+polysemy)}. In metonymy, the relation that is assumed to hold between the
+senses of the word is that of contiguity or connectedness.
+% Apresjan argued that metonymically motivated polysemy respects the usual
+% notion of polysemy, which is the ability of a word to have several distinct
+% but related meanings. 
 In metonymic polysemy, both the basic and the secondary senses are literal. For
 example, the ambiguous word \emph{chicken} has the literal basic sense
 referring to the animal and the literal secondary sense of the meat of that
 animal. 
 
-% It is customary in the literature to distinguish between regular or logical
-% polysemy, on the one hand, and irregular or accidental polysemy, on the other
-% (Apresjan, 1974; Pustejovsky, 1995). 
+% regular or logical polysemy, and irregular or accidental polysemy
 
 ``After centuries of practical lexicography, there is still hardly any
 consensus on how to divide the semantic space of a lexical item''
-\citep{mee:2006}. This is reflected in the fact that dictionaries, even those for
-the same types of users and of similar size, offer (very) different sense
-division of many words. As \citet{moo:1987} says, there is no absolute answer on
-how many senses a word has and in which order they should be presented. Senses
-of polysemous words can be described at different levels of granularity, either
-more towards broader categories (lumping) of fine-grained ones (splitting),
-depending on the purpose of the dictionary, its size, target users etc.
+\citep{Meer:2006}. This is reflected in the fact that dictionaries, even those
+for the same types of users and of similar size, offer (very) different sense
+division of many words. 
+% As \citet{Moon:1987} says, there is no absolute answer on how many senses a
+% word has and in which order they should be presented.
+Senses of polysemous words can be described at different levels of granularity,
+either more towards broader categories (lumping) of fine-grained ones
+(splitting), depending on the purpose of the dictionary, its size, target users
+etc.
 
-One of the problems of dictionaries is their approach to meaning description,
-i.e.~presenting words in isolation using the numbered lists of definitions
-%(which are actually a metalexicographic construct), fails to reflect actual
-language use \citep{han:2000}. Sue Atkins, a well-known lexicographer, has
-famously said that she does not believe in word senses \citep{kil:19997}.
-Similarly, researchers in translation theory (\cite{nid:19997}) have argued that
-words have no meaning without context. Context is the key for describing word
-meanings and disambiguating between them, an idea that goes back to Firth and
-his famous quote ``You shall know by the company it keeps'' \citep{Firth:1957}.
-Another theory that is based on this view is lexical
-priming by \citet{hoe:2005} whose research shows that collocations, semantic
-associations and colligations of a word play a decisive role in differentiating
-between its senses.
-%In relation to this, it is particularly important to mention Hanks' theory of Norms and Exploitations (Hanks 2013), which has at its core the idea that isolated words do not have meanings, but rather meaning potentials. According to Hanks, word meanings do exist, ``but traditional descriptions are misleading'' (ibid.: 82). Hanks goes on to suggest that a major future task in addressing meaning ``will be to identify meaning components, the ways in which they combine, relations with the meaning components of semantically related words, and the phraseological circumstances in which they are activated'' (ibid.: 82). This is highly relevant not only for lexicography, but also for linguistics in general, as well as other disciplines such as natural language processing.
-Word ambiguity may pose great problems in language understanding both by humans and computers.
-%T may pose great problems of 
-%T legyünk szerényebbek: önamgában az hogy a szavaknak több jelentésük van nem feltétlenül okoz problémát a beszélőknek. A megfelelő kontextusban ugyanis fel sem tűnik nekik, hogy más jelentései is vannak a szavaknak, amelyeket használnak. 
-%The underlying reason for this is twofold: first, lexicons may comprise overlapping meanings, which render the unique assignment of the right meaning to the given word impossible even for human annotators (above chance assignment). Secondly, the granularity of senses in the lexicon may differ, which, to the extreme, may result in one sense being completely subsumed under the other.
-As discussed above, homonymy, metonymy and polysemy have fuzzy borders 
-%where co-occurrence statistics and cross-lingual comparison provide two independent sources of information. 
-therefore, a methodology is needed that is able to clear-cut the fuzzy border of overlapping meanings and is able to find the right grain-size for the specific task.
+While homonyms with their non-overlapping semantic fields easily lend
+themselves to \emph{sense-tagging}, polysemic meanings pose real challenge for
+sense-tagging.  Lexicons may comprise overlapping meanings, which render the
+unique assignment of the right meaning to the given word impossible even for
+human annotators (above chance assignment). 
 
-%Moreover, listing as many senses of an ambiguous word (or frames attaching to a verb) as we can, misses the information that some meanings (and frames) are related. It is standard to distinguish \emph{homonymy}, arbitrary coincidence of word forms e.g.~Hungarian \emph{vár} `wait; castle', \emph{metonymy} (e.g.~\emph{school} and many other institution nouns are used to express both the building and the people involved), and  \emph{polysemy} (word forms with related but remarkably different senses e.g.~Hungarian \emph{nap} `day; Sun` or \emph{gerinc} `spine; ridge').
-%E.:information for what. 
-%The three categories have fuzzy borders where 
-Co-occurrence statistics and cross-lingual comparison provide two independent sources of information.
-\citet{Youn:2016} analyses the universal structure of lexical semantics, and show
-that some concepts are more prone to polysemy than others, and that there are
-clusters of concepts within which polysemy is significantly more frequent
-than across the clusters. 
-% While homonyms are usually considered to be non-overlapping semantic fields that easily lend themselves to sense-tagging, polysemic meanings pose real challenge for sense-tagging as they are more likely to be overlapping entities.
+% Collocations, semantic associations and colligations of a word play a
+% decisive role in differentiating between its senses (lexical priming,
+% \cite{Hoey:2005}).
+
+% \citet{Youn:2016} analyses the universal structure of lexical meaning, and
+% show that some concepts are more prone to polysemy than others, and that
+% there are clusters of concepts within which polysemy is significantly more
+% frequent than across the clusters. 
+
 \section{Multi-sense word embeddings}
 
 MSEs originate with \cite{Reisinger:2010,Huang:2012} who use a uniform number
@@ -259,6 +263,10 @@ choosing $z_i$ to be the nearest neighbor of $Wx_i$.
 % more consistent use of metrics; but see \citep{Xing:2015} for opposing
 % results.
 
+We follow \cite{Xing:2015} in formulating transformation as an orthogonal
+mapping from the source language embedding to the target one, trained on a seed
+of a few thousand word pairs..
+
 A common error in linear translation is when there are \emph{hubs}, target
 words returned as the translation of many words, which is wrong in most of the
 cases.  \cite{Dinu:2015} propose a method they call \emph{global correction}
@@ -307,8 +315,64 @@ seed dictionary, extracted with
 % s}ingle-sense and {\bf m}ulti-sense translation. 
 
 ``forward'' neighbor search: precision increases with vocabulary cut-off
-(tryied up to $2^16=65536$
+(tryied up to $2^{16}=65536$
 
+\subsection{Qualitative analysis}
+
+We give qualitative analysis of words for which the model with the best
+parameter setting succeeds to attribute more sense vectors with different good
+translations. The clearest case of homonymy is when different senses differ in
+their POS, such as \emph{nő} `woman; increase' or \emph{vár} `wait; case'.
+More interesting are words whose one sense is a special case of an other sense
+of the same word, e.g.~ \emph{cikk}, `item; article' (an
+article is an item in a newspaper); \emph{eredmény}, `score; result' (a score
+is a result measured by a number); \emph{magas}, `tall; high' (tall is used for
+people in spite of high). The meanings of \emph{idegen}, `strange, alien;
+foreign' are special cases of unfamiliar (person versus language).  Note that
+in the \fl~approach, POS-difference alone is not enough for analyzing a word as
+ambiguous, e.g.~the only difference between the senses of \emph{alkalmazott},
+`employee; applied' is that employment is the application of people for work;
+in the case of \emph{belső} `internal; interior', the noun \emph{interior}
+refers to the \emph{internal} part of a building. Finally we mention two cases
+where the relation between the two senses is more idiosyncratic, but in a
+monosemic approach, they will have a single representation: \emph{beteg} means
+`ill, sick; patient'. Though \emph{ill} is a health state and \emph{patient} is
+a situational role, the fact that patients of doctors are usually ill, may
+suffice for identifying the `patent' based on the representation of
+\emph{ill}; and a monosemic system is designed to give account of metaphorical
+relations like the one between the meanings of \emph{világos}, `bright; clear'
+as well.
+
+Calling a translation $t$ \emph{common}, if all the sense vectors that have at
+least one good translation have $t$ among its translations, we find that when a
+word has more than two sense vectors with good non-common translations (there
+are 13 such words with the best parameter setting), with most of the words
+there is a more ``general'' vector (or two, in the case of \emph{tud}) that has
+more good translations, and good translations of the other vectors are mostly
+among the good translations of this general vector, see
+\autoref{tab:like_than}.
+
+\begin{table} \footnotesize
+  \begin{tabular}{ll}
+    \toprule
+mint	& \{like, than, as\}, \{like\}, \{than\}	\\
+majd	& \{then, later\}, \{then\}, \{later\}	\\
+talán	& \{probably, perhaps\}, \{probably, maybe\}, \{perhaps\}	\\
+tud	& \{understand, can\}, \{know, understand\}, \{know\}, \{can\}	\\
+program	& \{project, programme, program\}, \{project, programme\}, \{project, program\}	\\
+terület	& \{region, area, territory\}, \{region, district\}, \{region, area\}, \{area\}	\\
+felső	& \{upper, top\}, \{upper\}, \{higher\}	\\
+díj	& \{charge, fee, rate\}, \{fee\}, \{award\}	\\
+kicsi	& \{little, small\}, \{little\}, \{small\}	\\
+erő	& \{strength, power, force, stress, energy\}, \{strength, power\}, \{force\}	\\
+lakás	& \{apartment, housing\}, \{residence, housing\}, \{rooms, apartment\}	\\
+kérelem	& \{application, appeal\}, \{application\}, \{appeal\}	\\
+figyel	& \{watch, listen\}, \{watch\}, \{listen\}	\\
+\bottomrule
+\end{tabular}
+  \caption{Words with at least three good sense vectors}
+  \label{tab:like_than} 
+\end{table}
 
 \section{Acknowledgments}
 
@@ -340,7 +404,7 @@ lessons to learn in efficiency.
 % \cite{Swadesh:1955}
 
 \bibliographystyle{acl_natbib} 
-\bibliography{snn}  
+\bibliography{ml}  
 
 \end{document}
 
