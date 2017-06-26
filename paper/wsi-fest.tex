@@ -35,7 +35,7 @@
 \def\aclpaperid{28} %  Enter the acl Paper ID here
 
 \setlength\titlebox{8cm}
-%\setlength\titlebox{50ex}  % Vertical space allocated for \Authors 
+%\setlength\titlebox{50ex}  % Vertical space allocated for \Authors
 % You can expand the titlebox if you need extra space
 % to show all the authors. Please do not make the titlebox
 % smaller than 5cm (the original size); we will check this
@@ -45,7 +45,7 @@
 translation}
 \author{
   Márton Makrai \\
-  %Institute for Linguistics\\ 
+  %Institute for Linguistics\\
   %Hungarian Academy of Sciences \\
   %Bencz\'ur u. 33 \\ 1068 Budapest, Hungary \\
   %{\tt makrai.marton@nytud.mta.hu} \\
@@ -65,7 +65,7 @@ translation}
 without supervision \citep{Schutze:1998}. Recent approaches include multi-sense
 word embeddings (MSEs), vector space models of word distribution with more
 vectors for ambiguous words, each vector corresponding ideally to a different
-word sense.  
+word sense.
 
 In \cite{Borbely:2016}, we proposed a cross-lingual method for the evaluation
 of MSEs based on the principle that words may be ambiguous as far as the
@@ -75,7 +75,7 @@ from the source languages embedding to the target as a least-squares regression
 supervised by a seed dictionary of the  few thousand most frequent words. The
 translation of a source word vector is the nearest neighbor of its image by the
 mapping in the target space. In the multi-sense setting, we translated from an
-MSE (the target embedding remaining single-sense).  
+MSE (the target embedding remaining single-sense).
 
 Now we develop the eveluation further. Part of the eveluation task is to decide
 on empirical grounds whether different good translations of a word are synonyms
@@ -83,19 +83,11 @@ or translations in different senses.  We propose analysis as follows.  Because
 of the nearest neighbor search, the distance between the translations is not
 determined by the distance of the sense vectors in the source space.  We
 analyze the distances between the translations of different senses of each
-word. If the distribution turns out to be multi-modal (i.e.~some words have
-stipulated meanings with similar translations and others have senses with
-greater distance, but intermediate distances are less frequent), we can
-separate synonyms from true ambiguity. Then we say that the MSE discovered a
-real ambiguous word, if two sense vectors have such translations that are
-licensed by the gold dictionary, and the distance of these words in the target
-space is above the threshold judged significant by the analysis of the distance
-distribution.  
-
+word. 
 \url{https://github.com/makrai/wsi-fest}
 
-\section{%Monosemy: 
-  Towards a less delicious 
+\section{%Monosemy:
+  Towards a less delicious
   %sense
   inventory}
 
@@ -111,7 +103,7 @@ different languages make different lump/split decisions in the conceptual
 space, so much so that translational relatedness can, to a remarkable extent,
 be used to recover the universal clustering \citep{Youn:2016}.
 
-\subsection{Lexicographic Background (Veronika Lipp)}
+\subsection{Lexicographic Background \\ (Veronika Lipp)}
 
 \label{sec:bground}
 
@@ -131,7 +123,7 @@ of words. Words that are historically derived from distinct lexical items are
 taken to be homonymous. However, the etymological criterion is not always
 decisive. One reason is that there are many words whose historical derivation
 is uncertain. Another reason is that it is not always very clear how far back
-we should go in tracing the history of words \citep{Lyons:1977}.  
+we should go in tracing the history of words \citep{Lyons:1977}.
 
 The second criterion for the distinction between homonymy and polysemy has to
 do with the \emph{relatedness/unrelatedness of meaning}.  The distinction
@@ -157,31 +149,27 @@ polysemy)}. In metonymy, the relation that is assumed to hold between the
 senses of the word is that of contiguity or connectedness.
 % Apresjan argued that metonymically motivated polysemy respects the usual
 % notion of polysemy, which is the ability of a word to have several distinct
-% but related meanings. 
+% but related meanings.
 In metonymic polysemy, both the basic and the secondary senses are literal. For
 example, the ambiguous word \emph{chicken} has the literal basic sense
 referring to the animal and the literal secondary sense of the meat of that
-animal. 
+animal.
 
 % regular or logical polysemy, and irregular or accidental polysemy
 
-``After centuries of practical lexicography, there is still hardly any
-consensus on how to divide the semantic space of a lexical item''
-\citep{Meer:2006}. This is reflected in the fact that dictionaries, even those
-for the same types of users and of similar size, offer (very) different sense
-division of many words. 
-% As \citet{Moon:1987} says, there is no absolute answer on how many senses a
-% word has and in which order they should be presented.
-Senses of polysemous words can be described at different levels of granularity,
-either more towards broader categories (lumping) of fine-grained ones
-(splitting), depending on the purpose of the dictionary, its size, target users
-etc.
-
-While homonyms with their non-overlapping semantic fields easily lend
-themselves to \emph{sense-tagging}, polysemic meanings pose real challenge for
-sense-tagging.  Lexicons may comprise overlapping meanings, which render the
-unique assignment of the right meaning to the given word impossible even for
-human annotators (above chance assignment). 
+% ``After centuries of practical lexicography, there is still hardly any
+% consensus on how to divide the semantic space of a lexical item''
+% \citep{Meer:2006}, how many senses a word has, and in which order they should
+% be presented.  Senses of polysemous words can be described at different levels
+% of granularity, either more towards broader categories (lumping) or
+% fine-grained ones (splitting), depending on the purpose of the dictionary, its
+% size, target users etc.  Dictionaries, even those for the same types of users
+% and of similar size, offer (very) different sense division of many words.  
+% 
+% While homonyms with their non-overlapping semantic fields easily lend
+% themselves to \emph{sense-tagging}, polysemic meanings pose real challenge.
+% Lexicons may comprise overlapping meanings, which render the unique assignment
+% of the right meaning to the given word impossible even for human annotators.
 
 % Collocations, semantic associations and colligations of a word play a
 % decisive role in differentiating between its senses (lexical priming,
@@ -190,7 +178,7 @@ human annotators (above chance assignment).
 % \citet{Youn:2016} analyses the universal structure of lexical meaning, and
 % show that some concepts are more prone to polysemy than others, and that
 % there are clusters of concepts within which polysemy is significantly more
-% frequent than across the clusters. 
+% frequent than across the clusters.
 
 \section{Multi-sense word embeddings}
 
@@ -214,7 +202,7 @@ semantic resolution
 
  \cite{Mikolov:2013x} discovered that embeddings of different languages are so
  similar that a linear transformation can map vectors of the source language
- words to the vectors of their translations.  
+ words to the vectors of their translations.
 
 \begin{figure}[b]
     \centering
@@ -281,7 +269,7 @@ method.
 
 In a multi-sense embedding scenario, we take a multi-sense embedding
 as source model, and a single-sense embedding as target model.
-We evaluate a specific source MSE model in two ways 
+We evaluate a specific source MSE model in two ways
 referred as \emph{single}, and \emph{multiple}.
 
 The tools that generate MSEs all provide fall-backs to singe-sense embeddings
@@ -314,32 +302,74 @@ The quality of the translation was measured by training on the most frequent 5k
 word pairs and evaluating on another 1k seed pairs.  We used Witionary as our
 seed dictionary, extracted with
 \texttt{wikt2dict}\footnote{\url{https://github.com/juditacs/wikt2dict}}
-\citep{Acs:2016}. 
+\citep{Acs:2016}.
 % TODO shows the percentage of correctly translated words for {\bf
-% s}ingle-sense and {\bf m}ulti-sense translation. 
+% s}ingle-sense and {\bf m}ulti-sense translation.
 
 ``forward'' neighbor search: precision increases with vocabulary cut-off, see
 \autoref{tab:prec}
 
-\begin{table}
+\begin{table*}
+  \centering
+    %\resizebox{\columnwidth}{!}{%
   \begin{tabular}{c|rrr|rrr}
     \toprule
-    \\
+    cutoff &
+    \multicolumn{3}{c|}{forward (vanilla) NN search} &
+    \multicolumn{3}{c}{reverse NN search} \\
     \midrule
-    00.0\% & 00.0\% & 00.0\% & 03.9\% & 13.1\% & 23.6\% & \\ &
-    00.3\% & 00.6\% & 00.7\% & 11.4\% & 25.5\% & 36.9\% & \\ &
-    07.2\% & 11.5\% & 13.2\% & 15.8\% & 36.1\% & 44.0\% & \\ &
-    17.2\% & 29.9\% & 34 \%& 22.9\% & 45.5\% & 52.4\% & \\ &
-    22.2\% & 4 .&\% 45.4\% & \textbf{26.1\%} & 47.3\% & 53.5\% & \\ &
-    23.7\% & 42.8\% & 49.5\% & 20.1\% & \textbf{50.6\%} & \textbf{62.8\%} & \\ &
-    24 \%& 43.3\% & 49.7\% & 14.7\% & 40.7\% & 55 \%& \\
+    1024 & 0.0\% & 0.0\% & 0.0\% & 03.9\% & 13.1\% & 23.6\% \\
+    2048 & 0.3\% & 0.6\% & 0.7\% & 11.4\% & 25.5\% & 36.9\% \\
+    4096 & 7.2\% & 11.5\% & 13.2\% & 15.8\% & 36.1\% & 44.0\% \\
+    8192 & 17.2\% & 29.9\% & 34.0 \%& 22.9\% & 45.5\% & 52.4\% \\
+    16384 & 22.2\% & 4.0 \% & 45.4\% & \textbf{26.1\%} & 47.3\% & 53.5\% \\
+    32768 & 23.7\% & 42.8\% & 49.5\% & 20.1\% & \textbf{50.6\%} & \textbf{62.8\%} \\
+    65536 & \emph{24.0} \%& \emph{43.3}\% & \emph{49.7}\% & 14.7\% & 40.7\% & 55.0 \%\\
     \bottomrule
 \end{tabular}
-  \caption{Precision of linear translation from MSE}
+  %}
+  \caption{Precision of reverse NNs when translating from an AdaGram model
+  trained on HNC (600 dimensions, $\alpha=.05$)}
   \label{tab:prec}
-\end{table}
+\end{table*}
 
 \subsection{Qualitative analysis}
+
+among sim $le.48$ % TODO
+
+% If the distribution turns out to be multi-modal (i.e.~some words have
+% stipulated meanings with similar translations and others have senses with
+% greater distance, but intermediate distances are less frequent), we can
+% separate synonyms from true ambiguity. Then we say that the MSE discovered a
+% real ambiguous word, if two sense vectors have such translations that are
+% licensed by the gold dictionary, and the distance of these words in the
+% target space is above the threshold judged significant by the analysis of the
+% distance distribution.
+
+
+\begin{table*}[t]
+  %\footnotesize
+  \begin{tabular}{ll}
+    \toprule
+mint	& \{like, than, as\}, \{like\}, \{than\}	\\
+majd	& \{then, later\}, \{then\}, \{later\}	\\
+talán	& \{probably, perhaps\}, \{probably, maybe\}, \{perhaps\}	\\
+tud	& \{understand, can\}, \{know, understand\}, \{know\}, \{can\}	\\
+program	& \{project, programme, program\}, \{project, programme\}, \{project, program\}	\\
+terület	& \{region, area, territory\}, \{region, district\}, \{region, area\}, \{area\}	\\
+felső	& \{upper, top\}, \{upper\}, \{higher\}	\\
+díj	& \{charge, fee, rate\}, \{fee\}, \{award\}	\\
+kicsi	& \{little, small\}, \{little\}, \{small\}	\\
+erő	& \{strength, power, force, stress, energy\}, \{strength, power\}, \{force\}	\\
+lakás	& \{apartment, housing\}, \{residence, housing\}, \{rooms, apartment\}	\\
+kérelem	& \{application, appeal\}, \{application\}, \{appeal\}	\\
+figyel	& \{watch, listen\}, \{watch\}, \{listen\}	\\
+\bottomrule
+\end{tabular}
+  \caption{Words with at least three good sense vectors (forward NNs, source is
+  the AdaGram model trained on HNC (600 dimensions, $\alpha=.05$)}
+  \label{tab:like_than}
+\end{table*}
 
 We give qualitative analysis of words for which the model with the best
 parameter setting succeeds to attribute more sense vectors with different good
@@ -374,32 +404,12 @@ more good translations, and good translations of the other vectors are mostly
 among the good translations of this general vector, see
 \autoref{tab:like_than}.
 
-\begin{table} \footnotesize
-  \begin{tabular}{ll}
-    \toprule
-mint	& \{like, than, as\}, \{like\}, \{than\}	\\
-majd	& \{then, later\}, \{then\}, \{later\}	\\
-talán	& \{probably, perhaps\}, \{probably, maybe\}, \{perhaps\}	\\
-tud	& \{understand, can\}, \{know, understand\}, \{know\}, \{can\}	\\
-program	& \{project, programme, program\}, \{project, programme\}, \{project, program\}	\\
-terület	& \{region, area, territory\}, \{region, district\}, \{region, area\}, \{area\}	\\
-felső	& \{upper, top\}, \{upper\}, \{higher\}	\\
-díj	& \{charge, fee, rate\}, \{fee\}, \{award\}	\\
-kicsi	& \{little, small\}, \{little\}, \{small\}	\\
-erő	& \{strength, power, force, stress, energy\}, \{strength, power\}, \{force\}	\\
-lakás	& \{apartment, housing\}, \{residence, housing\}, \{rooms, apartment\}	\\
-kérelem	& \{application, appeal\}, \{application\}, \{appeal\}	\\
-figyel	& \{watch, listen\}, \{watch\}, \{listen\}	\\
-\bottomrule
-\end{tabular}
-  \caption{Words with at least three good sense vectors}
-  \label{tab:like_than} 
-\end{table}
-
 \section{Acknowledgments}
 
-\autoref{bground} was written by Veronika Lipp (Research Institute for
-Linguistics of the Hungarian Academy of Sciences).  
+Section \ref{sec:bground} was written by Veronika Lipp (Research Institute for
+Linguistics of the Hungarian Academy of Sciences).
+
+\bigskip
 
 1957 was an influential year in linguistics: \cite{Harris:1957} developed the
 frequency-aware variant of the distributional method, \cite{Osgood:1957}
@@ -410,11 +420,11 @@ he taught on the book he was writing \citep{Kornai:2007}. I heard about
 \emph{deep cases} and \emph{k\={a}rakas} sooner than I did about \emph{thematic
 roles}. The fact that he taught me computational linguistics in a master and
 disciple fashion comes at no surprise as there have been no such PhD school in
-Hungary, not to mention mathematical linguistics proper.  
+Hungary, not to mention mathematical linguistics proper.
 % He advised my so called \emph{topic labor} and MSc at the Budapest University
-% of Technology and Economics, and 
+% of Technology and Economics, and
 I started my PhD as a member of the 4lang project at the Institute for Computer
-Science and Control of the Hungarian Academy of Sciences. 
+Science and Control of the Hungarian Academy of Sciences.
 
 Laozi says that a good leader does not leave a footprint, and András encouraged
 us to be independent and effective. One of his remarkable citations is that
@@ -428,9 +438,9 @@ lessons to learn in efficiency.
 
 % \cite{Swadesh:1955}
 
-\bibliographystyle{acl_natbib} 
-\bibliography{ml}  
+\bibliographystyle{acl_natbib}
+\bibliography{ml}
 
 \end{document}
 
-%\section{Ten years of semi-supervised word sense induction} 
+%\section{Ten years of semi-supervised word sense induction}
