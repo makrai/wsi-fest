@@ -28,7 +28,7 @@ class MultiSenseLinearTranslator():
             'glove.840B.300d.gensim')
         parser.add_argument(
             '--seed_dict',
-            default='/mnt/store/makrai/data/language/hungarian/dict/' 
+            default='/mnt/store/makrai/data/language/hungarian/dict/'
             'wikt2dict-en-hu.by-freq',
             help='Name of the seed dictionary file. The order of the source'
             ' and the target language in the arguments for embeddings and in'
@@ -36,9 +36,12 @@ class MultiSenseLinearTranslator():
         parser.add_argument(
             '--general-linear-mapping', dest='orthog', action='store_false')
         parser.add_argument('--translate_all', action='store_true')
-        parser.add_argument('--reverse', action='store_true')
+        parser.add_argument('--vanilla-nn-search', dest='reverse',
+                            action='store_false', 
+                            help='Do not compute reverse NNs')
         parser.add_argument('--restrict_vocab', type=int, default=2**16,
                             help='default is 2^16, cca 66 K')
+        parser.add_argument('--prec_level', type=int, default=10)
         return parser.parse_args()
 
     def __init__(self):
@@ -91,86 +94,65 @@ class MultiSenseLinearTranslator():
             self.regression.fit(self.train_sr, self.train_tg)
 
     def test(self):
+        """
+        In reverse mode, instead of ranking the nearest neighbors of the
+        computed point in target space, we rank source words by the distance of
+        their translations to each target word. Source words are translated to
+        the target word for which they have the lowest neighbor rank, following
+        Dinu et al (2015).
+
+        G. Dinu, A. Lazaridou and M. Baroni
+        Improving zero-shot learning by mitigating the hubness problem.
+        Proceedings of ICLR 2015, workshop track
+        """ 
+        # Inner functions used both in reverse and normal mode
         def read_test_dict():
             self.test_dict = defaultdict(set)
             for line in self.seed_f.readlines():
                 tg, sr = line.split()
                 self.test_dict[sr].add(tg)
 
-        def neighbors_by_vector(vect):
-            sense_neighbors, _ = zip(*self.target_embed.similar_by_vector(
-                vect, restrict_vocab=self.args.restrict_vocab))
-            return set(sense_neighbors)
+        def log_prec():
+            logging.info(
+                'prec after testing on {} words: {:%} (good_disambig: {})'.format(
+                    self.test_size_act,
+                    float(self.score)/self.test_size_act,
+                    self.good_disambig))
 
-        def eval_word(sr_word, sr_vecs):
+        def eval_word(sr_word, neighbor_by_vec):
             # TODO monitor the neighborhood rank of the good translations
-            self.test_size_act += 1
-            tg_vecs = np.concatenate(sr_vecs).dot(self.regression.coef_.T)
-            neighbor_by_vec = [neighbors_by_vector(v) for v in tg_vecs]
-            hit_by_vec = [ns.intersection(self.test_dict[sr_word]) 
+            hit_by_vec = [ns.intersection(self.test_dict[sr_word])
                           for ns in neighbor_by_vec]
             if reduce(set.union, hit_by_vec):
-                self.score_at10 += 1
+                self.score += 1
                 common_hits = reduce(set.intersection, hit_by_vec)
-                uniq_hits_by_vec = [trans - common_hits 
+                uniq_hits_by_vec = [trans - common_hits
                                     for trans in hit_by_vec]
                 uniq_hit_sets = set(' '.join(s) for s in uniq_hits_by_vec if s)
                 if len(uniq_hit_sets) > 1:
                     self.good_disambig += 1
-                    uniq_hit_sets = [neigh.split(' ') 
+                    uniq_hit_sets = [neigh.split(' ')
                                      for neigh in uniq_hit_sets]
                     uniq_hit_sets.sort(key=len, reverse=True)
-                    logging.debug(( sr_word, uniq_hit_sets,
-                                   '_'.join(common_hits), self.good_disambig))
+                    sim = ''
+                    if len(uniq_hit_sets) == 2:
+                        w1, w2 = [list(hits)[0] for hits in uniq_hit_sets]
+                        sim = self.target_embed.similarity(w1, w2)
+                        logging.debug(( sr_word, uniq_hit_sets, sim,
+                                       '_'.join(common_hits),
+                                       self.good_disambig))
             if not self.test_size_act % 1000 and self.test_size_act:
-                self.log_prec()
+                log_prec()
 
-        logging.info('Testing...')
-        self.test_size_goal = 1000
-        self.test_size_act = 0
-        self.score_at10 = 0
-        read_test_dict()
-        if self.args.reverse:
-            return self.reverse_nn()
-        with open(self.args.source_mse) as source_mse:
-            logging.info(
-                'skipping header: {}'.format(source_mse.readline().strip()))
-            self.good_disambig = 0
-            sr_word = ''
-            sr_vecs = []
-            while (self.args.translate_all 
-                   or self.test_size_act < self.test_size_goal):
-                line = source_mse.readline()
-                if not line:
-                    logging.info(
-                        'tested on {} items'.format(self.test_size_act))
-                    break
-                new_sr_word, vect_str = line.strip().split(maxsplit=1)
-                if new_sr_word != sr_word:
-                    if sr_word in self.test_dict:
-                        eval_word(sr_word, sr_vecs)
-                    sr_word = new_sr_word
-                    sr_vecs = []
-                sr_vecs.append(np.fromstring(vect_str, sep=' ').reshape((1,-1)))
-        return float(self.score_at10)/self.test_size_act
+        # Inner functions used only in the vanilla (non-reverse) version
+        def neighbors_by_vector(vect):
+            sense_neighbors, _ = zip(*self.target_embed.similar_by_vector(
+                vect, restrict_vocab=self.args.restrict_vocab, topn=self.args.prec_level))
+            return set(sense_neighbors)
+            # We loose the order of neighbors. Keeping it have been tried and
+            # brought no improvement.
 
-    def log_prec(self):
-        logging.info(
-            'prec after testing on {} words: {:%} (good_disambig: {})'.format(
-                self.test_size_act, float(self.score_at10)/self.test_size_act,
-                self.good_disambig))
-
-    def reverse_nn(self, prec_level=10):
-        """
-        Instead of the nearest neighbors of the computed point in target space,
-        we rank source words by the distance of their translations to each
-        target word. Source words are translated to the target word for which
-        they have the lowest neighbor rank, following Dinu et al (2015).
-
-        G. Dinu, A. Lazaridou and M. Baroni
-        Improving zero-shot learning by mitigating the hubness problem.
-        Proceedings of ICLR 2015, workshop track
-        """ 
+        # Inner functions used ony in reverse mode
         def read_sr_embed():
             logging.info(
                 'Reading source mx from {}...'.format(self.args.source_mse))
@@ -186,72 +168,86 @@ class MultiSenseLinearTranslator():
                 'Source vocab and mx read {}'.format(source_mse.shape))
             return sr_vocab, source_mse
 
-        def debug(batch_size, block, sort_fwd=False):
-            start_debug_word = 500
-            show_level = 8
-            for debug_word_i in range(start_debug_word, start_debug_word+10):
-                if sort_fwd: 
-                    translation = (
-                        sr_vocab[debug_word_i],
-                        [self.target_embed.index2word[i*batch_size+block[debug_word_i,j]] 
-                         for j in range(show_level)])
-                else:
-                    translation = (
-                        self.target_embed.index2word[i*batch_size+debug_word_i],
-                        [sr_vocab[block[j,debug_word_i]] 
-                         for j in range(show_level)]
-                    )
-                logging.debug(translation)
-
         def get_rev_rank(debug=False):
             logging.info('Populating reverse neighbor rank mx...')
-            rev_rank_col_blocks = [] 
+            rev_rank_col_blocks = []
             batch_size = 10000
-            n_batch = int(min(self.target_embed.syn0.shape[0], self.args.restrict_vocab) /
-                          batch_size)
+            n_batch = max(int(min(self.target_embed.syn0.shape[0],
+                                  self.args.restrict_vocab) / batch_size),
+                          1)
             for i in range(n_batch):
                 tg_batch = self.target_embed.syn0[i*batch_size:(i+1)*batch_size]
-                block = translated_points.dot(tg_batch.T)
+                block = self.translated_points.dot(tg_batch.T)
                 block = (-block).argsort(axis=0).astype('uint16')
                 block = block.argsort(axis=0).astype('uint16')
                 rev_rank_col_blocks.append(block)
-                logging.debug( 
+                logging.debug(
                     '{:.1%} of reverse neighbor rank mx populated, {} {}'.format(
                         float(i+1)/n_batch, block.dtype, block.shape))
             rev_rank_mx = np.concatenate(rev_rank_col_blocks,
                                          axis=1).astype('uint16')
-            logging.debug('min rank: {}'.format(rev_rank_mx.min(axis=1)))
+            logging.debug('Min ranks: {}'.format(rev_rank_mx.min(axis=1)))
             rev_rank_mx = rev_rank_mx.argsort().astype('uint16')
             return rev_rank_mx
 
-        sr_vocab, source_mse = read_sr_embed()
-        translated_points = source_mse.dot(self.regression.coef_.T)
-        rev_rank_mx = get_rev_rank()
-        test_size_act = 0
-        score_at10 = 0
-        for sr_word, rev_rank_row in zip(sr_vocab, rev_rank_mx):
-            if sr_word in self.test_dict:
-                # TODO skip training items
-                test_size_act += 1
-                tg_words = [self.target_embed.index2word[i] 
-                            for  i in rev_rank_row[:prec_level]]
-                if not test_size_act % 100:
-                    logging.debug((sr_word, self.test_dict[sr_word],
-                                   set(tg_words),
-                                   self.test_dict[sr_word].intersection(set(tg_words))))
-                if self.test_dict[sr_word].intersection(set(tg_words)):
-                    score_at10 += 1
-                if test_size_act == self.test_size_goal:
-                    return float(score_at10)/test_size_act
+        def normalize(vecs):
+            vecs /= np.apply_along_axis(np.linalg.norm, 1,
+                                        vecs).reshape((-1,1))
+
+        def init_test():
+            self.test_size_goal = 1000
+            self.test_size_act = 0
+            self.score = 0
+            self.good_disambig = 0
+            read_test_dict()
+            if self.args.reverse:
+                if self.args.reverse:
+                    self.sr_i = 0
+                sr_vocab, source_mse = read_sr_embed()
+                normalize(source_mse)
+                normalize(self.target_embed.syn0)
+                self.translated_points = source_mse.dot(self.regression.coef_.T)
+                self.rev_rank_mx = get_rev_rank()
+
+        logging.info('Testing...')
+        init_test()
+        with open(self.args.source_mse) as source_mse:
+            logging.debug(
+                'skipping header: {}'.format(source_mse.readline().strip()))
+            sr_word = ''
+            sr_vecs = [] # sr_vecs is NOT used in reverse mode
+            act_sense_indices = []
+            while (self.args.translate_all
+                   or self.test_size_act < self.test_size_goal):
+                line = source_mse.readline()
+                if (self.args.reverse and self.sr_i > self.args.restrict_vocab
+                    or not line):
+                    logging.info(
+                        'tested on {} items'.format(self.test_size_act))
+                    break
+                new_sr_word, vect_str = line.strip().split(maxsplit=1)
+                if new_sr_word != sr_word:
+                    if sr_word in self.test_dict:
+                        self.test_size_act += 1
+                        if self.args.reverse:
+                            rev_rank_row_block = self.rev_rank_mx[act_sense_indices]
+                            neighbor_by_vec = [
+                                set(self.target_embed.index2word[i] 
+                                 for  i in rev_rank_row[:self.args.prec_level]) 
+                                for rev_rank_row in rev_rank_row_block]
+                        else:
+                            tg_vecs = np.concatenate(sr_vecs).dot(self.regression.coef_.T)
+                            neighbor_by_vec = [neighbors_by_vector(v) for v in tg_vecs]
+                        eval_word(sr_word, neighbor_by_vec)
+                    sr_word = new_sr_word
+                    sr_vecs = []
+                if self.args.reverse:
+                    act_sense_indices.append(self.sr_i)
+                    self.sr_i += 1
+                else:
+                    sr_vecs.append(np.fromstring(vect_str, sep=' ').reshape((1,-1)))
+        return float(self.score)/self.test_size_act
 
 
 if __name__ == '__main__':
     print(MultiSenseLinearTranslator().main())
-
-"""
-if len(good_vecs) > 2:
-    sim_mx = good_vecs.dot(good_vecs.T)
-    ij = np.unravel_index( np.argmin(sim_mx), sim_mx.shape)
-    tgw1, tgw2 = [hit_by_vec[i] for i in ij]
-    logging.debug((sr_word, hit_by_vec, tgw1, tgw2))
-    """
