@@ -123,10 +123,12 @@ class MultiSenseLinearTranslator():
                         w1, w2 = [list(hits)[0] for hits in uniq_hit_sets[:2]]
                         sim = self.target_embed.similarity(w1, w2)
                         self.sims.append(sim)
-                        #print
-                        logging.debug('{} {} {} {} {}'.format(
+                        msg = '{} {} {} {} {}'.format(
                             sim, sr_word, uniq_hit_sets, '_'.join(common_hits),
-                            self.good_disambig))
+                            self.good_disambig)
+                        print(msg)
+                        if not self.good_disambig % 10:
+                            logging.debug(msg)
             if not self.test_size_act % 1000 and self.test_size_act:
                 log_prec()
 
