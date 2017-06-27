@@ -41,7 +41,7 @@
 % smaller than 5cm (the original size); we will check this
 % in the camera-ready version and ask you to change it back.
 
-\title{Do multi-sense embedding learn more senses? \\ An evalutaion in linear
+\title{Do multi-sense embeddings learn more senses? \\ An evalutaion in linear
 translation}
 \author{
   Márton Makrai \\
@@ -74,22 +74,54 @@ applied the method by \citet{Mikolov:2013x} who train a translation mapping
 from the source languages embedding to the target as a least-squares regression
 supervised by a seed dictionary of the  few thousand most frequent words. The
 translation of a source word vector is the nearest neighbor of its image by the
-mapping in the target space. In the multi-sense setting, we translated from an
-MSE (the target embedding remaining single-sense).
+mapping in the target space. In the multi-sense setting, we translated from
+MSEs (the target embedding remaining single-sense).
 
 Now we develop the eveluation further. Part of the eveluation task is to decide
 on empirical grounds whether different good translations of a word are synonyms
-or translations in different senses.  We propose analysis as follows.  Because
-of the nearest neighbor search, the distance between the translations is not
-determined by the distance of the sense vectors in the source space.  We
-analyze the distances between the translations of different senses of each
-word. 
+or translations in different senses.  We analyze sense vectors based on their
+distance, which is not directly determined by the distance of the sense vectors
+in the source space because of the nearest neighbor search.
+
+The code for these experiments can be found at
 \url{https://github.com/makrai/wsi-fest}
 
 \section{%Monosemy:
   Towards a less delicious
   %sense
   inventory}
+
+\begin{figure}[b]
+    \centering
+    \resizebox{\columnwidth}{!} {
+        \begin{tikzpicture}[line width=2pt] %[&gt;=stealth']
+            \tikzstyle{every node}=[font=\huge]
+            %\tikzset{every edge thick}
+            \node          (hf) at (2, 2)  {finom};
+            \node          (hf) at (1.7, 1.4)  {durva};
+            \node          (hs) at (5, 4)  {finom};
+            \node          (hs) at (4.5, 4.6)  {ízletes};
+            \node          (gf) at (11, 2) {fine};
+            \node          (gf) at (11, 1.4) {coarse};
+            \node		 (gs) at (14, 4) {delicious};
+            \node		 (gs) at (15.5, 3.4) {tasty};
+            \node (ho) at (0, 0) {};
+            \node (hx) at (8, 0) {};
+            \node (hy) at (0, 6) {};
+            \node (go) at (9,0) {};
+            \node (gx) at (17,0) {};
+            \node (gy) at (9,6) {};
+
+            \draw[->] (ho) edge (hx);
+            \draw[->] (ho) edge (hy);
+            \draw[->] (go) edge (gx);
+            \draw[->] (go) edge (gy);
+        \end{tikzpicture}
+    }
+    \caption{Linear translation of word senses. The Hungarian word
+        \emph{finom} is ambiguous between `fine' and `delicious'.}
+        \label{fig:AdaGram}
+\end{figure}
 
 The differentiation of word senses, as already noted in \cite{Borbely:2016}, is
 fraught with difficulties, especially when we wish to distinguish homophony,
@@ -98,8 +130,8 @@ Russian {\it mir} `world' and {\it mir} `peace' from polysemy, where speakers
 feel that the two senses are very strongly connected, such as in Hungarian {\it
 nap} `day' and {\it nap} `sun'.  To quote \cite{Zgusta:1971} ``Of course it is
 a pity that we have to rely on the subjective interpretations of the speakers,
-but we have hardly anything else on hand''. Etymology makes clear that
-different languages make different lump/split decisions in the conceptual
+but we have hardly anything else on hand''. %Etymology makes clear that
+Different languages make different lump/split decisions in the conceptual
 space, so much so that translational relatedness can, to a remarkable extent,
 be used to recover the universal clustering \citep{Youn:2016}.
 
@@ -164,8 +196,8 @@ animal.
 % of granularity, either more towards broader categories (lumping) or
 % fine-grained ones (splitting), depending on the purpose of the dictionary, its
 % size, target users etc.  Dictionaries, even those for the same types of users
-% and of similar size, offer (very) different sense division of many words.  
-% 
+% and of similar size, offer (very) different sense division of many words.
+%
 % While homonyms with their non-overlapping semantic fields easily lend
 % themselves to \emph{sense-tagging}, polysemic meanings pose real challenge.
 % Lexicons may comprise overlapping meanings, which render the unique assignment
@@ -182,10 +214,15 @@ animal.
 
 \section{Multi-sense word embeddings}
 
+% TODO
+
 MSEs originate with \cite{Reisinger:2010,Huang:2012} who use a uniform number
-of clusters for all words that are selected as potentially ambiguous.  adaptive
-sense numbers \citep{Neelakantan:2014}, new senses are introduced during
-training.  Dirichlet process, AdaGram \citep{Bartunov:2015}, where senses may
+of clusters for all words that they selected as potentially ambiguous.  The
+first system with adaptive
+sense numbers is a modification of skip-gram \cite{Mikolov:2013d}, multi-sense
+skip-gram \citep{Neelakantan:2014}, where new senses are introduced during
+training by tresholding the similarity of the present context to earlier
+contexts.  Dirichlet process, AdaGram \citep{Bartunov:2015}, where senses may
 be merged as well as allocated during training; and and mutli-sense skip-gram
 \citep{Li:2015}
 % mi a fő különbség Reisinger és Huang között?
@@ -203,40 +240,6 @@ semantic resolution
  \cite{Mikolov:2013x} discovered that embeddings of different languages are so
  similar that a linear transformation can map vectors of the source language
  words to the vectors of their translations.
-
-\begin{figure}[b]
-    \centering
-    \resizebox{\columnwidth}{!} {
-        \begin{tikzpicture}[line width=2pt] %[&gt;=stealth']
-            \tikzstyle{every node}=[font=\huge]
-            %\tikzset{every edge thick}
-            \node          (hf) at (2, 2)  {finom};
-            \node          (hf) at (1.7, 1.4)  {értelmezés};
-            \node          (hs) at (5, 4)  {finom};
-            \node          (hs) at (4.5, 4.6)  {tanulmány};
-            \node          (gf) at (11, 2) {fine};
-            \node          (gf) at (11, 1.4) {interpretation};
-            \node		 (gs) at (14, 4) {delicions};
-            \node		 (gs) at (15.5, 3.4) {memorandum };
-            \node (ho) at (0, 0) {};
-            \node (hx) at (8, 0) {};
-            \node (hy) at (0, 6) {};
-            \node (go) at (9,0) {};
-            \node (gx) at (17,0) {};
-            \node (gy) at (9,6) {};
-
-            \draw[->] (ho) edge (hx);
-            \draw[->] (ho) edge (hy);
-            \draw[->] (go) edge (gx);
-            \draw[->] (go) edge (gy);
-        \end{tikzpicture}
-    }
-    \caption{Linear translation of word senses. The Hungarian word
-        \emph{finom} is ambiguous between `fine' and `delicions'.  The two
-        senses are identified by the ``neighboring'' words \emph{értelmezés}
-    `interpretation' and \emph{tanulmány} `memorandum'.
-    } \label{fig:AdaGram}
-\end{figure}
 
 The method uses a seed dictionary of a few thousand words to learn translation
 as a linear mapping $W: \mathbb{R}^{d_1}\rightarrow \mathbb{R}^{d_2}$ from the
@@ -294,7 +297,7 @@ evaluation a translation is taken to be correct if any of the source word's
 senses are translated into any of its gold translations.  In strict evaluation
 the translations of the source word are expected to cover all of its gold
 translations.  For example if {\it finom} has two gold translations, {\it
-  delicions} and {\it fine}, and its actual translations are `delicions' and some
+  delicious} and {\it fine}, and its actual translations are `delicious' and some
 word other than `fine', then it has a lax score of $2$, but a strict score
 of $1$.
 
@@ -346,6 +349,9 @@ among sim $le.48$ % TODO
 % target space is above the threshold judged significant by the analysis of the
 % distance distribution.
 
+missing sense
+  édes [['sweetheart'], ['cute
+  közvetlen [['informal'], ['casual
 
 \begin{table*}[t]
   %\footnotesize
@@ -373,15 +379,17 @@ figyel	& \{watch, listen\}, \{watch\}, \{listen\}	\\
 
 We give qualitative analysis of words for which the model with the best
 parameter setting succeeds to attribute more sense vectors with different good
-translations. The clearest case of homonymy is when different senses differ in
-their POS, such as \emph{nő} `woman; increase' or \emph{vár} `wait; case'.
-More interesting are words whose one sense is a special case of an other sense
-of the same word, e.g.~ \emph{cikk}, `item; article' (an
-article is an item in a newspaper); \emph{eredmény}, `score; result' (a score
-is a result measured by a number); \emph{magas}, `tall; high' (tall is used for
-people in spite of high). The meanings of \emph{idegen}, `strange, alien;
-foreign' are special cases of unfamiliar (person versus language).  Note that
-in the \fl~approach, POS-difference alone is not enough for analyzing a word as
+translations. The clearest case of homonymy is when senses belong to different
+POS, and the translations reflect these POSs, e.g.~\emph{nő} `woman; increase'
+or \emph{vár} `wait; case'.  In some cases, the POS difference on the source
+side is less clear, e.g.~\emph{önkéntes} `voluntary; volunteer'. More
+interesting are words with POS dif whose one sense is a special case of an
+other sense of the same word, e.g.~ \emph{cikk}, `item; article' (an article is
+an item in a newspaper); \emph{eredmény}, `score; result' (a score is a result
+measured by a number); \emph{magas}, `tall; high' (tall is used for people in
+spite of high). The meanings of \emph{idegen}, `strange, alien; foreign' are
+special cases of unfamiliar (person versus language).  Note that in the
+\fl~approach, POS-difference alone is not enough for analyzing a word as
 ambiguous, e.g.~the only difference between the senses of \emph{alkalmazott},
 `employee; applied' is that employment is the application of people for work;
 in the case of \emph{belső} `internal; interior', the noun \emph{interior}
@@ -390,10 +398,9 @@ where the relation between the two senses is more idiosyncratic, but in a
 monosemic approach, they will have a single representation: \emph{beteg} means
 `ill, sick; patient'. Though \emph{ill} is a health state and \emph{patient} is
 a situational role, the fact that patients of doctors are usually ill, may
-suffice for identifying the `patent' based on the representation of
-\emph{ill}; and a monosemic system is designed to give account of metaphorical
-relations like the one between the meanings of \emph{világos}, `bright; clear'
-as well.
+suffice for identifying the `patent' based on the representation of \emph{ill};
+and a monosemic system is designed to give account of metaphorical relations
+like the one between the meanings of \emph{világos}, `bright; clear' as well.
 
 Calling a translation $t$ \emph{common}, if all the sense vectors that have at
 least one good translation have $t$ among its translations, we find that when a
@@ -405,11 +412,6 @@ among the good translations of this general vector, see
 \autoref{tab:like_than}.
 
 \section{Acknowledgments}
-
-Section \ref{sec:bground} was written by Veronika Lipp (Research Institute for
-Linguistics of the Hungarian Academy of Sciences).
-
-\bigskip
 
 1957 was an influential year in linguistics: \cite{Harris:1957} developed the
 frequency-aware variant of the distributional method, \cite{Osgood:1957}
@@ -436,7 +438,12 @@ the first compiler and popularized the idea of machine-independent programming
 languages. Both the alleged and the real source remind me to that I still have
 lessons to learn in efficiency.
 
-% \cite{Swadesh:1955}
+% TODO Thank you
+
+\smallskip
+
+Section \ref{sec:bground} was written by Veronika Lipp (Research Institute for
+Linguistics of the Hungarian Academy of Sciences).
 
 \bibliographystyle{acl_natbib}
 \bibliography{ml}
