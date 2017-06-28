@@ -9,14 +9,21 @@
 \usepackage{natbib}
 \usepackage{hyperref}
 \usepackage{amsmath,amssymb,amsfonts,amsthm,amstext,amscd}
-\usepackage{color}
+%\usepackage[usenames, dvipsnames]{color}
+
 \newcommand{\jiweil}{\texttt{jiweil}}
 \newcommand{\huang}{\texttt{huang}}
 \newcommand{\neelakantan}{\texttt{neela}}
 \newcommand{\Ro}{\mathbb{R}^{d_1}}
 \newcommand{\Rt}{\mathbb{R}^{d_2}}
 \newcommand{\fl}{\texttt{4lang}}
+
 \usepackage{tikz}
+\definecolor{hltblue}{RGB}{3,61,92}
+\definecolor{hltdarkgreen}{RGB}{26,148,129}
+\definecolor{hltlightgreen}{RGB}{155,204,147}
+\definecolor{hltyellow}{RGB}{252,238,166}
+
 \usepackage{booktabs}
 %\usepackage{multirow,multicol}
 \usepackage{cleveref}
@@ -32,9 +39,9 @@
 %\usepackage{todonotes}
 
 \aclfinalcopy % Uncomment this line for the final submission
-\def\aclpaperid{28} %  Enter the acl Paper ID here
+%\def\aclpaperid{28} %  Enter the acl Paper ID here
 
-\setlength\titlebox{8cm}
+%\setlength\titlebox{8cm}
 %\setlength\titlebox{50ex}  % Vertical space allocated for \Authors
 % You can expand the titlebox if you need extra space
 % to show all the authors. Please do not make the titlebox
@@ -44,8 +51,8 @@
 \title{Do multi-sense embeddings learn more senses? \\ An evalutaion in linear
 translation}
 \author{
-  Márton Makrai \\
-  %Institute for Linguistics\\
+  Márton Makrai
+  %\\ Institute for Linguistics\\
   %Hungarian Academy of Sciences \\
   %Bencz\'ur u. 33 \\ 1068 Budapest, Hungary \\
   %{\tt makrai.marton@nytud.mta.hu} \\
@@ -56,7 +63,7 @@ translation}
 \begin{document}
 \maketitle
 
-\hspace{2cm}
+%\hspace{2cm}
 
 %\begin{abstract}
 %\end{abstract}
@@ -97,14 +104,14 @@ The code for these experiments can be found at
         \begin{tikzpicture}[line width=2pt] %[&gt;=stealth']
             \tikzstyle{every node}=[font=\huge]
             %\tikzset{every edge thick}
-            \node          (hf) at (2, 2)  {finom};
-            \node          (hf) at (1.7, 1.4)  {durva};
-            \node          (hs) at (5, 4)  {finom};
-            \node          (hs) at (4.5, 4.6)  {ízletes};
-            \node          (gf) at (11, 2) {fine};
-            \node          (gf) at (11, 1.4) {coarse};
-            \node		 (gs) at (14, 4) {delicious};
-            \node		 (gs) at (15.5, 3.4) {tasty};
+            \node[text=hltdarkgreen] (hf) at (2, 2) {finom};
+            \node (hf) at (1.7, 1.4)  {durva};
+            \node[text=hltdarkgreen] (hs) at (5, 4)  {finom};
+            \node (hs) at (4.5, 4.6)  {ízletes};
+            \node[text=hltdarkgreen] (gf) at (11, 2) {fine};
+            \node (gf) at (11, 1.4) {coarse};
+            \node[text=hltdarkgreen] (gs) at (14, 4) {delicious};
+            \node (gs) at (12.5, 4.6) {tasty};
             \node (ho) at (0, 0) {};
             \node (hx) at (8, 0) {};
             \node (hy) at (0, 6) {};
@@ -134,6 +141,7 @@ but we have hardly anything else on hand''. %Etymology makes clear that
 Different languages make different lump/split decisions in the conceptual
 space, so much so that translational relatedness can, to a remarkable extent,
 be used to recover the universal clustering \citep{Youn:2016}.
+\Cref{sec:bground} offers an overview by Veronika Lipp.
 
 \subsection{Lexicographic Background \\ (Veronika Lipp)}
 
@@ -310,7 +318,7 @@ seed dictionary, extracted with
 % s}ingle-sense and {\bf m}ulti-sense translation.
 
 ``forward'' neighbor search: precision increases with vocabulary cut-off, see
-\autoref{tab:prec}
+\cref{tab:prec}
 
 \begin{table*}
   \centering
@@ -409,7 +417,7 @@ are 13 such words with the best parameter setting), with most of the words
 there is a more ``general'' vector (or two, in the case of \emph{tud}) that has
 more good translations, and good translations of the other vectors are mostly
 among the good translations of this general vector, see
-\autoref{tab:like_than}.
+\cref{tab:like_than}.
 
 \section{Acknowledgments}
 
@@ -442,7 +450,7 @@ lessons to learn in efficiency.
 
 \smallskip
 
-Section \ref{sec:bground} was written by Veronika Lipp (Research Institute for
+\Cref{sec:bground} was written by Veronika Lipp (Research Institute for
 Linguistics of the Hungarian Academy of Sciences).
 
 \bibliographystyle{acl_natbib}
