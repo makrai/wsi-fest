@@ -5,11 +5,13 @@ from collections import defaultdict
 from functools import reduce
 import logging
 import os
+import configparser
 
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from gensim.models import KeyedVectors
 
+default_config_filen = 'hlt_bp.ini'
 
 class MultiSenseLinearTranslator():
     """
@@ -18,8 +20,8 @@ class MultiSenseLinearTranslator():
     """
 
     def __init__(self, args=None, source_mse=None, target_embed=None,
-                 seed_dict=None, orthog=None, translate_all=None, reverse=None,
-                 restrict_vocab=None, prec_level=None):
+                 seed_dict=None, orthog=True, translate_all=False, reverse=True,
+                 restrict_vocab=2**15, prec_level=10):
         def get_first_vectors(filen):
             root, ext = os.path.splitext(filen)
             gens_fn = '{}.gensim'.format(root)
@@ -30,18 +32,28 @@ class MultiSenseLinearTranslator():
                 embed.save(gens_fn)
                 return embed
 
+        def get_proxy(filen):
+            config = configparser.ConfigParser()
+            config.read(filen)
+            return config['DEFAULT']
+
         if args:
             self.args = args
+            default_proxy = get_proxy(args.config_file)
         else:
             self.args = argparse.Namespace()
-            self.args.source_mse = source_mse if source_mse else '/mnt/permanent/Language/Hungarian/Embed/multiprot/adagram/mnsz/adagram-mnsz-600d-a.05-5p-m100_sense.mse'
-            self.args.target_embed = target_embed if target_embed else '/mnt/permanent/Language/English/Embed/glove.840B.300d.gensim'
-            self.args.seed_dict = seed_dict if seed_dict else '/mnt/store/makrai/data/language/hungarian/dict/wikt2dict-en-hu.by-freq'
-            self.args.orthog = orthog if orthog else  False
-            self.args.translate_all = translate_all if translate_all else  False
-            self.args.reverse = reverse if reverse else  True
-            self.args.restrict_vocab = restrict_vocab if restrict_vocab else 2**15
-            self.args.prec_level = prec_level if prec_level else  10
+            self.args.orthog = orthog
+            self.args.translate_all = translate_all 
+            self.args.reverse = reverse 
+            self.args.restrict_vocab = restrict_vocab 
+            self.args.prec_level = prec_level 
+            default_proxy = get_proxy(default_config_filen)
+        if not self.args.source_mse:
+            self.args.source_mse = source_mse if source_mse else default_proxy['SourceMse']
+        if not self.args.target_embed:
+            self.args.target_embed = target_embed if target_embed else default_proxy['TargetEmbed']
+        if not self.args.seed_dict:
+            self.args.seed_dict = seed_dict if seed_dict else default_proxy['SeedDict']
         self.source_firsts = get_first_vectors(self.args.source_mse)
         logging.basicConfig(
             format="%(asctime)s %(module)s (%(lineno)s) %(levelname)s %(message)s",
@@ -117,7 +129,7 @@ class MultiSenseLinearTranslator():
                 uniq_hit_sets = set(' '.join(s) for s in uniq_hits_by_vec if s)
                 if len(uniq_hit_sets) > 1:
                     self.good_disambig += 1
-                    uniq_hit_sets = [neigh.split(' ')
+                    uniq_hit_sets = [neigh.split()
                                      for neigh in uniq_hit_sets]
                     uniq_hit_sets.sort(key=len, reverse=True)
                     if len(uniq_hit_sets) > 1:
@@ -245,28 +257,20 @@ class MultiSenseLinearTranslator():
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--source_mse',
-        default='/mnt/permanent/Language/Hungarian/Embed/multiprot/adagram/mnsz/'
-        'adagram-mnsz-600d-a.05-5p-m100_sense.mse')
-    parser.add_argument(
-        '--target_embed',
-        default='/mnt/permanent/Language/English/Embed/'
-        'glove.840B.300d.gensim')
-    parser.add_argument(
-        '--seed_dict',
-        default='/mnt/store/makrai/data/language/hungarian/dict/'
-        'wikt2dict-en-hu.by-freq',
-        help='Name of the seed dictionary file. The order of the source'
-        ' and the target language in the arguments for embeddings and in'
-        ' the word pairs in the seed file is opposite')
+        '--config_file', default='hlt_bp.ini', 
+        help='Name of the seed dictionary file. The order of the source and'
+        ' the target language in the arguments for embeddings and in the word'
+        ' pairs in the seed file is opposite') 
+    parser.add_argument('--source_mse')
+    parser.add_argument('--target_embed')
+    parser.add_argument('--seed_dict')
     parser.add_argument(
         '--general-linear-mapping', dest='orthog', action='store_false')
     parser.add_argument('--translate_all', action='store_true')
     parser.add_argument('--vanilla-nn-search', dest='reverse',
                         action='store_false', 
                         help='Do not compute reverse NNs')
-    parser.add_argument('--restrict_vocab', type=int, default=2**15,
-                        help='default is 2^16, cca 66 K')
+    parser.add_argument('--restrict_vocab', type=int, default=2**15)
     parser.add_argument('--prec_level', type=int, default=10)
     parser.add_argument('--silent', action='store_true')
     return parser.parse_args()
