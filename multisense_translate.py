@@ -24,7 +24,7 @@ class MultiSenseLinearTranslator():
             root, ext = os.path.splitext(filen)
             gens_fn = '{}.gensim'.format(root)
             if os.path.isfile(gens_fn):
-                return KeyedVectors.load(gens_fn)
+               return KeyedVectors.load(gens_fn)
             else:
                 embed = KeyedVectors.load_word2vec_format(filen)
                 embed.save(gens_fn)
@@ -40,7 +40,7 @@ class MultiSenseLinearTranslator():
             self.args.orthog = orthog if orthog else  False
             self.args.translate_all = translate_all if translate_all else  False
             self.args.reverse = reverse if reverse else  True
-            self.args.restrict_vocab = restrict_vocab if restrict_vocab else  2**16
+            self.args.restrict_vocab = restrict_vocab if restrict_vocab else 2**15
             self.args.prec_level = prec_level if prec_level else  10
         self.source_firsts = get_first_vectors(self.args.source_mse)
         logging.basicConfig(
@@ -108,7 +108,8 @@ class MultiSenseLinearTranslator():
             # TODO monitor the neighborhood rank of the good translations
             hit_by_vec = [ns.intersection(self.test_dict[sr_word])
                           for ns in neighbor_by_vec]
-            if reduce(set.union, hit_by_vec):
+            good_trans = reduce(set.union, hit_by_vec)
+            if good_trans:
                 self.score += 1
                 common_hits = reduce(set.intersection, hit_by_vec)
                 uniq_hits_by_vec = [trans - common_hits
@@ -123,12 +124,14 @@ class MultiSenseLinearTranslator():
                         w1, w2 = [list(hits)[0] for hits in uniq_hit_sets[:2]]
                         sim = self.target_embed.similarity(w1, w2)
                         self.sims.append(sim)
-                        msg = '{} {} {} {} {}'.format(
+                        msg = '{} {} {} {} {} {}'.format(
                             sim, sr_word, uniq_hit_sets, '_'.join(common_hits),
+                            len(good_trans)/len(self.test_dict[sr_word]),
                             self.good_disambig)
-                        print(msg)
-                        if not self.good_disambig % 10:
-                            logging.debug(msg)
+                        if not self.args.silent:
+                            print(msg)
+                        #if not self.good_disambig % 10:
+                        logging.debug(msg)
             if not self.test_size_act % 1000 and self.test_size_act:
                 log_prec()
 
@@ -262,9 +265,10 @@ def parse_args():
     parser.add_argument('--vanilla-nn-search', dest='reverse',
                         action='store_false', 
                         help='Do not compute reverse NNs')
-    parser.add_argument('--restrict_vocab', type=int, default=2**16,
+    parser.add_argument('--restrict_vocab', type=int, default=2**15,
                         help='default is 2^16, cca 66 K')
     parser.add_argument('--prec_level', type=int, default=10)
+    parser.add_argument('--silent', action='store_true')
     return parser.parse_args()
 
 
