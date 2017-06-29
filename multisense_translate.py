@@ -132,18 +132,17 @@ class MultiSenseLinearTranslator():
                     uniq_hit_sets = [neigh.split()
                                      for neigh in uniq_hit_sets]
                     uniq_hit_sets.sort(key=len, reverse=True)
-                    if len(uniq_hit_sets) > 1:
-                        w1, w2 = [list(hits)[0] for hits in uniq_hit_sets[:2]]
-                        sim = self.target_embed.similarity(w1, w2)
-                        self.sims.append(sim)
-                        msg = '{} {} {} {} {} {}'.format(
-                            sim, sr_word, uniq_hit_sets, '_'.join(common_hits),
-                            len(good_trans)/len(self.test_dict[sr_word]),
-                            self.good_disambig)
-                        if not self.args.silent:
-                            print(msg)
-                        #if not self.good_disambig % 10:
-                        logging.debug(msg)
+                    w1, w2 = [list(hits)[0] for hits in uniq_hit_sets[:2]]
+                    sim = self.target_embed.similarity(w1, w2)
+                    self.sims.append(sim)
+                    msg = '{} {} {} {} {:.2} {}'.format(
+                        sim, sr_word, uniq_hit_sets, '_'.join(common_hits),
+                        len(good_trans)/len(self.test_dict[sr_word]),
+                        self.good_disambig)
+                    if not self.args.silent:
+                        print(msg)
+                    #if not self.good_disambig % 10:
+                    logging.debug(msg)
             if not self.test_size_act % 1000 and self.test_size_act:
                 log_prec()
 
