@@ -250,7 +250,8 @@ class MultiSenseLinearTranslator():
                     self.sr_i += 1
                 else:
                     sr_vecs.append(np.fromstring(vect_str, sep=' ').reshape((1,-1)))
-        print('{:.1%}'.format(float(self.score)/self.test_size_act))
+        print('{:.1%} {}'.format(float(self.score)/self.test_size_act,
+                                self.good_disambig))
         return self.sims
 
 
