@@ -117,13 +117,13 @@ class MultiSenseLinearTranslator():
                     self.good_disambig))
 
         def eval_word(sr_word, neighbor_by_vec):
-            # TODO monitor the neighborhood rank of the good translations
             hit_by_vec = [ns.intersection(self.test_dict[sr_word])
                           for ns in neighbor_by_vec]
             good_trans = reduce(set.union, hit_by_vec)
             if good_trans:
                 self.score += 1
-                common_hits = reduce(set.intersection, hit_by_vec)
+                common_hits = reduce(set.intersection, 
+                                     [hits for hits in hit_by_vec if hits])
                 uniq_hits_by_vec = [trans - common_hits
                                     for trans in hit_by_vec]
                 uniq_hit_sets = set(' '.join(s) for s in uniq_hits_by_vec if s)
@@ -192,6 +192,10 @@ class MultiSenseLinearTranslator():
             rev_rank_mx = rev_rank_mx.argsort().astype('uint16')
             return rev_rank_mx
 
+        def get_tie_broken_rev_rank():
+            sim_mx = self.translated_points.dot(self.target_embed.syn0.T)
+            # TODO
+
         def normalize(vecs):
             vecs /= np.apply_along_axis(np.linalg.norm, 1,
                                         vecs).reshape((-1,1))
@@ -206,9 +210,9 @@ class MultiSenseLinearTranslator():
                 if self.args.reverse:
                     self.sr_i = 0
                 sr_vocab, source_mse = read_sr_embed()
-                normalize(source_mse)
-                normalize(self.target_embed.syn0)
                 self.translated_points = source_mse.dot(self.regression.coef_.T)
+                normalize(self.target_embed.syn0)
+                normalize(self.translated_points)
                 self.rev_rank_mx = get_rev_rank()
 
         logging.info('Testing...')
@@ -249,6 +253,7 @@ class MultiSenseLinearTranslator():
                     self.sr_i += 1
                 else:
                     sr_vecs.append(np.fromstring(vect_str, sep=' ').reshape((1,-1)))
+                    # TODO normalize
         print('{:.1%} {}'.format(float(self.score)/self.test_size_act,
                                 self.good_disambig))
         return self.sims
