@@ -43,10 +43,10 @@ class MultiSenseLinearTranslator():
         else:
             self.args = argparse.Namespace()
             self.args.orthog = orthog
-            self.args.translate_all = translate_all 
-            self.args.reverse = reverse 
-            self.args.restrict_vocab = restrict_vocab 
-            self.args.prec_level = prec_level 
+            self.args.translate_all = translate_all
+            self.args.reverse = reverse
+            self.args.restrict_vocab = restrict_vocab
+            self.args.prec_level = prec_level
             default_proxy = get_proxy(default_config_filen)
         if not self.args.source_mse:
             self.args.source_mse = source_mse if source_mse else default_proxy['SourceMse']
@@ -58,12 +58,18 @@ class MultiSenseLinearTranslator():
         logging.basicConfig(
             format="%(asctime)s %(module)s (%(lineno)s) %(levelname)s %(message)s",
             level=logging.DEBUG)
-        self.target_embed = get_first_vectors(self.args.target_embed) 
+        self.target_embed = get_first_vectors(self.args.target_embed)
+        if self.args.orthog:
+            self.source_firsts.syn0
+            self.target_embed.syn0
 
     def main(self):
         with open(self.args.seed_dict) as self.seed_f:
             self.train()
             return self.test()
+
+    def normalize(vecs):
+        vecs /= np.apply_along_axis(np.linalg.norm, 1, vecs).reshape((-1,1))
 
     def train(self, train_size_goal = 5000):
         self.train_sr = np.zeros((train_size_goal,
@@ -101,7 +107,7 @@ class MultiSenseLinearTranslator():
         G. Dinu, A. Lazaridou and M. Baroni
         Improving zero-shot learning by mitigating the hubness problem.
         Proceedings of ICLR 2015, workshop track
-        """ 
+        """
         # Inner functions used both in reverse and normal mode
         def read_test_dict():
             self.test_dict = defaultdict(set)
@@ -122,7 +128,7 @@ class MultiSenseLinearTranslator():
             good_trans = reduce(set.union, hit_by_vec)
             if good_trans:
                 self.score += 1
-                common_hits = reduce(set.intersection, 
+                common_hits = reduce(set.intersection,
                                      [hits for hits in hit_by_vec if hits])
                 uniq_hits_by_vec = [trans - common_hits
                                     for trans in hit_by_vec]
@@ -196,9 +202,6 @@ class MultiSenseLinearTranslator():
             sim_mx = self.translated_points.dot(self.target_embed.syn0.T)
             # TODO
 
-        def normalize(vecs):
-            vecs /= np.apply_along_axis(np.linalg.norm, 1,
-                                        vecs).reshape((-1,1))
 
         def init_test():
             self.test_size_goal = 1000
@@ -211,8 +214,8 @@ class MultiSenseLinearTranslator():
                     self.sr_i = 0
                 sr_vocab, source_mse = read_sr_embed()
                 self.translated_points = source_mse.dot(self.regression.coef_.T)
-                normalize(self.target_embed.syn0)
-                normalize(self.translated_points)
+                self.normalize(self.target_embed.syn0)
+                self.normalize(self.translated_points)
                 self.rev_rank_mx = get_rev_rank()
 
         logging.info('Testing...')
@@ -239,11 +242,12 @@ class MultiSenseLinearTranslator():
                         if self.args.reverse:
                             rev_rank_row_block = self.rev_rank_mx[act_sense_indices]
                             neighbor_by_vec = [
-                                set(self.target_embed.index2word[i] 
-                                 for  i in rev_rank_row[:self.args.prec_level]) 
+                                set(self.target_embed.index2word[i]
+                                 for  i in rev_rank_row[:self.args.prec_level])
                                 for rev_rank_row in rev_rank_row_block]
                         else:
                             tg_vecs = np.concatenate(sr_vecs).dot(self.regression.coef_.T)
+                            self.normalize(tg_vecs)
                             neighbor_by_vec = [neighbors_by_vector(v) for v in tg_vecs]
                         eval_word(sr_word, neighbor_by_vec)
                     sr_word = new_sr_word
@@ -253,7 +257,7 @@ class MultiSenseLinearTranslator():
                     self.sr_i += 1
                 else:
                     sr_vecs.append(np.fromstring(vect_str, sep=' ').reshape((1,-1)))
-                    # TODO normalize
+
         print('{:.1%} {}'.format(float(self.score)/self.test_size_act,
                                 self.good_disambig))
         return self.sims
@@ -262,10 +266,10 @@ class MultiSenseLinearTranslator():
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--config_file', default='hlt_bp.ini', 
+        '--config_file', default='hlt_bp.ini',
         help='Name of the seed dictionary file. The order of the source and'
         ' the target language in the arguments for embeddings and in the word'
-        ' pairs in the seed file is opposite') 
+        ' pairs in the seed file is opposite')
     parser.add_argument('--source_mse')
     parser.add_argument('--target_embed')
     parser.add_argument('--seed_dict')
@@ -273,7 +277,7 @@ def parse_args():
         '--general-linear-mapping', dest='orthog', action='store_false')
     parser.add_argument('--translate_all', action='store_true')
     parser.add_argument('--vanilla-nn-search', dest='reverse',
-                        action='store_false', 
+                        action='store_false',
                         help='Do not compute reverse NNs')
     parser.add_argument('--restrict_vocab', type=int, default=2**15)
     parser.add_argument('--prec_level', type=int, default=10)
