@@ -13,6 +13,7 @@ from gensim.models import KeyedVectors
 
 default_config_filen = 'hlt_bp.ini'
 
+
 class MultiSenseLinearTranslator():
     """
     Cross-lingual word sense induction experiments: linear translation (Mikolov
@@ -22,15 +23,16 @@ class MultiSenseLinearTranslator():
     def __init__(self, args=None, source_mse=None, target_embed=None,
                  seed_dict=None, orthog=False, translate_all=False, reverse=True,
                  restrict_vocab=2**15, prec_level=10):
+
         def get_first_vectors(filen):
             root, ext = os.path.splitext(filen)
             gens_fn = '{}.gensim'.format(root)
             if os.path.isfile(gens_fn):
-               return KeyedVectors.load(gens_fn)
+                embed = KeyedVectors.load(gens_fn)
             else:
                 embed = KeyedVectors.load_word2vec_format(filen)
                 embed.save(gens_fn)
-                return embed
+            return embed
 
         def get_proxy(filen):
             config = configparser.ConfigParser()
@@ -54,22 +56,34 @@ class MultiSenseLinearTranslator():
             self.args.target_embed = target_embed if target_embed else default_proxy['TargetEmbed']
         if not self.args.seed_dict:
             self.args.seed_dict = seed_dict if seed_dict else default_proxy['SeedDict']
+        self.center = False
+        self.normalize_data = False
+
         self.source_firsts = get_first_vectors(self.args.source_mse)
         logging.basicConfig(
             format="%(asctime)s %(module)s (%(lineno)s) %(levelname)s %(message)s",
             level=logging.DEBUG)
         self.target_embed = get_first_vectors(self.args.target_embed)
-        if self.args.orthog:
-            self.source_firsts.syn0
-            self.target_embed.syn0
+
+    def get_center(self, embed):
+        return np.sum(embed, axis=0)/embed.shape[0]
 
     def main(self):
+        if self.normalize_data:
+            self.normalize(self.source_firsts.syn0)
+            self.normalize(self.target_embed.syn0)
+        if self.center:
+            self.sr_center = self.get_center(self.source_firsts.syn0)
+            self.tg_center = self.get_center(self.target_embed.syn0)
+            self.source_firsts.syn0 -= self.sr_center
+            self.target_embed.syn0 -= self.tg_center
+
         with open(self.args.seed_dict) as self.seed_f:
             self.train()
             return self.test()
 
-    def normalize(vecs):
-        vecs /= np.apply_along_axis(np.linalg.norm, 1, vecs).reshape((-1,1))
+    def normalize(self, embed):
+        embed /= np.apply_along_axis(np.linalg.norm, 1, embed).reshape((-1,1))
 
     def train(self, train_size_goal = 5000):
         self.train_sr = np.zeros((train_size_goal,
@@ -109,6 +123,20 @@ class MultiSenseLinearTranslator():
         Proceedings of ICLR 2015, workshop track
         """
         # Inner functions used both in reverse and normal mode
+        def init_test():
+            self.test_size_goal = 1000
+            self.test_size_act = 0
+            self.score = 0
+            self.good_disambig = 0
+            read_test_dict()
+            if self.args.reverse:
+                self.sr_i = 0
+                sr_vocab, source_mse = read_sr_embed()
+                self.translated_points = source_mse.dot(self.regression.coef_.T)
+                self.normalize(self.target_embed.syn0)
+                self.normalize(self.translated_points)
+                self.rev_rank_mx = get_rev_rank()
+
         def read_test_dict():
             self.test_dict = defaultdict(set)
             for line in self.seed_f.readlines():
@@ -141,7 +169,7 @@ class MultiSenseLinearTranslator():
                     w1, w2 = [list(hits)[0] for hits in uniq_hit_sets[:2]]
                     sim = self.target_embed.similarity(w1, w2)
                     self.sims.append(sim)
-                    msg = '{} {} {} {} {:.2} {}'.format(
+                    msg = '{:.4} {} {} {} {:.2} {}'.format(
                         sim, sr_word, uniq_hit_sets, '_'.join(common_hits),
                         len(good_trans)/len(self.test_dict[sr_word]),
                         self.good_disambig)
@@ -152,7 +180,7 @@ class MultiSenseLinearTranslator():
             if not self.test_size_act % 1000 and self.test_size_act:
                 log_prec()
 
-        # Inner functions used only in the vanilla (non-reverse) version
+        # Inner functions used only in the fwd (non-reverse) version
         def neighbors_by_vector(vect):
             sense_neighbors, _ = zip(*self.target_embed.similar_by_vector(
                 vect, restrict_vocab=self.args.restrict_vocab, topn=self.args.prec_level))
@@ -172,6 +200,10 @@ class MultiSenseLinearTranslator():
                 self.args.source_mse, skip_header=1, max_rows=self.args.restrict_vocab,
                 usecols=np.arange(1, int(dim)+1), dtype='float16',
                 comments=None)
+            if self.center:
+                source_mse -= self.sr_center
+            if self.normalize_data:
+                self.normalize(source_mse)
             logging.info(
                 'Source vocab and mx read {}'.format(source_mse.shape))
             return sr_vocab, source_mse
@@ -209,22 +241,6 @@ class MultiSenseLinearTranslator():
                 rev_rank_mx = rev_rank_mx.argsort().astype('uint16')
                 return rev_rank_mx
 
-
-        def init_test():
-            self.test_size_goal = 1000
-            self.test_size_act = 0
-            self.score = 0
-            self.good_disambig = 0
-            read_test_dict()
-            if self.args.reverse:
-                if self.args.reverse:
-                    self.sr_i = 0
-                sr_vocab, source_mse = read_sr_embed()
-                self.translated_points = source_mse.dot(self.regression.coef_.T)
-                self.normalize(self.target_embed.syn0)
-                self.normalize(self.translated_points)
-                self.rev_rank_mx = get_rev_rank()
-
         logging.info('Testing...')
         init_test()
         with open(self.args.source_mse) as source_mse:
@@ -254,7 +270,10 @@ class MultiSenseLinearTranslator():
                                 for rev_rank_row in rev_rank_row_block]
                         else:
                             tg_vecs = np.concatenate(sr_vecs).dot(self.regression.coef_.T)
-                            self.normalize(tg_vecs)
+                            if self.center:
+                                tg_vecs -= self.tg_center
+                            if self.normalize_data:
+                                self.normalize(tg_vecs)
                             neighbor_by_vec = [neighbors_by_vector(v) for v in tg_vecs]
                         eval_word(sr_word, neighbor_by_vec)
                     sr_word = new_sr_word
@@ -264,7 +283,6 @@ class MultiSenseLinearTranslator():
                     self.sr_i += 1
                 else:
                     sr_vecs.append(np.fromstring(vect_str, sep=' ').reshape((1,-1)))
-
         print('{:.1%} {}'.format(float(self.score)/self.test_size_act,
                                 self.good_disambig))
         return self.sims
@@ -284,7 +302,7 @@ def parse_args():
         '--orthog', action='store_true')
     parser.add_argument('--translate_all', action='store_true')
     parser.add_argument('--fwd-nn-search', dest='reverse',
-                        action='store_false', 
+                        action='store_false',
                         help='non-reverse NN search')
     parser.add_argument('--restrict_vocab', type=int, default=2**15)
     parser.add_argument('--prec_level', type=int, default=10)
