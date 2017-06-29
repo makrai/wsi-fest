@@ -272,9 +272,9 @@ def parse_args():
     parser.add_argument(
         '--orthog', action='store_true')
     parser.add_argument('--translate_all', action='store_true')
-    parser.add_argument('--vanilla-nn-search', dest='reverse',
+    parser.add_argument('--fwd-nn-search', dest='reverse',
                         action='store_false', 
-                        help='Do not compute reverse NNs')
+                        help='not-reverse NN search')
     parser.add_argument('--restrict_vocab', type=int, default=2**15)
     parser.add_argument('--prec_level', type=int, default=10)
     parser.add_argument('--silent', action='store_true')
