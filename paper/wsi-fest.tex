@@ -73,7 +73,8 @@ translation}
 without supervision \citep{Schutze:1998}. Recent approaches include multi-sense
 word embeddings (MSEs), vector space models of word distribution with more
 vectors for ambiguous words, each vector corresponding ideally to a different
-word sense.
+word sense. These models cluster the contexts in which a given word appears and
+obtain a representation for each cluster.
 
 In \cite{Borbely:2016}, we proposed a cross-lingual method for the evaluation
 of MSEs based on the principle that words may be ambiguous as far as the
@@ -220,20 +221,19 @@ animal.
 
 \section{Multi-sense word embeddings}
 
-\todo{}
-
-Vector-space language models with \emph{more vectors} for each meaning of a
+Vector-space language models with more vectors for each meaning of a
 word originate with \cite{Reisinger:2010}.
-
 \cite{Huang:2012} trained the first neural-network-based MSE.
 Both works use a uniform number of clusters for all words that they select
-before training as
-potentially ambiguous.
+before training as potentially ambiguous.
 The first system with adaptive sense numbers and an effective open-source
-implementation the a
+implementation is the 
 modification of skip-gram \cite{Mikolov:2013d}, multi-sense skip-gram by
 \cite{Neelakantan:2014}, where new senses are introduced during training by
 tresholding the similarity of the present context to earlier contexts.
+
+% \cite{Tian:2014}, Guo et al., 2014, Wu and Giles, 2015, Liu et al., 2015, Vu
+% and Parker 2016, Šuster et al., 2016
 
 % \citep{Neelakantan:2015, Bartunov:2015} improve upon the predecessors in
 % three aspects: they do word sense discrimination simultaneously with the
@@ -241,18 +241,30 @@ tresholding the similarity of the present context to earlier contexts.
 % the similarities of exemplars to global vectors, and make the system
 % computationally more efficient.
 
-\todo{Dirichlet process} \adagram \citep{Bartunov:2015}, where senses may be
-merged as well as allocated during training; and \mutli-sense skip-gram
-\citep{Li:2015}.\footnote{Note the metathesis in the name of the repo which is
-the only way of distinguishing it from the other two multi-sense skipram
-models.} \todo{mi a fő különbség Reisinger és Huang között?} MSEs are yet in
-research phase, as \cite{Li:2015}  demonstrate that, when meta-parameters are
+\todo{Bayesian leaning:
+\url{http://nostalgebraist.tumblr.com/post/161645122124/bayes-a-kinda-sorta-masterpost}}
+
+\cite{Bartunov:2015,Li:2015} improve upon the heuristic thresholding by
+formulating text generation as a Dirichlet process. In \adagram
+\citep{Bartunov:2015}, senses may be merged as well as allocated during
+training. \mutli-sense skip-gram \citep{Li:2015} applies the Chinese restaurant
+process formalization of the Dirichlet process\footnote{Note the metathesis in
+the name of the repo which is the only way of distinguishing it from the other
+two multi-sense skipram models.}. Both \adagram and \mutli have a parameter for
+semantis resolution (number of senses) $\alpha$ and $\gamma$ respectively. 
+
+% https://sites.google.com/site/senseworkshop2017/
+
+% Though sense representations have been already used for several NLP tasks
+% such as text classification (Li and Jurafsky, 2015, Flekova and Gurevych,
+% 2016) and knowledge base construction (Delli Bovi et al. 2015, Espinosa-Anke
+% et al. 2016) and completion (Bordes et al. 2013, Wang et al. 2014)}, 
+MSEs are yet in
+research phase: \cite{Li:2015}  demonstrate that, when meta-parameters are
 carefully controlled for, MSEs introduce a slight performance boost in
 semantics-related tasks (semantic similarity for words and sentences, semantic
 relation identification, part-of-speech tagging), but similar improvements can
-be achieved by increasing the dimension of a single-sense embedding.
-
-\todo{paramter for semantic resolution}
+be achieved by simply increasing the dimension of a single-sense embedding.
 
 \section{Linear translation from MSEs}
 
@@ -302,17 +314,26 @@ significantly better results than general linear mapping.
 
 \subsection{Reverese nearest neighbor search}
 
-\todo{other than NLP and mapping}
+\todo{other than NLP and mapping, Radovanović, Tomasev}
+
+\todo{\cite{Dinu:2015} normalize the vector of similarities of each target item
+to the mapped pivots to [sum to] length 1,}
+
+% First, worse method by Dinu:2015: they sample additional vectors in the
+% source domain called \emph{pivots} besides the test words, and normalize the
+% vector of similarities of each target item to the mapped pivots to length 1. 
 
 A common error in linear translation is when there are \emph{hubs}, target
 words returned as the translation of many words, which is wrong in most of the
 cases.  In natural language processing, \cite{Dinu:2015} were the first to
-explicitly attack the problem with a method they called \emph{global
-correction}.  Instead of the vanilla NN that we will call \emph{forward} NN
-search to contrast with the more sophisticated method, they first rank source
-words by their similarity to target words. In \emph{reverse} NN, source words
-are translated to the target words to which they have the lowest (forward) NN
-rank.
+explicitly attack the problem with a method they call \emph{global correction}.
+Here, instead of the vanilla NN that we will call \emph{forward} NN search to
+contrast with the more sophisticated method, they first rank source words by
+their similarity to target words. In \emph{reverse} NN, source words are
+translated to the target words to which they have the lowest (forward) NN rank.
+\todo{} If more target words have the same forward rank, the decision is based
+on cosine similarity. This tie braking is yet not included in our
+implementation.
 
 We found that in reverse NN search it is important to resrict the vocabulary to
 the some tens of thousands most frequent words not only for memory saving (the
