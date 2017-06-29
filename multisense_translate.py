@@ -20,7 +20,7 @@ class MultiSenseLinearTranslator():
     """
 
     def __init__(self, args=None, source_mse=None, target_embed=None,
-                 seed_dict=None, orthog=True, translate_all=False, reverse=True,
+                 seed_dict=None, orthog=False, translate_all=False, reverse=True,
                  restrict_vocab=2**15, prec_level=10):
         def get_first_vectors(filen):
             root, ext = os.path.splitext(filen)
@@ -265,7 +265,7 @@ def parse_args():
     parser.add_argument('--target_embed')
     parser.add_argument('--seed_dict')
     parser.add_argument(
-        '--general-linear-mapping', dest='orthog', action='store_false')
+        '--orthog', action='store_true')
     parser.add_argument('--translate_all', action='store_true')
     parser.add_argument('--vanilla-nn-search', dest='reverse',
                         action='store_false', 
