@@ -170,31 +170,38 @@ class MultiSenseLinearTranslator():
                 'Source vocab and mx read {}'.format(source_mse.shape))
             return sr_vocab, source_mse
 
-        def get_rev_rank(debug=False):
-            logging.info('Populating reverse neighbor rank mx...')
-            rev_rank_col_blocks = []
-            batch_size = 10000
-            n_batch = max(int(min(self.target_embed.syn0.shape[0],
-                                  self.args.restrict_vocab) / batch_size),
-                          1)
-            for i in range(n_batch):
-                tg_batch = self.target_embed.syn0[i*batch_size:(i+1)*batch_size]
-                block = self.translated_points.dot(tg_batch.T)
-                block = (-block).argsort(axis=0).astype('uint16')
-                block = block.argsort(axis=0).astype('uint16')
-                rev_rank_col_blocks.append(block)
-                logging.debug(
-                    '{:.1%} of reverse neighbor rank mx populated, {} {}'.format(
-                        float(i+1)/n_batch, block.dtype, block.shape))
-            rev_rank_mx = np.concatenate(rev_rank_col_blocks,
-                                         axis=1).astype('uint16')
-            logging.debug('Min ranks: {}'.format(rev_rank_mx.min(axis=1)))
-            rev_rank_mx = rev_rank_mx.argsort().astype('uint16')
-            return rev_rank_mx
-
-        def get_tie_broken_rev_rank():
-            sim_mx = self.translated_points.dot(self.target_embed.syn0.T)
-            # TODO
+        def get_rev_rank(debug=False, break_ties=False):
+            if break_ties:
+                raise NotImplementedError
+                sim_mx = self.translated_points.dot(
+                    self.target_embed.syn0[:self.args.restrict_vocab].T).astype(
+                        'float16')
+                fwd_ranks = (-sim_mx).argsort(axis=0).astype('uint16')
+                fwd_ranks = fwd_ranks.argsort(axis=0).astype('uint16')
+                #fwd_ranks -= sim_mx
+                logging.debug((fwd_ranks.dtype, fwd_ranks[:,0]))
+                return fwd_ranks.argsort().astype('uint16')
+            else:
+                logging.info('Populating reverse neighbor rank mx...')
+                rev_rank_col_blocks = []
+                batch_size = 10000
+                n_batch = max(int(min(self.target_embed.syn0.shape[0],
+                                      self.args.restrict_vocab) / batch_size),
+                              1)
+                for i in range(n_batch):
+                    tg_batch = self.target_embed.syn0[i*batch_size:(i+1)*batch_size]
+                    block = self.translated_points.dot(tg_batch.T)
+                    block = (-block).argsort(axis=0).astype('uint16')
+                    block = block.argsort(axis=0).astype('uint16')
+                    rev_rank_col_blocks.append(block)
+                    logging.debug(
+                        '{:.1%} of reverse neighbor rank mx populated, {} {}'.format(
+                            float(i+1)/n_batch, block.dtype, block.shape))
+                rev_rank_mx = np.concatenate(rev_rank_col_blocks,
+                                             axis=1).astype('uint16')
+                logging.debug('Min ranks: {}'.format(rev_rank_mx.min(axis=1)))
+                rev_rank_mx = rev_rank_mx.argsort().astype('uint16')
+                return rev_rank_mx
 
         def normalize(vecs):
             vecs /= np.apply_along_axis(np.linalg.norm, 1,
