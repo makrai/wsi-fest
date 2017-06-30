@@ -22,7 +22,7 @@ class MultiSenseLinearTranslator():
 
     def __init__(self, args=None, source_mse=None, target_embed=None,
                  seed_dict=None, orthog=False, translate_all=False, reverse=True,
-                 restrict_vocab=2**15, prec_level=10):
+                 restrict_vocab=2**15, prec_level=10, silent=True):
 
         def get_first_vectors(filen):
             root, ext = os.path.splitext(filen)
@@ -49,6 +49,10 @@ class MultiSenseLinearTranslator():
             self.args.reverse = reverse
             self.args.restrict_vocab = restrict_vocab
             self.args.prec_level = prec_level
+            self.args.silent = silent
+            self.args.source_mse = None
+            self.args.target_embed = None
+            self.args.seed_dict = None
             default_proxy = get_proxy(default_config_filen)
         if not self.args.source_mse:
             self.args.source_mse = source_mse if source_mse else default_proxy['SourceMse']
