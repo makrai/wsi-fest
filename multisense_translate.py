@@ -130,7 +130,7 @@ class MultiSenseLinearTranslator():
             self.test_size_goal = 1000
             self.test_size_act = 0
             self.score = 0
-            self.good_disambig = 0
+            self.gold_ambig = 0
             read_test_dict()
             if self.args.reverse:
                 self.sr_i = 0
@@ -148,10 +148,10 @@ class MultiSenseLinearTranslator():
 
         def log_prec():
             logging.info(
-                'prec after testing on {} words: {:%} (good_disambig: {})'.format(
+                'prec after testing on {} words: {:.3%} {:.3%}'.format(
                     self.test_size_act,
-                    float(self.score)/self.test_size_act,
-                    self.good_disambig))
+                    self.score/self.test_size_act,
+                    self.gold_ambig/self.sys_ambig))
 
         def eval_word(sr_word, neighbor_by_vec):
             hit_by_vec = [ns.intersection(self.test_dict[sr_word])
@@ -161,17 +161,25 @@ class MultiSenseLinearTranslator():
                 self.score += 1
                 uniq_hit_sets = set(' '.join(hs) for hs in hit_by_vec if hs)
                 if len(uniq_hit_sets) > 1:
-                    self.good_disambig += 1
+                    self.gold_ambig += 1
                     uniq_hit_sets = [neigh.split()
                                      for neigh in uniq_hit_sets]
                     uniq_hit_sets.sort(key=len, reverse=True)
+                    if len(uniq_hit_sets) > 2 and self.args.prec_level != 1:
+                        logging.warning(
+                            'When there are sense vectors with more than two'
+                            ' hits, the choice of the corresponding target'
+                            ' words is arbitrary.')
+                        #inds = [self.target_embed.word2index(wt[0]) 
+                        #for wt in uniq_hit_sets]
+                        #vecs = self.target_embed.syn0[inds]
+                        #logging.debug(vecs.dot(vecs.T))
                     w1, w2 = [list(hits)[0] for hits in uniq_hit_sets[:2]]
                     sim = self.target_embed.similarity(w1, w2)
                     self.sims.append(sim)
-                    msg = '{:.4}\t{}\t{}\t{:.2}\t{}\t{}'.format(
+                    msg = '{:.4}\t{}\t{}\t{:.2}'.format(
                         sim, sr_word, uniq_hit_sets,
-                        len(good_trans)/len(self.test_dict[sr_word]),
-                        len(self.test_dict[sr_word]), self.good_disambig)
+                        len(good_trans)/len(self.test_dict[sr_word]))
                     print(msg)
                     logging.debug(msg)
             if not self.test_size_act % 1000 and self.test_size_act:
@@ -247,6 +255,7 @@ class MultiSenseLinearTranslator():
             sr_vecs = [] # sr_vecs is NOT used in reverse mode
             act_sense_indices = []
             self.sims = []
+            self.sys_ambig = 0
             while (self.args.translate_all
                    or self.test_size_act < self.test_size_goal):
                 line = source_mse.readline()
@@ -260,12 +269,16 @@ class MultiSenseLinearTranslator():
                     if sr_word in self.test_dict:
                         self.test_size_act += 1
                         if self.args.reverse:
+                            if len(act_sense_indices) > 1:
+                                self.sys_ambig += 1
                             rev_rank_row_block = self.rev_rank_mx[act_sense_indices]
                             neighbor_by_vec = [
                                 set(self.target_embed.index2word[i]
                                  for  i in rev_rank_row[:self.args.prec_level])
                                 for rev_rank_row in rev_rank_row_block]
                         else:
+                            if len(sr_vecs) > 1:
+                                self.sys_ambig += 1
                             tg_vecs = np.concatenate(sr_vecs).dot(self.regression.coef_.T)
                             if self.center:
                                 tg_vecs -= self.tg_center
@@ -280,8 +293,8 @@ class MultiSenseLinearTranslator():
                     self.sr_i += 1
                 else:
                     sr_vecs.append(np.fromstring(vect_str, sep=' ').reshape((1,-1)))
-        print('{:.1%} {}'.format(float(self.score)/self.test_size_act,
-                                self.good_disambig))
+            print('{:.1%} {:.3%}'.format(self.score/self.test_size_act,
+                                         self.gold_ambig/self.sys_ambig))
         return self.sims
 
 
