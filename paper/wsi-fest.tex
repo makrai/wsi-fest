@@ -11,9 +11,10 @@
 \usepackage{amsmath,amssymb,amsfonts,amsthm,amstext,amscd}
 %\usepackage[usenames, dvipsnames]{color}
 
-\newcommand{\jiweil}{\texttt{jiweil}}
-\newcommand{\huang}{\texttt{huang}}
-\newcommand{\neelakantan}{\texttt{neela}}
+%\newcommand{\huang}{\texttt{huang}}
+\newcommand{\neelakantan}{\cite{Neelakantan:2014}}
+\newcommand{\adagram}{\texttt{AdaGram}}
+\newcommand{\mutli}{\texttt{mutli}}
 \newcommand{\Ro}{\mathbb{R}^{d_1}}
 \newcommand{\Rt}{\mathbb{R}^{d_2}}
 \newcommand{\fl}{\texttt{4lang}}
@@ -36,7 +37,7 @@
 %\usepackage{dcolumn}
 %\newcolumntype{d}[1]{D{.}{.}{#1}}
 
-%\usepackage{todonotes}
+\usepackage{todonotes}
 
 \aclfinalcopy % Uncomment this line for the final submission
 %\def\aclpaperid{28} %  Enter the acl Paper ID here
@@ -72,7 +73,8 @@ translation}
 without supervision \citep{Schutze:1998}. Recent approaches include multi-sense
 word embeddings (MSEs), vector space models of word distribution with more
 vectors for ambiguous words, each vector corresponding ideally to a different
-word sense.
+word sense. These models cluster the contexts in which a given word appears and
+obtain a representation for each cluster.
 
 In \cite{Borbely:2016}, we proposed a cross-lingual method for the evaluation
 of MSEs based on the principle that words may be ambiguous as far as the
@@ -93,10 +95,7 @@ in the source space because of the nearest neighbor search.
 The code for these experiments can be found at
 \url{https://github.com/makrai/wsi-fest}
 
-\section{%Monosemy:
-  Towards a less delicious
-  %sense
-  inventory}
+\section{Towards a less \emph{delicious} inventory}
 
 \begin{figure}[b]
     \centering
@@ -141,7 +140,7 @@ but we have hardly anything else on hand''. %Etymology makes clear that
 Different languages make different lump/split decisions in the conceptual
 space, so much so that translational relatedness can, to a remarkable extent,
 be used to recover the universal clustering \citep{Youn:2016}.
-\Cref{sec:bground} offers an overview by Veronika Lipp.
+\Cref{sec:bground} by Veronika Lipp offers a more detailed background.
 
 \subsection{Lexicographic Background \\ (Veronika Lipp)}
 
@@ -222,28 +221,52 @@ animal.
 
 \section{Multi-sense word embeddings}
 
-% TODO
+Vector-space language models with more vectors for each meaning of a
+word originate with \cite{Reisinger:2010}.
+\cite{Huang:2012} trained the first neural-network-based MSE.
+Both works use a uniform number of clusters for all words that they select
+before training as potentially ambiguous.
+The first system with adaptive sense numbers and an effective open-source
+implementation is the 
+modification of skip-gram \cite{Mikolov:2013d}, multi-sense skip-gram by
+\cite{Neelakantan:2014}, where new senses are introduced during training by
+tresholding the similarity of the present context to earlier contexts.
 
-MSEs originate with \cite{Reisinger:2010,Huang:2012} who use a uniform number
-of clusters for all words that they selected as potentially ambiguous.  The
-first system with adaptive
-sense numbers is a modification of skip-gram \cite{Mikolov:2013d}, multi-sense
-skip-gram \citep{Neelakantan:2014}, where new senses are introduced during
-training by tresholding the similarity of the present context to earlier
-contexts.  Dirichlet process, AdaGram \citep{Bartunov:2015}, where senses may
-be merged as well as allocated during training; and and mutli-sense skip-gram
-\citep{Li:2015}
-% mi a fő különbség Reisinger és Huang között?
-MSEs are yet in research phase, as \cite{Li:2015}  demonstrate that, when
-meta-parameters are carefully controlled for, MSEs introduce a slight
-performance boost in semantics-related tasks (semantic similarity for words and
-sentences, semantic relation identification, part-of-speech tagging), but
-similar improvements can be achieved by increasing the dimension of a
-single-sense embedding.
+% \cite{Tian:2014}, Guo et al., 2014, Wu and Giles, 2015, Liu et al., 2015, Vu
+% and Parker 2016, Šuster et al., 2016
 
-semantic resolution
+% \citep{Neelakantan:2015, Bartunov:2015} improve upon the predecessors in
+% three aspects: they do word sense discrimination simultaneously with the
+% training of word embeddings, they determine the number of meanings based on
+% the similarities of exemplars to global vectors, and make the system
+% computationally more efficient.
 
-\section{Linear translation}
+\todo{Bayesian leaning:
+\url{http://nostalgebraist.tumblr.com/post/161645122124/bayes-a-kinda-sorta-masterpost}}
+
+\cite{Bartunov:2015,Li:2015} improve upon the heuristic thresholding by
+formulating text generation as a Dirichlet process. In \adagram
+\citep{Bartunov:2015}, senses may be merged as well as allocated during
+training. \mutli-sense skip-gram \citep{Li:2015} applies the Chinese restaurant
+process formalization of the Dirichlet process\footnote{Note the metathesis in
+the name of the repo which is the only way of distinguishing it from the other
+two multi-sense skipram models.}. Both \adagram and \mutli have a parameter for
+semantis resolution (number of senses) $\alpha$ and $\gamma$ respectively. 
+
+% https://sites.google.com/site/senseworkshop2017/
+
+% Though sense representations have been already used for several NLP tasks
+% such as text classification (Li and Jurafsky, 2015, Flekova and Gurevych,
+% 2016) and knowledge base construction (Delli Bovi et al. 2015, Espinosa-Anke
+% et al. 2016) and completion (Bordes et al. 2013, Wang et al. 2014)}, 
+MSEs are yet in
+research phase: \cite{Li:2015}  demonstrate that, when meta-parameters are
+carefully controlled for, MSEs introduce a slight performance boost in
+semantics-related tasks (semantic similarity for words and sentences, semantic
+relation identification, part-of-speech tagging), but similar improvements can
+be achieved by simply increasing the dimension of a single-sense embedding.
+
+\section{Linear translation from MSEs}
 
  \cite{Mikolov:2013x} discovered that embeddings of different languages are so
  similar that a linear transformation can map vectors of the source language
@@ -258,79 +281,113 @@ The translation model is trained with linear regression on the seed dictionary
 \[\min_W \sum_i || Wx_i - z_i ||^2 \]
 
 \noindent and can be used to collect translations for the whole vocabulary by
-choosing $z_i$ to be the nearest neighbor of $Wx_i$.
-
-% TODO We follow \cite{Mikolov:2013x} in using different metrics, Euclidean
-% distance in training and cosine similarity in collection of translations.
+choosing $z_i$ to be the nearest neighbor (NN) of $Wx_i$.
+We follow \cite{Mikolov:2013x} in using different metrics, Euclidean
+ distance in training and cosine similarity in collection of translations.
 % Though this choice is theoretically unmotivated, it seems to work better than
 % more consistent use of metrics; but see \citep{Xing:2015} for opposing
 % results.
 
-\todo{\cite{Lazaridou:2015,Artetxe:2016}}
 
-We follow \cite{Xing:2015} in formulating transformation as an orthogonal
-mapping from the source language embedding to the target one, trained on a seed
-of a few thousand word pairs..
+In a multi-sense embedding scenario, \cite{Borbely:2016} take an MSE as the
+source model, and a single-sense embedding as target model.  The quality of the
+translation has been measured by training on the most frequent 5k word pairs
+and evaluating on another 1k seed pairs.
+
+\subsection{Orthogonal restriction}
+
+Besides optimising the transformation $W$ among all linear mappings, we
+followed \cite{Xing:2015} in restricting the approximation to orthogonal
+transformations (``rotations''). After computing the singular value
+decomposition
+
+\[U\Sigma V=S_t^\top T_t\]
+
+\noindent where $S_t$ and $T_t$ are the matrices consisting of the embedding vectors of
+the trainig words pairs in the source and the target space respectively, we
+took
+
+\[W=U\mathbf{1}V\]
+
+\noindent where $\mathbf 1$ is the rectangular identity matrix of appropriate shape.
+Similarly to \cite{Xing:2015}, we found that the orthogonal restriction yields
+significantly better results than general linear mapping.
+
+\subsection{Reverese nearest neighbor search}
+
+\todo{other than NLP and mapping, Radovanović, Tomasev}
+
+\todo{\cite{Dinu:2015} normalize the vector of similarities of each target item
+to the mapped pivots to [sum to] length 1,}
+
+% First, worse method by Dinu:2015: they sample additional vectors in the
+% source domain called \emph{pivots} besides the test words, and normalize the
+% vector of similarities of each target item to the mapped pivots to length 1. 
 
 A common error in linear translation is when there are \emph{hubs}, target
 words returned as the translation of many words, which is wrong in most of the
-cases.  \cite{Dinu:2015} propose a method they call \emph{global correction}
-for decreasing the importance of such target words. \cite{Lazaridou:2015} used
-a method for solving the problems of hubs during training. Our experiments use
-this method.
-% Borbely:2016-ban nem használtuk a Dinu-nak a "global correction"-jét memória
-% problémák miatt
+cases.  In natural language processing, \cite{Dinu:2015} were the first to
+explicitly attack the problem with a method they call \emph{global correction}.
+Here, instead of the vanilla NN that we will call \emph{forward} NN search to
+contrast with the more sophisticated method, they first rank source words by
+their similarity to target words. In \emph{reverse} NN, source words are
+translated to the target words to which they have the lowest (forward) NN rank.
+\todo{} If more target words have the same forward rank, the decision is based
+on cosine similarity. This tie braking is yet not included in our
+implementation.
 
-In a multi-sense embedding scenario, we take a multi-sense embedding
-as source model, and a single-sense embedding as target model.
-We evaluate a specific source MSE model in two ways
-referred as \emph{single}, and \emph{multiple}.
+\todo{\cite{Lazaridou:2015,Artetxe:2016}}
 
-The tools that generate MSEs all provide fall-backs to singe-sense embeddings
-in the form of so called global vectors. The method \emph{single} can be
-considered as a baseline; a traditional, single-sense translation between the
-global vectors and the target vectors.  Note that the seed dictionary may
-contain overlapping translation pairs: one word can have multiple translations
-in the gold data, and more than one word can have the same translation.  In
-the \emph{multiple} method we used the same translation matrix, trained on the
-global vectors, and inspected the translations of the different senses of the
-same source word.  Exploiting the multiple sense vectors one word can have
-more than one translation.
-
-\section{Data}
+We found that in reverse NN search it is important to resrict the vocabulary to
+the some tens of thousands most frequent words not only for memory saving (the
+$|V_{sr}|\times|V_{tg}|$ similarity matrix has to be sorted column-wise for
+forward and row-wise for reverse ranking, so at some point of the computation
+we keep the whole integer matrix of forward NN ranks in memory), but we found
+that a vocabulary cutoff of $2^{15}=32768$ both on the source and the target
+size yields better results than the more ambitious $2^{16}=65536$. This is not
+the case for forward NN seach, where accuracy increases with vocabulary limit,
+see \cref{tab:prec}.
 
 \section{Experiments}
 
-restrict the vocabulary
+\subsection{Data}
 
-Two evaluation metrics were considered, \emph{lax} and \emph{strict}. In lax
-evaluation a translation is taken to be correct if any of the source word's
-senses are translated into any of its gold translations.  In strict evaluation
-the translations of the source word are expected to cover all of its gold
-translations.  For example if {\it finom} has two gold translations, {\it
-  delicious} and {\it fine}, and its actual translations are `delicious' and some
-word other than `fine', then it has a lax score of $2$, but a strict score
-of $1$.
-
-The quality of the translation was measured by training on the most frequent 5k
-word pairs and evaluating on another 1k seed pairs.  We used Witionary as our
+We trained \neelakantan, \adagram~and \mutli~models on (vanilla and stemmed
+forms of) two Hungarian semi-gigaword corpora (.7--.8 B words), the Hungarian
+Wecorpus (Webkorpusz, \cite{Halacsy:2004}) and (the non-social-media part of) the
+Hungarian National Corpus (HNC, \cite{Oravecz:2014}).  We used Witionary as our
 seed dictionary, extracted with
 \texttt{wikt2dict}\footnote{\url{https://github.com/juditacs/wikt2dict}}
-\citep{Acs:2016}.
-% TODO shows the percentage of correctly translated words for {\bf
-% s}ingle-sense and {\bf m}ulti-sense translation.
+\citep{Acs:2013}. We tried several English embeddings as target, including the
+300 dimensional skipram with negative sampling model
+\texttt{GoogleNews} released with \texttt{word2vec}
+\citep{Mikolov:2013f}\footnote{\url{https://code.google.com/archive/p/word2vec/}},
+and those released with GloVe
+\citep{Pennington:2014}\footnote{\url{https://nlp.stanford.edu/projects/glove/}}.
 
-``forward'' neighbor search: precision increases with vocabulary cut-off, see
-\cref{tab:prec}
+\subsection{Results}
 
-\begin{table*}
-  \centering
-    %\resizebox{\columnwidth}{!}{%
+\newcommand{\any}{\texttt{any}}
+\newcommand{\disamb}{\texttt{disamb}}
+
+We evaluate MSE models in two ways referred as \any~and \disamb.
+The method \any~has been used for the tuning of (meta)parameters of
+both the source and the target embedding: a traditional, single-sense
+translation has been trained between the first sense vector of each word form and
+its translations. (If the training word is ambiguous in the seed dictionary,
+all translations have been included in the training data.)  Exploiting the
+multiple sense vectors, one word can have more than one translation.  During
+test, a source word was accepted if \any~of its sense vectors had at least one
+good translation among its top $k$ translations (prec@$k$).
+
+\begin{table*} \centering
+  %\resizebox{\columnwidth}{!}{%
   \begin{tabular}{c|rrr|rrr}
     \toprule
     cutoff &
     \multicolumn{3}{c|}{forward (vanilla) NN search} &
     \multicolumn{3}{c}{reverse NN search} \\
+    & prec@1 & prec@5 & prec@10 & prec@1 & prec@5 & prec@10 \\
     \midrule
     1024 & 0.0\% & 0.0\% & 0.0\% & 03.9\% & 13.1\% & 23.6\% \\
     2048 & 0.3\% & 0.6\% & 0.7\% & 11.4\% & 25.5\% & 36.9\% \\
@@ -340,16 +397,111 @@ seed dictionary, extracted with
     32768 & 23.7\% & 42.8\% & 49.5\% & 20.1\% & \textbf{50.6\%} & \textbf{62.8\%} \\
     65536 & \emph{24.0} \%& \emph{43.3}\% & \emph{49.7}\% & 14.7\% & 40.7\% & 55.0 \%\\
     \bottomrule
-\end{tabular}
+  \end{tabular}
   %}
-  \caption{Precision of reverse NNs when translating from an AdaGram model
+  \caption{Precision of \any~reverse NN when translating from an AdaGram model
   trained on HNC (600 dimensions, $\alpha=.05$)}
   \label{tab:prec}
 \end{table*}
 
+In \disamb, we used the translation matrix trained on first sense vectors again,
+and inspected the translations of the different senses of each source word.
+We separated \emph{common} translations of word vectors, i.e.~translations $t$ of a source word
+such that all the source sense vectors that have at least one good
+translation have $t$ among their translations. We say that the MSE
+\disamb iguates a word, if it has at least two sense vectors $s_1, s_2$ with a
+different set of good non-common translations among the top $k$ NNs of their
+translations $Ws_i$.
+
 \subsection{Qualitative analysis}
 
-among sim $le.48$ % TODO
+We analyzed qualitatively successfully disambiguated words, sorted by the
+cosine similarity $s$ of their translations.  (If there are more than two, the
+choice of the two senses was arbitrary.) \Cref{tab:alkoto} shows words with
+$s<.3$, most with sense vectors corresponding to senses with clear difference.
+
+\begin{table*}
+  \begin{tabular}{cllc}
+  0.0182 & alkotó 	& constituent, creator, composer, creative	&  1.0 \\
+  0.0407 & rész 	& parcel, episode	&  1.0 \\
+  0.0447 & ér 	& vein, arrive	&  0.66 \\
+  0.0509 & előzetes 	& preliminary, trailer	&  1.0 \\
+  0.0543 & villamos 	& electro, tram	&  0.5 \\
+  0.0555 & nemes 	& peer, sublime, noble	&  1.0 \\
+  0.0654 & sorozat 	& succession, serial, suite	&  1.0 \\
+  0.1005 & egyenes 	& linear, frank, straightforward	&  1.0 \\
+  0.1007 & kar 	& choir, arm	&  1.0 \\
+  0.1153 & test 	& hull, corpus	&  1.0 \\
+  0.1155 & rendelet 	& doom, regulation	&  0.66 \\
+  0.1267 & tömeg 	& mob/crowd, bulk, cloud, mob, crowd	&  1.0 \\
+  0.1410 & terem 	& classroom, yield, hall	&  1.0 \\
+  0.1512 & hátsó 	& hinder, rear	&  1.0 \\
+  0.1587 & szem 	& grain, optic	&  1.0 \\
+  0.1760 & hatalom 	& empire, leverage	&  0.33 \\
+  0.1809 & megfelel 	& suit, correspond	&  1.0 \\
+  0.1848 & Judit 	& Jude, Jodi	&  0.4 \\
+  0.1872 & induló 	& march, candidate	&  1.0 \\
+  0.1920 & cigány 	& Roma, Rom	&  0.4 \\
+  0.1926 & szakértő 	& judge, adept, adviser	& 0.42 \\
+  0.1933 & eltérés 	& departure, variance	&  0.4 \\
+  0.2017 & sor 	& queue/row, rank	&  1.0 \\
+  0.2028 & piros 	& rot, hearts	&  1.0 \\
+  0.2036 & felső 	& superior, overhead	&  1.0 \\
+    0.2053 & megelőző 	& preventive/preventative, preceding,
+    \\&&\hspace{1cm}preventative, foregoing, anterior	&  0.71 \\
+  0.2202 & fekvő 	& landscape, lying	&  0.66 \\
+  0.2235 & lengyel 	& Pole, Polish	&  1.0 \\
+  0.2236 & környező 	& ambient, surrounding	& 0.66 \\
+  0.2345 & ok 	& motive, okay	&  1.0 \\
+  0.2424 & kiegészítő 	& complementary, expansion, supplementary, accessory	&  0.8 \\
+  0.2428 & készít 	& manufacture, prepare	&  1.0 \\
+  0.2436 & vár 	& castle/fortress, await, castle	&  1.0 \\
+  0.2514 & előbbi 	& preceding, anterior	&  0.66 \\
+  0.2558 & kötelezettség 	& engagement, obligation	& 0.66 \\
+  0.2569 & némi 	& generic, genital	&  0.5 \\
+  0.2575 & szín 	& suit, shed	&  0.66 \\
+  0.2616 & vállalkozó 	& contractor, entrepreneur	&  1.0 \\
+  0.2639 & közepes 	& mediocre, moderate	&  0.66 \\
+  0.2732 & követ 	& haunt, succeed	&  0.66 \\
+  0.2818 & puszta 	& pure, desert, bleak, bare, sheer	&  0.55 \\
+  0.2838 & bemutató 	& premiere, presenter, exhibition	& 1.0 \\
+  0.2946 & előre 	& onward, beforehand	&  0.0 \\
+\end{tabular}
+\caption{Sense vectors with rather different translations. Alternatives like
+  mob/crowd denote more good non-common translations}
+\label{tab:alkoto}
+\end{table*}
+
+The clearest case of homonymy is when senses belong to different POS, and the
+translations reflect these POSs, e.g.~\emph{nő} `woman; increase' or \emph{vár}
+\todo{update examples} `wait; case'.  We note that some POSs in Hungarian have
+blurred borders, e.g.  it is debatable whether the nominal \emph{önkéntes}
+`voluntary; volunteer' is ambiguous. 
+
+\todo{Note that in the \fl~approach, POS-difference alone is not enough for
+analyzing a word as ambiguous, e.g.~the only difference between the senses of
+\emph{alkalmazott}, `employee; applied' is that employment is the application
+of people for work; in the case of \emph{belső} `internal; interior', the noun
+\emph{interior} refers to the \emph{internal} part of a building.} 
+
+% More interesting are words whose one sense is a special case of an other
+% sense of the same word, e.g.~ \emph{cikk}, `item; article' (an article is an
+% item in a newspaper); \emph{eredmény}, `score; result' (a score is a result
+% measured by a number); \emph{magas}, `tall; high' (tall is used for people in
+% spite of high).  The meanings of \emph{idegen}, `strange, alien; foreign' are
+% special cases of unfamiliar (person versus language).
+
+% Finally we mention two cases where the relation between the two senses is
+% more idiosyncratic, but in a monosemic approach, they will have a single
+% representation: \emph{beteg} means `ill, sick; patient'. Though \emph{ill} is
+% a health state and \emph{patient} is a situational role, the fact that
+% patients of doctors are usually ill, may suffice for identifying the `patent'
+% based on the representation of \emph{ill}; and a monosemic system is designed
+% to give account of metaphorical relations like the one between the meanings
+% of \emph{világos}, `bright; clear' as well.
+
+\todo{missing sense \\ édes [['sweetheart'], ['cute \\
+  közvetlen [['informal'], ['casual}
 
 % If the distribution turns out to be multi-modal (i.e.~some words have
 % stipulated meanings with similar translations and others have senses with
@@ -360,67 +512,35 @@ among sim $le.48$ % TODO
 % target space is above the threshold judged significant by the analysis of the
 % distance distribution.
 
-missing sense
-  édes [['sweetheart'], ['cute
-  közvetlen [['informal'], ['casual
+When a word has more than two sense vectors with good non-common translations,
+with most of the words there is a more ``general'' vector (or two, in the case
+of \emph{tud}) that has more good translations, and good translations of the
+other vectors are mostly among the good translations of this general vector,
+see \cref{tab:like_than}.
 
 \begin{table*}[t]
   %\footnotesize
   \begin{tabular}{ll}
     \toprule
-mint	& \{like, than, as\}, \{like\}, \{than\}	\\
-majd	& \{then, later\}, \{then\}, \{later\}	\\
-talán	& \{probably, perhaps\}, \{probably, maybe\}, \{perhaps\}	\\
-tud	& \{understand, can\}, \{know, understand\}, \{know\}, \{can\}	\\
-program	& \{project, programme, program\}, \{project, programme\}, \{project, program\}	\\
-terület	& \{region, area, territory\}, \{region, district\}, \{region, area\}, \{area\}	\\
-felső	& \{upper, top\}, \{upper\}, \{higher\}	\\
-díj	& \{charge, fee, rate\}, \{fee\}, \{award\}	\\
-kicsi	& \{little, small\}, \{little\}, \{small\}	\\
-erő	& \{strength, power, force, stress, energy\}, \{strength, power\}, \{force\}	\\
-lakás	& \{apartment, housing\}, \{residence, housing\}, \{rooms, apartment\}	\\
-kérelem	& \{application, appeal\}, \{application\}, \{appeal\}	\\
-figyel	& \{watch, listen\}, \{watch\}, \{listen\}	\\
-\bottomrule
-\end{tabular}
+    mint	& \{like, than, as\}, \{like\}, \{than\}	\\
+    majd	& \{then, later\}, \{then\}, \{later\}	\\
+    talán	& \{probably, perhaps\}, \{probably, maybe\}, \{perhaps\}	\\
+    tud	& \{understand, can\}, \{know, understand\}, \{know\}, \{can\}	\\
+    program	& \{project, programme, program\}, \{project, programme\}, \{project, program\}	\\
+    terület	& \{region, area, territory\}, \{region, district\}, \{region, area\}, \{area\}	\\
+    felső	& \{upper, top\}, \{upper\}, \{higher\}	\\
+    díj	& \{charge, fee, rate\}, \{fee\}, \{award\}	\\
+    kicsi	& \{little, small\}, \{little\}, \{small\}	\\
+    erő	& \{strength, power, force, stress, energy\}, \{strength, power\}, \{force\}	\\
+    lakás	& \{apartment, housing\}, \{residence, housing\}, \{rooms, apartment\}	\\
+    kérelem	& \{application, appeal\}, \{application\}, \{appeal\}	\\
+    figyel	& \{watch, listen\}, \{watch\}, \{listen\}	\\
+    \bottomrule
+  \end{tabular}
   \caption{Words with at least three good sense vectors (forward NNs, source is
   the AdaGram model trained on HNC (600 dimensions, $\alpha=.05$)}
   \label{tab:like_than}
 \end{table*}
-
-We give qualitative analysis of words for which the model with the best
-parameter setting succeeds to attribute more sense vectors with different good
-translations. The clearest case of homonymy is when senses belong to different
-POS, and the translations reflect these POSs, e.g.~\emph{nő} `woman; increase'
-or \emph{vár} `wait; case'.  In some cases, the POS difference on the source
-side is less clear, e.g.~\emph{önkéntes} `voluntary; volunteer'. More
-interesting are words with POS dif whose one sense is a special case of an
-other sense of the same word, e.g.~ \emph{cikk}, `item; article' (an article is
-an item in a newspaper); \emph{eredmény}, `score; result' (a score is a result
-measured by a number); \emph{magas}, `tall; high' (tall is used for people in
-spite of high). The meanings of \emph{idegen}, `strange, alien; foreign' are
-special cases of unfamiliar (person versus language).  Note that in the
-\fl~approach, POS-difference alone is not enough for analyzing a word as
-ambiguous, e.g.~the only difference between the senses of \emph{alkalmazott},
-`employee; applied' is that employment is the application of people for work;
-in the case of \emph{belső} `internal; interior', the noun \emph{interior}
-refers to the \emph{internal} part of a building. Finally we mention two cases
-where the relation between the two senses is more idiosyncratic, but in a
-monosemic approach, they will have a single representation: \emph{beteg} means
-`ill, sick; patient'. Though \emph{ill} is a health state and \emph{patient} is
-a situational role, the fact that patients of doctors are usually ill, may
-suffice for identifying the `patent' based on the representation of \emph{ill};
-and a monosemic system is designed to give account of metaphorical relations
-like the one between the meanings of \emph{világos}, `bright; clear' as well.
-
-Calling a translation $t$ \emph{common}, if all the sense vectors that have at
-least one good translation have $t$ among its translations, we find that when a
-word has more than two sense vectors with good non-common translations (there
-are 13 such words with the best parameter setting), with most of the words
-there is a more ``general'' vector (or two, in the case of \emph{tud}) that has
-more good translations, and good translations of the other vectors are mostly
-among the good translations of this general vector, see
-\cref{tab:like_than}.
 
 \section{Acknowledgments}
 
@@ -449,16 +569,16 @@ the first compiler and popularized the idea of machine-independent programming
 languages. Both the alleged and the real source remind me to that I still have
 lessons to learn in efficiency.
 
-% TODO Thank you
+\todo{Thank you}
 
 \smallskip
 
 \Cref{sec:bground} was written by Veronika Lipp (Research Institute for
-Linguistics of the Hungarian Academy of Sciences).
+Linguistics of the Hungarian Academy of Sciences). The orthogonal approximation
+was implemented following a
+code\footnote{\url{https://github.com/hlt-bme-hu/eval-embed}} by Gábor Borbely.
 
 \bibliographystyle{acl_natbib}
 \bibliography{ml}
 
 \end{document}
-
-%\section{Ten years of semi-supervised word sense induction}

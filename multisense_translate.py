@@ -5,10 +5,13 @@ from collections import defaultdict
 from functools import reduce
 import logging
 import os
+import configparser
 
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from gensim.models import KeyedVectors
+
+default_config_filen = 'hlt_bp.ini'
 
 
 class MultiSenseLinearTranslator():
@@ -18,40 +21,69 @@ class MultiSenseLinearTranslator():
     """
 
     def __init__(self, args=None, source_mse=None, target_embed=None,
-                 seed_dict=None, orthog=None, translate_all=None, reverse=None,
-                 restrict_vocab=None, prec_level=None):
+                 seed_dict=None, orthog=False, translate_all=False, reverse=True,
+                 restrict_vocab=2**15, prec_level=10):
+
         def get_first_vectors(filen):
             root, ext = os.path.splitext(filen)
             gens_fn = '{}.gensim'.format(root)
             if os.path.isfile(gens_fn):
-               return KeyedVectors.load(gens_fn)
+                embed = KeyedVectors.load(gens_fn)
             else:
                 embed = KeyedVectors.load_word2vec_format(filen)
                 embed.save(gens_fn)
-                return embed
+            return embed
+
+        def get_proxy(filen):
+            config = configparser.ConfigParser()
+            config.read(filen)
+            return config['DEFAULT']
 
         if args:
             self.args = args
+            default_proxy = get_proxy(args.config_file)
         else:
             self.args = argparse.Namespace()
-            self.args.source_mse = source_mse if source_mse else '/mnt/permanent/Language/Hungarian/Embed/multiprot/adagram/mnsz/adagram-mnsz-600d-a.05-5p-m100_sense.mse'
-            self.args.target_embed = target_embed if target_embed else '/mnt/permanent/Language/English/Embed/glove.840B.300d.gensim'
-            self.args.seed_dict = seed_dict if seed_dict else '/mnt/store/makrai/data/language/hungarian/dict/wikt2dict-en-hu.by-freq'
-            self.args.orthog = orthog if orthog else  False
-            self.args.translate_all = translate_all if translate_all else  False
-            self.args.reverse = reverse if reverse else  True
-            self.args.restrict_vocab = restrict_vocab if restrict_vocab else 2**15
-            self.args.prec_level = prec_level if prec_level else  10
+            self.args.orthog = orthog
+            self.args.translate_all = translate_all
+            self.args.reverse = reverse
+            self.args.restrict_vocab = restrict_vocab
+            self.args.prec_level = prec_level
+            default_proxy = get_proxy(default_config_filen)
+        if not self.args.source_mse:
+            self.args.source_mse = source_mse if source_mse else default_proxy['SourceMse']
+        if not self.args.target_embed:
+            self.args.target_embed = target_embed if target_embed else default_proxy['TargetEmbed']
+        if not self.args.seed_dict:
+            self.args.seed_dict = seed_dict if seed_dict else default_proxy['SeedDict']
+        self.center = False
+        self.normalize_data = False
+
         self.source_firsts = get_first_vectors(self.args.source_mse)
         logging.basicConfig(
             format="%(asctime)s %(module)s (%(lineno)s) %(levelname)s %(message)s",
             level=logging.DEBUG)
-        self.target_embed = get_first_vectors(self.args.target_embed) 
+        self.target_embed = get_first_vectors(self.args.target_embed)
+
+    def get_center(self, embed):
+        return np.sum(embed, axis=0)/embed.shape[0]
 
     def main(self):
+        if self.normalize_data:
+            self.normalize(self.source_firsts.syn0)
+            self.normalize(self.target_embed.syn0)
+        if self.center:
+            self.sr_center = self.get_center(self.source_firsts.syn0)
+            self.tg_center = self.get_center(self.target_embed.syn0)
+            self.source_firsts.syn0 -= self.sr_center
+            self.target_embed.syn0 -= self.tg_center
+
         with open(self.args.seed_dict) as self.seed_f:
             self.train()
             return self.test()
+
+    def normalize(self, embed):
+        embed /= np.apply_along_axis(np.linalg.norm, 1, embed).reshape((-1,1))
 
     def train(self, train_size_goal = 5000):
         self.train_sr = np.zeros((train_size_goal,
@@ -89,8 +121,22 @@ class MultiSenseLinearTranslator():
         G. Dinu, A. Lazaridou and M. Baroni
         Improving zero-shot learning by mitigating the hubness problem.
         Proceedings of ICLR 2015, workshop track
-        """ 
+        """
         # Inner functions used both in reverse and normal mode
+        def init_test():
+            self.test_size_goal = 1000
+            self.test_size_act = 0
+            self.score = 0
+            self.good_disambig = 0
+            read_test_dict()
+            if self.args.reverse:
+                self.sr_i = 0
+                sr_vocab, source_mse = read_sr_embed()
+                self.translated_points = source_mse.dot(self.regression.coef_.T)
+                self.normalize(self.target_embed.syn0)
+                self.normalize(self.translated_points)
+                self.rev_rank_mx = get_rev_rank()
+
         def read_test_dict():
             self.test_dict = defaultdict(set)
             for line in self.seed_f.readlines():
@@ -105,37 +151,36 @@ class MultiSenseLinearTranslator():
                     self.good_disambig))
 
         def eval_word(sr_word, neighbor_by_vec):
-            # TODO monitor the neighborhood rank of the good translations
             hit_by_vec = [ns.intersection(self.test_dict[sr_word])
                           for ns in neighbor_by_vec]
             good_trans = reduce(set.union, hit_by_vec)
             if good_trans:
                 self.score += 1
-                common_hits = reduce(set.intersection, hit_by_vec)
+                common_hits = reduce(set.intersection,
+                                     [hits for hits in hit_by_vec if hits])
                 uniq_hits_by_vec = [trans - common_hits
                                     for trans in hit_by_vec]
                 uniq_hit_sets = set(' '.join(s) for s in uniq_hits_by_vec if s)
                 if len(uniq_hit_sets) > 1:
                     self.good_disambig += 1
-                    uniq_hit_sets = [neigh.split(' ')
+                    uniq_hit_sets = [neigh.split()
                                      for neigh in uniq_hit_sets]
                     uniq_hit_sets.sort(key=len, reverse=True)
-                    if len(uniq_hit_sets) > 1:
-                        w1, w2 = [list(hits)[0] for hits in uniq_hit_sets[:2]]
-                        sim = self.target_embed.similarity(w1, w2)
-                        self.sims.append(sim)
-                        msg = '{} {} {} {} {} {}'.format(
-                            sim, sr_word, uniq_hit_sets, '_'.join(common_hits),
-                            len(good_trans)/len(self.test_dict[sr_word]),
-                            self.good_disambig)
-                        if not self.args.silent:
-                            print(msg)
-                        #if not self.good_disambig % 10:
-                        logging.debug(msg)
+                    w1, w2 = [list(hits)[0] for hits in uniq_hit_sets[:2]]
+                    sim = self.target_embed.similarity(w1, w2)
+                    self.sims.append(sim)
+                    msg = '{:.4} {} {} {} {:.2} {}'.format(
+                        sim, sr_word, uniq_hit_sets, '_'.join(common_hits),
+                        len(good_trans)/len(self.test_dict[sr_word]),
+                        self.good_disambig)
+                    if not self.args.silent:
+                        print(msg)
+                    #if not self.good_disambig % 10:
+                    logging.debug(msg)
             if not self.test_size_act % 1000 and self.test_size_act:
                 log_prec()
 
-        # Inner functions used only in the vanilla (non-reverse) version
+        # Inner functions used only in the fwd (non-reverse) version
         def neighbors_by_vector(vect):
             sense_neighbors, _ = zip(*self.target_embed.similar_by_vector(
                 vect, restrict_vocab=self.args.restrict_vocab, topn=self.args.prec_level))
@@ -155,50 +200,46 @@ class MultiSenseLinearTranslator():
                 self.args.source_mse, skip_header=1, max_rows=self.args.restrict_vocab,
                 usecols=np.arange(1, int(dim)+1), dtype='float16',
                 comments=None)
+            if self.center:
+                source_mse -= self.sr_center
+            if self.normalize_data:
+                self.normalize(source_mse)
             logging.info(
                 'Source vocab and mx read {}'.format(source_mse.shape))
             return sr_vocab, source_mse
 
-        def get_rev_rank(debug=False):
-            logging.info('Populating reverse neighbor rank mx...')
-            rev_rank_col_blocks = []
-            batch_size = 10000
-            n_batch = max(int(min(self.target_embed.syn0.shape[0],
-                                  self.args.restrict_vocab) / batch_size),
-                          1)
-            for i in range(n_batch):
-                tg_batch = self.target_embed.syn0[i*batch_size:(i+1)*batch_size]
-                block = self.translated_points.dot(tg_batch.T)
-                block = (-block).argsort(axis=0).astype('uint16')
-                block = block.argsort(axis=0).astype('uint16')
-                rev_rank_col_blocks.append(block)
-                logging.debug(
-                    '{:.1%} of reverse neighbor rank mx populated, {} {}'.format(
-                        float(i+1)/n_batch, block.dtype, block.shape))
-            rev_rank_mx = np.concatenate(rev_rank_col_blocks,
-                                         axis=1).astype('uint16')
-            logging.debug('Min ranks: {}'.format(rev_rank_mx.min(axis=1)))
-            rev_rank_mx = rev_rank_mx.argsort().astype('uint16')
-            return rev_rank_mx
-
-        def normalize(vecs):
-            vecs /= np.apply_along_axis(np.linalg.norm, 1,
-                                        vecs).reshape((-1,1))
-
-        def init_test():
-            self.test_size_goal = 1000
-            self.test_size_act = 0
-            self.score = 0
-            self.good_disambig = 0
-            read_test_dict()
-            if self.args.reverse:
-                if self.args.reverse:
-                    self.sr_i = 0
-                sr_vocab, source_mse = read_sr_embed()
-                normalize(source_mse)
-                normalize(self.target_embed.syn0)
-                self.translated_points = source_mse.dot(self.regression.coef_.T)
-                self.rev_rank_mx = get_rev_rank()
+        def get_rev_rank(debug=False, break_ties=False):
+            if break_ties:
+                raise NotImplementedError
+                sim_mx = self.translated_points.dot(
+                    self.target_embed.syn0[:self.args.restrict_vocab].T).astype(
+                        'float16')
+                fwd_ranks = (-sim_mx).argsort(axis=0).astype('uint16')
+                fwd_ranks = fwd_ranks.argsort(axis=0).astype('uint16')
+                #fwd_ranks -= sim_mx
+                logging.debug((fwd_ranks.dtype, fwd_ranks[:,0]))
+                return fwd_ranks.argsort().astype('uint16')
+            else:
+                logging.info('Populating reverse neighbor rank mx...')
+                rev_rank_col_blocks = []
+                batch_size = 10000
+                n_batch = max(int(min(self.target_embed.syn0.shape[0],
+                                      self.args.restrict_vocab) / batch_size),
+                              1)
+                for i in range(n_batch):
+                    tg_batch = self.target_embed.syn0[i*batch_size:(i+1)*batch_size]
+                    block = self.translated_points.dot(tg_batch.T)
+                    block = (-block).argsort(axis=0).astype('uint16')
+                    block = block.argsort(axis=0).astype('uint16')
+                    rev_rank_col_blocks.append(block)
+                    logging.debug(
+                        '{:.1%} of reverse neighbor rank mx populated, {} {}'.format(
+                            float(i+1)/n_batch, block.dtype, block.shape))
+                rev_rank_mx = np.concatenate(rev_rank_col_blocks,
+                                             axis=1).astype('uint16')
+                logging.debug('Min ranks: {}'.format(rev_rank_mx.min(axis=1)))
+                rev_rank_mx = rev_rank_mx.argsort().astype('uint16')
+                return rev_rank_mx
 
         logging.info('Testing...')
         init_test()
@@ -224,11 +265,15 @@ class MultiSenseLinearTranslator():
                         if self.args.reverse:
                             rev_rank_row_block = self.rev_rank_mx[act_sense_indices]
                             neighbor_by_vec = [
-                                set(self.target_embed.index2word[i] 
-                                 for  i in rev_rank_row[:self.args.prec_level]) 
+                                set(self.target_embed.index2word[i]
+                                 for  i in rev_rank_row[:self.args.prec_level])
                                 for rev_rank_row in rev_rank_row_block]
                         else:
                             tg_vecs = np.concatenate(sr_vecs).dot(self.regression.coef_.T)
+                            if self.center:
+                                tg_vecs -= self.tg_center
+                            if self.normalize_data:
+                                self.normalize(tg_vecs)
                             neighbor_by_vec = [neighbors_by_vector(v) for v in tg_vecs]
                         eval_word(sr_word, neighbor_by_vec)
                     sr_word = new_sr_word
@@ -238,35 +283,28 @@ class MultiSenseLinearTranslator():
                     self.sr_i += 1
                 else:
                     sr_vecs.append(np.fromstring(vect_str, sep=' ').reshape((1,-1)))
-        print('{:.1%}'.format(float(self.score)/self.test_size_act))
+        print('{:.1%} {}'.format(float(self.score)/self.test_size_act,
+                                self.good_disambig))
         return self.sims
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--source_mse',
-        default='/mnt/permanent/Language/Hungarian/Embed/multiprot/adagram/mnsz/'
-        'adagram-mnsz-600d-a.05-5p-m100_sense.mse')
+        '--config_file', default='hlt_bp.ini',
+        help='Name of the seed dictionary file. The order of the source and'
+        ' the target language in the arguments for embeddings and in the word'
+        ' pairs in the seed file is opposite')
+    parser.add_argument('--source_mse')
+    parser.add_argument('--target_embed')
+    parser.add_argument('--seed_dict')
     parser.add_argument(
-        '--target_embed',
-        default='/mnt/permanent/Language/English/Embed/'
-        'glove.840B.300d.gensim')
-    parser.add_argument(
-        '--seed_dict',
-        default='/mnt/store/makrai/data/language/hungarian/dict/'
-        'wikt2dict-en-hu.by-freq',
-        help='Name of the seed dictionary file. The order of the source'
-        ' and the target language in the arguments for embeddings and in'
-        ' the word pairs in the seed file is opposite')
-    parser.add_argument(
-        '--general-linear-mapping', dest='orthog', action='store_false')
+        '--orthog', action='store_true')
     parser.add_argument('--translate_all', action='store_true')
-    parser.add_argument('--vanilla-nn-search', dest='reverse',
-                        action='store_false', 
-                        help='Do not compute reverse NNs')
-    parser.add_argument('--restrict_vocab', type=int, default=2**15,
-                        help='default is 2^16, cca 66 K')
+    parser.add_argument('--fwd-nn-search', dest='reverse',
+                        action='store_false',
+                        help='non-reverse NN search')
+    parser.add_argument('--restrict_vocab', type=int, default=2**15)
     parser.add_argument('--prec_level', type=int, default=10)
     parser.add_argument('--silent', action='store_true')
     return parser.parse_args()
