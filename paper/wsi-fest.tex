@@ -12,7 +12,7 @@
 %\usepackage[usenames, dvipsnames]{color}
 
 %\newcommand{\huang}{\texttt{huang}}
-\newcommand{\neelakantan}{\cite{Neelakantan:2014}}
+\newcommand{\neelakantan}{\texttt{neela}}
 \newcommand{\adagram}{\texttt{AdaGram}}
 \newcommand{\mutli}{\texttt{mutli}}
 \newcommand{\Ro}{\mathbb{R}^{d_1}}
@@ -72,9 +72,8 @@ translation}
 \emph{Word sense induction} (WSI) is the task of discovering senses of words
 without supervision \citep{Schutze:1998}. Recent approaches include multi-sense
 word embeddings (MSEs), vector space models of word distribution with more
-vectors for ambiguous words, each vector corresponding ideally to a different
-word sense. These models cluster the contexts in which a given word appears and
-obtain a representation for each cluster.
+vectors for ambiguous words; each vector is supposed to corresponding to a different
+word sense, but in parctice sense vectors seem to duplicate senses.
 
 In \cite{Borbely:2016}, we proposed a cross-lingual method for the evaluation
 of MSEs based on the principle that words may be ambiguous as far as the
@@ -86,11 +85,13 @@ translation of a source word vector is the nearest neighbor of its image by the
 mapping in the target space. In the multi-sense setting, we translated from
 MSEs (the target embedding remaining single-sense).
 
-Now we develop the eveluation further. Part of the eveluation task is to decide
+Now we develop the evaluation further. Part of the evaluation task is to decide
 on empirical grounds whether different good translations of a word are synonyms
 or translations in different senses.  We analyze sense vectors based on their
 distance, which is not directly determined by the distance of the sense vectors
-in the source space because of the nearest neighbor search.
+in the source space because of the nearest neighbor search. The reader should
+be noted that the evaluation is not very strict, rather a process of
+discovering something meaningful in available MSE implementations.
 
 The code for these experiments can be found at
 \url{https://github.com/makrai/wsi-fest}
@@ -230,7 +231,7 @@ The first system with adaptive sense numbers and an effective open-source
 implementation is the 
 modification of skip-gram \cite{Mikolov:2013d}, multi-sense skip-gram by
 \cite{Neelakantan:2014}, where new senses are introduced during training by
-tresholding the similarity of the present context to earlier contexts.
+thresholding the similarity of the present context to earlier contexts.
 
 % \cite{Tian:2014}, Guo et al., 2014, Wu and Giles, 2015, Liu et al., 2015, Vu
 % and Parker 2016, Šuster et al., 2016
@@ -250,8 +251,8 @@ formulating text generation as a Dirichlet process. In \adagram
 training. \mutli-sense skip-gram \citep{Li:2015} applies the Chinese restaurant
 process formalization of the Dirichlet process\footnote{Note the metathesis in
 the name of the repo which is the only way of distinguishing it from the other
-two multi-sense skipram models.}. Both \adagram and \mutli have a parameter for
-semantis resolution (number of senses) $\alpha$ and $\gamma$ respectively. 
+two multi-sense skip-gram models.}. Both \adagram and \mutli have a parameter for
+semantics resolution (number of senses) $\alpha$ and $\gamma$ respectively. 
 
 % https://sites.google.com/site/senseworkshop2017/
 
@@ -294,31 +295,30 @@ source model, and a single-sense embedding as target model.  The quality of the
 translation has been measured by training on the most frequent 5k word pairs
 and evaluating on another 1k seed pairs.
 
-\subsection{Orthogonal restriction}
+% \subsection{Orthogonal restriction}
 
-Besides optimising the transformation $W$ among all linear mappings, we
-followed \cite{Xing:2015} in restricting the approximation to orthogonal
-transformations (``rotations''). After computing the singular value
-decomposition
+\todo{\cite{Artetxe:2016}}
 
-\[U\Sigma V=S_t^\top T_t\]
+% Besides optimising the transformation $W$ among all linear mappings, we
+% followed \cite{Xing:2015} in restricting the approximation to orthogonal
+% transformations (``rotations''). After computing the singular value
+% decomposition
+% 
+% \[U\Sigma V=S_t^\top T_t\]
+% 
+% \noindent where $S_t$ and $T_t$ are the matrices consisting of the embedding vectors of
+% the trainig words pairs in the source and the target space respectively, we
+% took
+% 
+% \[W=U\mathbf{1}V\]
+% 
+% \noindent where $\mathbf 1$ is the rectangular identity matrix of appropriate shape.
+% Similarly to \cite{Xing:2015}, we found that the orthogonal restriction yields
+% significantly better results than general linear mapping.
 
-\noindent where $S_t$ and $T_t$ are the matrices consisting of the embedding vectors of
-the trainig words pairs in the source and the target space respectively, we
-took
+\subsection{Reverse nearest neighbor search}
 
-\[W=U\mathbf{1}V\]
-
-\noindent where $\mathbf 1$ is the rectangular identity matrix of appropriate shape.
-Similarly to \cite{Xing:2015}, we found that the orthogonal restriction yields
-significantly better results than general linear mapping.
-
-\subsection{Reverese nearest neighbor search}
-
-\todo{other than NLP and mapping, Radovanović, Tomasev}
-
-\todo{\cite{Dinu:2015} normalize the vector of similarities of each target item
-to the mapped pivots to [sum to] length 1,}
+\todo{other than NLP, non-mapped points, Radovanović, Tomasev}
 
 % First, worse method by Dinu:2015: they sample additional vectors in the
 % source domain called \emph{pivots} besides the test words, and normalize the
@@ -326,40 +326,38 @@ to the mapped pivots to [sum to] length 1,}
 
 A common error in linear translation is when there are \emph{hubs}, target
 words returned as the translation of many words, which is wrong in most of the
-cases.  In natural language processing, \cite{Dinu:2015} were the first to
-explicitly attack the problem with a method they call \emph{global correction}.
-Here, instead of the vanilla NN that we will call \emph{forward} NN search to
-contrast with the more sophisticated method, they first rank source words by
-their similarity to target words. In \emph{reverse} NN, source words are
-translated to the target words to which they have the lowest (forward) NN rank.
-\todo{} If more target words have the same forward rank, the decision is based
-on cosine similarity. This tie braking is yet not included in our
-implementation.
+cases.  In natural language processing, \cite{Dinu:2015} attack the problem
+explicitly with a method they call \emph{global correction}.  Here, instead of
+the original NN that we will call \emph{forward} NN search to contrast with the
+more sophisticated method, they first rank source words by their similarity to
+target words. In \emph{reverse} NN, source words are translated to the target
+words to which they have the lowest (forward) NN rank.  If more target
+words have the same forward rank, the decision is based on cosine similarity.
+\todo{This tie braking is yet not included in our implementation.}
 
-\todo{\cite{Lazaridou:2015,Artetxe:2016}}
 
-We found that in reverse NN search it is important to resrict the vocabulary to
-the some tens of thousands most frequent words not only for memory saving (the
-$|V_{sr}|\times|V_{tg}|$ similarity matrix has to be sorted column-wise for
-forward and row-wise for reverse ranking, so at some point of the computation
-we keep the whole integer matrix of forward NN ranks in memory), but we found
-that a vocabulary cutoff of $2^{15}=32768$ both on the source and the target
-size yields better results than the more ambitious $2^{16}=65536$. This is not
-the case for forward NN seach, where accuracy increases with vocabulary limit,
-see \cref{tab:prec}.
+% We found that in reverse NN search it is important to resrict the vocabulary
+% to the some tens of thousands most frequent words not only for memory saving
+% (the $|V_{sr}|\times|V_{tg}|$ similarity matrix has to be sorted column-wise
+% for forward and row-wise for reverse ranking, so at some point of the
+% computation we keep the whole integer matrix of forward NN ranks in memory),
+% but we found that a vocabulary cutoff of $2^{15}=32768$ both on the source
+% and the target size yields better results than the more ambitious
+% $2^{16}=65536$. This is not the case for forward NN seach, where accuracy
+% increases with vocabulary limit, see \cref{tab:prec}.
 
 \section{Experiments}
 
 \subsection{Data}
 
-We trained \neelakantan, \adagram~and \mutli~models on (vanilla and stemmed
+We trained \neelakantan, \adagram~and \mutli~models on (original and stemmed
 forms of) two Hungarian semi-gigaword corpora (.7--.8 B words), the Hungarian
 Wecorpus (Webkorpusz, \cite{Halacsy:2004}) and (the non-social-media part of) the
-Hungarian National Corpus (HNC, \cite{Oravecz:2014}).  We used Witionary as our
+Hungarian National Corpus (HNC, \cite{Oravecz:2014}).  We used Wiktionary as our
 seed dictionary, extracted with
 \texttt{wikt2dict}\footnote{\url{https://github.com/juditacs/wikt2dict}}
 \citep{Acs:2013}. We tried several English embeddings as target, including the
-300 dimensional skipram with negative sampling model
+300 dimensional skip-gram with negative sampling model
 \texttt{GoogleNews} released with \texttt{word2vec}
 \citep{Mikolov:2013f}\footnote{\url{https://code.google.com/archive/p/word2vec/}},
 and those released with GloVe
@@ -370,73 +368,74 @@ and those released with GloVe
 \newcommand{\any}{\texttt{any}}
 \newcommand{\disamb}{\texttt{disamb}}
 
-We evaluate MSE models in two ways referred as \any~and \disamb.
-The method \any~has been used for the tuning of (meta)parameters of
-both the source and the target embedding: a traditional, single-sense
-translation has been trained between the first sense vector of each word form and
-its translations. (If the training word is ambiguous in the seed dictionary,
-all translations have been included in the training data.)  Exploiting the
-multiple sense vectors, one word can have more than one translation.  During
-test, a source word was accepted if \any~of its sense vectors had at least one
-good translation among its top $k$ translations (prec@$k$).
+We evaluate MSE models in two ways referred as \any~and \disamb.  The method
+\any~has been used for tuning the (meta)parameters of both the source and the
+target embedding: a traditional, single-sense translation has been trained
+between the first \todo{all} sense vector of each word form and its
+translations. (If the training word is ambiguous in the seed dictionary, all
+translations have been included in the training data.)  Exploiting the multiple
+sense vectors, one word can have more than one translation.  During test, a
+source word was accepted if \any~\todo{the 1st}of its sense vectors had at
+least one good translation among the ten NNs. \Cref{tab:prec} shows results by
+the best models.
 
-\begin{table*} \centering
-  %\resizebox{\columnwidth}{!}{%
-  \begin{tabular}{c|rrr|rrr}
-    \toprule
-    &
-    \multicolumn{6}{c|}{forward (vanilla) NN search} &
-    \multicolumn{6}{c}{reverse NN search} \\
-    & prec@1 & prec@5 & prec@10 & prec@1 & prec@5 & prec@10 \\
-    \midrule
-\jiweil HNC-stemmed $dim=800,w=15$, joint learning, sense vectors & 3.6\%	&  0 4.5\%	&  0 4.0\%	&  0 35.5\%	&  42 36.3\%	&  39 34.1\%	&  33
-\jiweil HNC-stemmed $dim=800,w=15$, joint learning, context vectors	& 3.6\%	&  0 4.1\%	&  0 4.0\%	&  0 36.4\%	&  50 35.7\%	&  47 36.1\%	&  52
-\neelakantan HNC2-stemmed $dim=800,s=2$, cluster centroids	& 8.4\%	&  1 8.9\%	&  0 8.5\%	&  1 51.5\%	&  93 52.4\%	&  96 45.9\%	&  94
-\neelakantan Webkorpusz run 1, sense vector	& 9.7\%	&  1 10.6\%	&  2 10.4\%	&  1 49.5\%	&  89 48.7\%	&  92 46.9\%	&  91
-\neelakantan HNC2-stemmed $dim=800,s=2$, sense vectors	& 7.3\%	&  1 7.9\%	&  1 7.0\%	&  0 51.3\%	&  84 52.0\%	&  100 47.7\%	&  94
-\adagram HNC $dim=800,\alpha=.02,m=100$, sense vectors	& 24.8\%	&  0 29.9\%	&  0 30.3\%	&  0 47.6\%	&  65 47.8\%	&  57 54.2\%	&  77
-\adagram HNC-stemmed $dim=800,\alpha=.05$	& 24.0\%	&  2 29.2\%	&  2 27.8\%	&  0 55.1\%	&  102 54.5\%	&  94 59.5\%	&  113
-\neelakantan Webkorpusz run 2, sense vector	& 9.1\%	&  3 10.9\%	&  4 10.7\%	&  3 52.4\%	&  63 56.6\%	&  110 60.6\%	&  151
-\jiweil Webkorpusz-huWC, context vectors	& 1.0\%	&  0 1.5\%	&  0 1.6\%	&  0 42.9\%	&  36 48.7\%	&  81 63.4\%	&  169
-\jiweil Webkorpusz-huWC, sense vectors  & 24.6\%	&  0 30.2\%	&  2 30.6\%	&  2 49.7\%	&  46 54.1\%	&  96 64.5\%	&  163
-\adagram HNC $dim=160,\alpha=.05,p=3,m=200$, sense vectors	& 25.0\%	&  4 33.6\%	&  4 34.6\%	&  7 52.0\%	&  85 51.8\%	&  85 65.2\%	&  155
-\adagram -webkorp$dim=800,\alpha=.05,m=100$, sense vectors	& 29.0\%	&  7 36.4\%	&  10 36.6\%	&  11 58.0\%	&  100 58.3\%	&  110 68.6\%	&  179
-\adagram HNC $dim=600,p=3,m=50$, sense vectors	& 30.4\%	&  2 39.6\%	&  6 41.7\%	&  11 55.7\%	&  67 56.6\%	&  97 70.9\%	&  175
-\adagram HNC $dim=600,\alpha=.05,p=5,m=100$, sense vectors	& 31.5\%	&  4 40.3\%	&  5 40.5\%	&  7 55.0\%	&  96 55.0\%	&  101 70.0\%	&  164
-\adagram -webkorp$dim=800,m=100$, sense vectors	& 28.7\%	&  10 36.2\%	&  9 36.7\%	&  16 53.8\%	&  48 58.3\%	&  99 74.3\%	&  229
-\end{tabular}
-\cation{$m$ is `min count' i.e.~ the vocabulary cutoff
-
-%1024 & 0.0\% & 0.0\% & 0.0\% & 03.9\% & 13.1\% & 23.6\% \\
-%2048 & 0.3\% & 0.6\% & 0.7\% & 11.4\% & 25.5\% & 36.9\% \\
-%4096 & 7.2\% & 11.5\% & 13.2\% & 15.8\% & 36.1\% & 44.0\% \\
-%8192 & 17.2\% & 29.9\% & 34.0 \%& 22.9\% & 45.5\% & 52.4\% \\
-%16384 & 22.2\% & 4.0 \% & 45.4\% & \textbf{26.1\%} & 47.3\% & 53.5\% \\
-%32768 & 23.7\% & 42.8\% & 49.5\% & 20.1\% & \textbf{50.6\%} & \textbf{62.8\%} \\
-%65536 & \emph{24.0} \%& \emph{43.3}\% & \emph{49.7}\% & 14.7\% & 40.7\% & 55.0 \%\\
-    \bottomrule
-  \end{tabular}
-  %}
-  \caption{Precision of \any~reverse NN when translating from an AdaGram model
-  trained on HNC (600 dimensions, $\alpha=.05$)}
-  \label{tab:prec}
+\begin{table*} 
+  \resizebox{\textwidth}{!}{%
+    \begin{tabular}{lrlrr|rrrrrr|rrrrrr}
+      \toprule
+        & dim & $\alpha/\gamma$ & $p$ & $m$  & \multicolumn{6}{c|}{forward NN search} & \multicolumn{6}{c}{reverse NN search} \\
+      vocab cutoff &&&&& \multicolumn{2}{c}{8192} & \multicolumn{2}{c}{16384}
+      & \multicolumn{2}{c|}{32768} & \multicolumn{2}{c}{8192} &
+      \multicolumn{2}{c}{16384} & \multicolumn{2}{c}{32768} \\
+      \midrule
+      HNC	        & 800	& .02	&       & 100   & 24.8\%	&  0	& 29.9\%	&  0	& 30.3\%	&  0	& 47.6\%	&  65	  & 47.8\%	&  57	  & 54.2\%	&  77   \\
+      HNC stemmed	& 800	& .05	&       & 385 K & 24.0\%	&  2	& 29.2\%	&  2	& 27.8\%	&  0	& 55.1\%	&  102	& 54.5\%	&  94	  & 59.5\%	&  113  \\
+      \neelakantan Webkorpusz&300&--&2   &14665  & 9.1\%   &  3  & 10.9\%  &  4 & 10.7\%   &  3  & 52.4\%  &  63   & 56.6\%  &  110  & 60.6\%  &  151  \\
+      %\mutli Webkorp\footnotemark  &&&&    & 1.0\% &  0 & 1.5\% &  0 & 1.6\% &  0 & 42.9\% &  36 & 48.7\% &  81 & 63.4\% &  169 \\
+      \mutli Webkorpusz &300&.25 &       & 71    & 24.6\% &  0 & 30.2\% &  2 & 30.6\% &  2 & 49.7\% &  46 & 54.1\% &  96 & 64.5\% &  163 \\ 
+      HNC         & 160 & .05 & 3     & 200   & 25.0\% &  4 & 33.6\% &  4 & 34.6\% &  7 & 52.0\% &  85 & 51.8\% &  85 & 65.2\% &  155 \\ 
+      Webkorpusz	    & 800	& .05	&       & 100	  & 29.0\%	&  7	& 36.4\% &  10	& 36.6\%	&  11	& {\bf 58.0\%}	&  100	& {\bf 58.3\%}	&  110	& 68.6\%	&  179  \\
+      HNC	        & 600	& .1  & 3     & 50	  & 30.4\%	&  2	& 39.6\% &  6	& {\bf 41.7\%}	&  11	& 55.7\%	&  67	  & 56.6\%	&  97	  & 70.9\%	&  175  \\
+      HNC	        & 600	& .05	& 5     & 100	  & {\bf 31.5\%}	&  4	& {\bf 40.3\%}	&  5	& 40.5\%	&  7	& 55.0\%	&  96	  & 55.0\%	&  101	& 70.0\%	&  164  \\
+      Webkorpusz	    & 800	& .1  &       & 100	  & 28.7\%	&  10	& 36.2\% &  9	& 36.7\%	&  16	& 53.8\%	&  48	  & {\bf 58.3\%}	&  99	  & {\bf 74.3\%}	&  229  \\
+      \bottomrule
+    \end{tabular}
+  }
+  \caption{Precision of \any~forward and reverse NN and the number of word
+  forms with non-synonymic vectors (\disamb).  The source embedding has been
+  trained with \adagram, except for when indicated otherwise (\neelakantan,
+  \mutli).  The meta-parameters are $d$imension, the resolution parameter
+  ($\alpha$ in \adagram and $\gamma$ in \mutli), the maximum number of
+  $p$rototypes (sense vectors) and the vocabulary cutoff ($m$in-freq). The two
+  models with large $m$s have technically no cut-off.} 
+    \label{tab:prec}
 \end{table*}
 
-In \disamb, we used the translation matrix trained on first sense vectors again,
-and inspected the translations of the different senses of each source word.
-We separated \emph{common} translations of word vectors, i.e.~translations $t$ of a source word
-such that all the source sense vectors that have at least one good
-translation have $t$ among their translations. We say that the MSE
-\disamb iguates a word, if it has at least two sense vectors $s_1, s_2$ with a
-different set of good non-common translations among the top $k$ NNs of their
-translations $Ws_i$.
+In \disamb, we used the same translation matrix as in \any, and inspected the
+translations of the different sense vectors to see whether the vectors really
+model different senses (not synonyms).
+% We separated \emph{common} translations of word vectors, i.e.~translations
+% $t$ of a source word such that all the source sense vectors that have at
+% least one good translation have $t$ among their translations.  Common
+% translations do not evidence different senses. Instead 
+The lowest requirement for sense vectors $s_1, s_2$ for not being synonyms is
+that the sets of corresponding NN@$k$ hits are different. This is satisfied
+only in \todo{\%} of the words with more than one sense vector.
 
 \subsection{Qualitative analysis}
 
-We analyzed qualitatively successfully disambiguated words, sorted by the
-cosine similarity $s$ of their translations.  (If there are more than two, the
-choice of the two senses was arbitrary.) \Cref{tab:alkoto} shows words with
-$s<.3$, most with sense vectors corresponding to senses with clear difference.
+We analyzed qualitatively the successfully disambiguated words, sorting them by
+the cosine similarity $s$ of translations of different sense vectors. We found
+that most of the few cases when there are more than two sense vectors with a
+good NN@1 translation are due to that the seed dictionary contains some
+non-basic translation e.g. \emph{kapcsolat} `relationship, conjunction' has
+`affair' among its seed translations. In these cases, we two sense vectors
+arbitraryly. \todo{When there are sense vectors with more than two NN@$k$ hits
+, the choice of the corresponding target words is arbitrary.} \Cref{tab:alkoto}
+shows words with $s<.3$, most with sense vectors corresponding to senses with
+clear difference.  This is similar to clustering the sense vectors for each
+word, but here we restrict our analysis to sense vectors that prove to be
+sensible in linear translation.
 
 \begin{table*}
   \begin{tabular}{cllc}
@@ -600,3 +599,8 @@ code\footnote{\url{https://github.com/hlt-bme-hu/eval-embed}} by Gábor Borbely.
 \bibliography{ml}
 
 \end{document}
+
+\footnotetext{Both the original skip-gram model and its multi-sense variant
+have two kind of vector for each word, the vanilla ``word'' vector, and a
+context vector. The first \mutli model denotes context vectors.  otherwise we
+used word vectors.}
