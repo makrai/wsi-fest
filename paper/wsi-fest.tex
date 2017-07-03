@@ -142,14 +142,20 @@ fraught with difficulties, especially when we wish to distinguish homophony,
 using the same written or spoken form to express different concepts, such as
 Russian {\it mir} `world' and {\it mir} `peace' from polysemy, where speakers
 feel that the two senses are very strongly connected, such as in Hungarian {\it
-nap} `day' and {\it nap} `sun'.  To quote \cite{Zgusta:1971} ``Of course it is
-a pity that we have to rely on the subjective interpretations of the speakers,
-but we have hardly anything else on hand''. 
+nap} `day' and {\it nap} `sun'.  
+
+% To quote \cite{Zgusta:1971} ``Of course it is a pity that we have to rely on
+% the subjective interpretations of the speakers, but we have hardly anything
+% else on hand''. 
 % Etymology
-Different languages make different lump/split decisions in the conceptual
-space, so much so that translational relatedness can, to a remarkable extent,
-be used to recover the universal clustering \citep{Youn:2016}.
-\Cref{sec:bground} by Veronika Lipp offers a more detailed background.
+% Different languages make different lump/split decisions in the conceptual
+% space, so much so that translational relatedness can, to a remarkable extent,
+% be used to recover the universal clustering \citep{Youn:2016}.  
+
+A more modest goal in WSI is to distinguish homophony from polysemy. In ideal
+case, we could even differentiate between metonymy adn metaphor, two subtypes
+of polysemy that are discussed in \cref{sec:bground} by Veronika Lipp in more
+detail.
 
 \pagebreak
 
@@ -305,28 +311,6 @@ source model, and a single-sense embedding as target model.  The quality of the
 translation has been measured by training on the most frequent 5k word pairs
 and evaluating on another 1k seed pairs.
 
-% \subsection{Orthogonal restriction}
-
-\todo{orthogonality \cite{Xing:2015}, CCA \citep{Faruqui:2014}, and preserving
-analogies betwwen the mapped points \citep{Artetxe:2016}}
-
-% Besides optimising the transformation $W$ among all linear mappings, we
-% followed \cite{Xing:2015} in restricting the approximation to orthogonal
-% transformations (``rotations''). After computing the singular value
-% decomposition
-% 
-% \[U\Sigma V=S_t^\top T_t\]
-% 
-% \noindent where $S_t$ and $T_t$ are the matrices consisting of the embedding vectors of
-% the trainig words pairs in the source and the target space respectively, we
-% took
-% 
-% \[W=U\mathbf{1}V\]
-% 
-% \noindent where $\mathbf 1$ is the rectangular identity matrix of appropriate shape.
-% Similarly to \cite{Xing:2015}, we found that the orthogonal restriction yields
-% significantly better results than general linear mapping.
-
 \subsection{Reverse nearest neighbor search}
 
 \todo{other than NLP, non-mapped points, Radovanović, Tomasev}
@@ -344,8 +328,7 @@ more sophisticated method, they first rank source words by their similarity to
 target words. In \emph{reverse} nearest neighbour (rNN) search , source words are translated to the target
 words to which they have the lowest (forward) NN rank.  If more target
 words have the same forward rank, the decision is based on cosine similarity.
-\todo{This tie braking is yet not included in our implementation.}
-
+\todo{This tie braking is yet not included in our implementation.} 
 
 % We found that in reverse NN search it is important to resrict the vocabulary
 % to the some tens of thousands most frequent words not only for memory saving
@@ -357,20 +340,86 @@ words have the same forward rank, the decision is based on cosine similarity.
 % $2^{16}=65536$. This is not the case for forward NN seach, where accuracy
 % increases with vocabulary limit, see \cref{tab:prec}.
 
+\subsection{Orthogonal restriction, length normalization, and centering}
+
+\newcommand{\wordtovec}{\texttt{word1vec}}
+
+\cite{Xing:2015} notes that the original linear translation method is
+theoretically inconsistent as it is based on three different similarity
+measures: \wordtovec~itself uses the product of unnormalized vectors, the
+translation is trained based on Euclidean distance, and neighbours are queried
+based on cosine similarity. They make the distances coincide by
+length-normalizing the embeddings and restricting $W$ to preserve vector lenth,
+i.e.~their matrix $W$ is orthogonal (the mapping is a rotation).
+\citep{Faruqui:2014} gains further improvement by mapping the two embeddings to
+a lower-dimensional bilingual space with canonical correlation analysis.
+\citep{Artetxe:2016} analyses elements of these two works theoretically, and
+finds a combination that improves upon dictionary generation and also preserves
+analogies like $\mathbf{woman} - \mathbf{man} + \mathbf{king} \approx
+\mathbf{queen}$ among the mapped points $Wx_i$. They find that the
+orthogonality constraint is key to preserve performance in analogies, and it
+also improves bilingual performance. Length normalization, when followed by
+centering the embeddings to $\mathbf 0$ mean obtains further improvements in
+bilingual performance without hurting monolingual performance. \todo{Hara}
+
+e also implemented the orthogonal restriction by computing the singular value
+decomposition
+ 
+\[U\Sigma V=S_t^\top T_t\]
+ 
+\noindent where $S_t$ and $T_t$ are the matrices consisting of the embedding
+vectors of the trainig words pairs in the source and the target space
+respectively, and taking
+ 
+\[W=U\mathbf{1}V\]
+ 
+\noindent where $\mathbf 1$ is the rectangular identity matrix of appropriate
+shape.
+
+Similarly to \cite{Xing:2015} and \cite{Artetxe:2016}, we find that the
+orthogonal constraint improves forward NNs, but normalization + centering did
+not improves either forward or reverse NNs, nor did the orthogonality
+constraint improve reverse NNs, as seen in \cref{tab:orthog}.
+
+\begin{table}
+  \centering
+  %\resizebox{\columnwidth}{!}{%
+  \begin{tabular}{lll}
+    \toprule
+                          & forward & reverse \\
+    \midrule
+    general linear        & 28.7 \% & 53.8 \% \\
+    orthogonal restriction& 32.1 \% & 51.7 \% \\
+    + normalization       & 33.7 \% & 50.0 \% \\
+    + centering           & 32.8 \% & 51.9 \% \\
+    \bottomrule
+  \end{tabular}
+  %}
+  \caption{Precision@10 of translations whith different tricks. The source is
+  an \adagram~model in 800 dimensions,
+  $\alpha=.1$, trained on Webkorpusz with the vocabulary cut off at 8192.}
+  \label{tab:orthog}
+\end{table}
+
+% Besides optimising the transformation $W$ among all linear mappings, we
+% followed \cite{Xing:2015} in restricting the approximation to orthogonal
+% transformations (``rotations''). 
+
 \section{Experiments}
 
 \subsection{Data}
 
 We trained \neelakantan, \adagram~and \mutli~models on (original and stemmed
 forms of) two Hungarian semi-gigaword corpora (.7--.8 B words), the Hungarian
-Wecorpus (Webkorpusz, \cite{Halacsy:2004}) and (the non-social-media part of) the
+Wecorpus (Webkorpusz, \cite{Halacsy:2004}) and (the non-social-media part of)
+the
 Hungarian National Corpus (HNC, \cite{Oravecz:2014}).  We used Wiktionary as our
 seed dictionary, extracted with
 \texttt{wikt2dict}\footnote{\url{https://github.com/juditacs/wikt2dict}}
 \citep{Acs:2013}. We tried several English embeddings as target, including the
 300 dimensional skip-gram with negative sampling model
-\texttt{GoogleNews} released with \texttt{word2vec}
-\citep{Mikolov:2013f}\footnote{\url{https://code.google.com/archive/p/word2vec/}},
+\texttt{GoogleNews} released with
+\wordtovec~\citep{Mikolov:2013f}\footnote{\url{https://code.google.com/archive/p/word2vec/}},
 and those released with GloVe
 \citep{Pennington:2014}\footnote{\url{https://nlp.stanford.edu/projects/glove/}}.
 
