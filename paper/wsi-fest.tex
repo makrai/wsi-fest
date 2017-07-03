@@ -38,6 +38,7 @@
 %\newcolumntype{d}[1]{D{.}{.}{#1}}
 
 \usepackage{todonotes}
+\usepackage{wasysym}
 
 \aclfinalcopy % Uncomment this line for the final submission
 %\def\aclpaperid{28} %  Enter the acl Paper ID here
@@ -76,14 +77,15 @@ vectors for ambiguous words; each vector is supposed to corresponding to a diffe
 word sense, but in parctice sense vectors seem to duplicate senses.
 
 In \cite{Borbely:2016}, we proposed a cross-lingual method for the evaluation
-of MSEs based on the principle that words may be ambiguous as far as the
-postulated senses translate to different words in some other language.  We
-applied the method by \citet{Mikolov:2013x} who train a translation mapping
-from the source languages embedding to the target as a least-squares regression
-supervised by a seed dictionary of the  few thousand most frequent words. The
-translation of a source word vector is the nearest neighbor of its image by the
-mapping in the target space. In the multi-sense setting, we translated from
-MSEs (the target embedding remaining single-sense).
+of the sense resolution in MSEs. The method is based on the principle that
+words may be ambiguous as far as the postulated senses translate to different
+words in some other language.  We applied the method by \citet{Mikolov:2013x}
+who train a translation mapping from the source languages embedding to the
+target as a least-squares regression supervised by a seed dictionary of the
+few thousand most frequent words. The translation of a source word vector is
+the nearest neighbor of its image by the mapping in the target space. In the
+multi-sense setting, we translated from MSEs (the target embedding remaining
+single-sense).
 
 Now we develop the evaluation further. Part of the evaluation task is to decide
 on empirical grounds whether different good translations of a word are synonyms
@@ -130,18 +132,26 @@ The code for these experiments can be found at
         \label{fig:AdaGram}
 \end{figure}
 
-The differentiation of word senses, as already noted in \cite{Borbely:2016}, is
+We emphasize that our evaluation proposal probes an aspect of MSEs,
+\emph{semantic resolution}, which is not well measured by the well-known word
+sense disambiguation (WSD) task that aims at classifying occurrences of a word
+form to different elements of a sense inventory pre-defined by some experts.
+Our goal in WSI is to probe the granularity of the inventory itself.  The
+differentiation of word senses, as already noted in \cite{Borbely:2016}, is
 fraught with difficulties, especially when we wish to distinguish homophony,
 using the same written or spoken form to express different concepts, such as
 Russian {\it mir} `world' and {\it mir} `peace' from polysemy, where speakers
 feel that the two senses are very strongly connected, such as in Hungarian {\it
 nap} `day' and {\it nap} `sun'.  To quote \cite{Zgusta:1971} ``Of course it is
 a pity that we have to rely on the subjective interpretations of the speakers,
-but we have hardly anything else on hand''. %Etymology makes clear that
+but we have hardly anything else on hand''. 
+% Etymology
 Different languages make different lump/split decisions in the conceptual
 space, so much so that translational relatedness can, to a remarkable extent,
 be used to recover the universal clustering \citep{Youn:2016}.
 \Cref{sec:bground} by Veronika Lipp offers a more detailed background.
+
+\pagebreak
 
 \subsection{Lexicographic Background \\ (Veronika Lipp)}
 
@@ -297,7 +307,8 @@ and evaluating on another 1k seed pairs.
 
 % \subsection{Orthogonal restriction}
 
-\todo{\cite{Artetxe:2016}}
+\todo{orthogonality \cite{Xing:2015}, CCA \citep{Faruqui:2014}, and preserving
+analogies betwwen the mapped points \citep{Artetxe:2016}}
 
 % Besides optimising the transformation $W$ among all linear mappings, we
 % followed \cite{Xing:2015} in restricting the approximation to orthogonal
@@ -330,7 +341,7 @@ cases.  In natural language processing, \cite{Dinu:2015} attack the problem
 explicitly with a method they call \emph{global correction}.  Here, instead of
 the original NN that we will call \emph{forward} NN search to contrast with the
 more sophisticated method, they first rank source words by their similarity to
-target words. In \emph{reverse} NN, source words are translated to the target
+target words. In \emph{reverse} nearest neighbour (rNN) search , source words are translated to the target
 words to which they have the lowest (forward) NN rank.  If more target
 words have the same forward rank, the decision is based on cosine similarity.
 \todo{This tie braking is yet not included in our implementation.}
@@ -368,15 +379,15 @@ and those released with GloVe
 \newcommand{\any}{\texttt{any}}
 \newcommand{\disamb}{\texttt{disamb}}
 
-We evaluate MSE models in two ways referred as \any~and \disamb.  The method
-\any~has been used for tuning the (meta)parameters of both the source and the
-target embedding: a traditional, single-sense translation has been trained
+We evaluate MSE models in two ways referred to as \any~and \disamb.  The method
+\any~has been used for tuning the (meta)parameters of the source embedding and
+to choose the target: a traditional, single-sense translation has been trained
 between the first \todo{all} sense vector of each word form and its
 translations. (If the training word is ambiguous in the seed dictionary, all
 translations have been included in the training data.)  Exploiting the multiple
 sense vectors, one word can have more than one translation.  During test, a
 source word was accepted if \any~\todo{the 1st}of its sense vectors had at
-least one good translation among the ten NNs. \Cref{tab:prec} shows results by
+least one good translation among its \todo{10} rNNs. \Cref{tab:prec} shows results by
 the best models.
 
 \begin{table*} 
@@ -388,11 +399,11 @@ the best models.
       & \multicolumn{2}{c|}{32768} & \multicolumn{2}{c}{8192} &
       \multicolumn{2}{c}{16384} & \multicolumn{2}{c}{32768} \\
       \midrule
-      HNC	        & 800	& .02	&       & 100   & 24.8\%	&  0	& 29.9\%	&  0	& 30.3\%	&  0	& 47.6\%	&  65	  & 47.8\%	&  57	  & 54.2\%	&  77   \\
+      HNC	        & 800	& .02	&       & 100   & 24.8\%	&  0 & 29.9\%	&  0	& 30.3\%	&  0	& 47.6\%	&  65	  & 47.8\%	&  57	  & 54.2\%	&  77   \\
       HNC stemmed	& 800	& .05	&       & 385 K & 24.0\%	&  2	& 29.2\%	&  2	& 27.8\%	&  0	& 55.1\%	&  102	& 54.5\%	&  94	  & 59.5\%	&  113  \\
-      \neelakantan Webkorpusz&300&--&2   &14665  & 9.1\%   &  3  & 10.9\%  &  4 & 10.7\%   &  3  & 52.4\%  &  63   & 56.6\%  &  110  & 60.6\%  &  151  \\
-      %\mutli Webkorp\footnotemark  &&&&    & 1.0\% &  0 & 1.5\% &  0 & 1.6\% &  0 & 42.9\% &  36 & 48.7\% &  81 & 63.4\% &  169 \\
-      \mutli Webkorpusz &300&.25 &       & 71    & 24.6\% &  0 & 30.2\% &  2 & 30.6\% &  2 & 49.7\% &  46 & 54.1\% &  96 & 64.5\% &  163 \\ 
+      \neelakantan~Webkorpusz&300&--&2   &14665  & 9.1\%   &  3  & 10.9\%  &  4 & 10.7\%   &  3  & 52.4\%  &  63   & 56.6\%  &  110  & 60.6\%  &  151  \\
+      %\mutli~Webkorp\footnotemark  &&&&    & 1.0\% &  0 & 1.5\% &  0 & 1.6\% &  0 & 42.9\% &  36 & 48.7\% &  81 & 63.4\% &  169 \\
+      \mutli~Webkorpusz &300&.25 &       & 71    & 24.6\% &  0 & 30.2\% &  2 & 30.6\% &  2 & 49.7\% &  46 & 54.1\% &  96 & 64.5\% &  163 \\ 
       HNC         & 160 & .05 & 3     & 200   & 25.0\% &  4 & 33.6\% &  4 & 34.6\% &  7 & 52.0\% &  85 & 51.8\% &  85 & 65.2\% &  155 \\ 
       Webkorpusz	    & 800	& .05	&       & 100	  & 29.0\%	&  7	& 36.4\% &  10	& 36.6\%	&  11	& {\bf 58.0\%}	&  100	& {\bf 58.3\%}	&  110	& 68.6\%	&  179  \\
       HNC	        & 600	& .1  & 3     & 50	  & 30.4\%	&  2	& 39.6\% &  6	& {\bf 41.7\%}	&  11	& 55.7\%	&  67	  & 56.6\%	&  97	  & 70.9\%	&  175  \\
@@ -413,81 +424,103 @@ the best models.
 
 In \disamb, we used the same translation matrix as in \any, and inspected the
 translations of the different sense vectors to see whether the vectors really
-model different senses (not synonyms).
+model different senses rather than synonyms.
 % We separated \emph{common} translations of word vectors, i.e.~translations
 % $t$ of a source word such that all the source sense vectors that have at
 % least one good translation have $t$ among their translations.  Common
 % translations do not evidence different senses. Instead 
 The lowest requirement for sense vectors $s_1, s_2$ for not being synonyms is
-that the sets of corresponding NN@$k$ hits are different. This is satisfied
+that the sets of corresponding rNN@$k$ hits are different. This is satisfied
 only in \todo{\%} of the words with more than one sense vector.
+  \todo{recompute the whole tabular with recall values}
 
-\subsection{Qualitative analysis}
+%\subsection{Qualitative analysis}
 
-We analyzed qualitatively the successfully disambiguated words, sorting them by
-the cosine similarity $s$ of translations of different sense vectors. We found
-that most of the few cases when there are more than two sense vectors with a
-good NN@1 translation are due to that the seed dictionary contains some
+\newcommand{\bad}{$^\text{\frownie}$}
+
+%We analyzed qualitatively 
+\Cref{tab:alkoto} shows the successfully disambiguated words sorted by the
+cosine similarity $s$ of rNN@1 translations of different sense vectors. (We
+found that most of the few cases when there are more than two sense vectors
+with a good rNN@1 translation are due to that the seed dictionary contains some
 non-basic translation e.g. \emph{kapcsolat} `relationship, conjunction' has
-`affair' among its seed translations. In these cases, we two sense vectors
-arbitraryly. \todo{When there are sense vectors with more than two NN@$k$ hits
-, the choice of the corresponding target words is arbitrary.} \Cref{tab:alkoto}
-shows words with $s<.3$, most with sense vectors corresponding to senses with
-clear difference.  This is similar to clustering the sense vectors for each
-word, but here we restrict our analysis to sense vectors that prove to be
-sensible in linear translation.
+`affair' among its seed translations. In these cases, we chose two sense
+vectors arbitraryly.\todo{When there are sense vectors with more than two
+rNN@$k$ hits , the choice of the corresponding target words is also
+arbitrary.}).  Relying on $s$ is similar to clustering the sense vectors for
+each word, but here we restrict our analysis to sense vectors that prove to be
+sensible in linear translation.  \emph{covg} denotes coverage of the NN@1
+translations over all gold translations.  \bad denotes cases where we think the
+``gold'' seed translation is (totally) wrong.  
 
-\begin{table*}
-  \begin{tabular}{cllc}
-  0.0182 & alkotó 	& constituent, creator, composer, creative	&  1.0 \\
-  0.0407 & rész 	& parcel, episode	&  1.0 \\
-  0.0447 & ér 	& vein, arrive	&  0.66 \\
-  0.0509 & előzetes 	& preliminary, trailer	&  1.0 \\
-  0.0543 & villamos 	& electro, tram	&  0.5 \\
-  0.0555 & nemes 	& peer, sublime, noble	&  1.0 \\
-  0.0654 & sorozat 	& succession, serial, suite	&  1.0 \\
-  0.1005 & egyenes 	& linear, frank, straightforward	&  1.0 \\
-  0.1007 & kar 	& choir, arm	&  1.0 \\
-  0.1153 & test 	& hull, corpus	&  1.0 \\
-  0.1155 & rendelet 	& doom, regulation	&  0.66 \\
-  0.1267 & tömeg 	& mob/crowd, bulk, cloud, mob, crowd	&  1.0 \\
-  0.1410 & terem 	& classroom, yield, hall	&  1.0 \\
-  0.1512 & hátsó 	& hinder, rear	&  1.0 \\
-  0.1587 & szem 	& grain, optic	&  1.0 \\
-  0.1760 & hatalom 	& empire, leverage	&  0.33 \\
-  0.1809 & megfelel 	& suit, correspond	&  1.0 \\
-  0.1848 & Judit 	& Jude, Jodi	&  0.4 \\
-  0.1872 & induló 	& march, candidate	&  1.0 \\
-  0.1920 & cigány 	& Roma, Rom	&  0.4 \\
-  0.1926 & szakértő 	& judge, adept, adviser	& 0.42 \\
-  0.1933 & eltérés 	& departure, variance	&  0.4 \\
-  0.2017 & sor 	& queue/row, rank	&  1.0 \\
-  0.2028 & piros 	& rot, hearts	&  1.0 \\
-  0.2036 & felső 	& superior, overhead	&  1.0 \\
-    0.2053 & megelőző 	& preventive/preventative, preceding,
-    \\&&\hspace{1cm}preventative, foregoing, anterior	&  0.71 \\
-  0.2202 & fekvő 	& landscape, lying	&  0.66 \\
-  0.2235 & lengyel 	& Pole, Polish	&  1.0 \\
-  0.2236 & környező 	& ambient, surrounding	& 0.66 \\
-  0.2345 & ok 	& motive, okay	&  1.0 \\
-  0.2424 & kiegészítő 	& complementary, expansion, supplementary, accessory	&  0.8 \\
-  0.2428 & készít 	& manufacture, prepare	&  1.0 \\
-  0.2436 & vár 	& castle/fortress, await, castle	&  1.0 \\
-  0.2514 & előbbi 	& preceding, anterior	&  0.66 \\
-  0.2558 & kötelezettség 	& engagement, obligation	& 0.66 \\
-  0.2569 & némi 	& generic, genital	&  0.5 \\
-  0.2575 & szín 	& suit, shed	&  0.66 \\
-  0.2616 & vállalkozó 	& contractor, entrepreneur	&  1.0 \\
-  0.2639 & közepes 	& mediocre, moderate	&  0.66 \\
-  0.2732 & követ 	& haunt, succeed	&  0.66 \\
-  0.2818 & puszta 	& pure, desert, bleak, bare, sheer	&  0.55 \\
-  0.2838 & bemutató 	& premiere, presenter, exhibition	& 1.0 \\
-  0.2946 & előre 	& onward, beforehand	&  0.0 \\
-\end{tabular}
-\caption{Sense vectors with rather different translations. Alternatives like
-  mob/crowd denote more good non-common translations}
-\label{tab:alkoto}
-\end{table*}
+We see that most words with $s<.3$ are really ambiguous in a standard
+lexicographic point of view, and those with $s>.35$ are synonymic.
+
+
+\begin{table} \resizebox{\columnwidth}{!}{%
+  \begin{tabular}{llll}
+    \toprule
+    $s$     &         &                       & covg \\
+    \midrule
+    0.01821	& alkotó	& constituent, creator	& 0.5 \\
+    0.05096	& előzetes	& preliminary, trailer	& 1.0 \\
+    0.07632	& kapcsolat	& affair, linkage, conjunction	& 0.33 \\
+    0.1142	& sorozat	& succession, suite, serial	& 1.0 \\
+    0.1873	& induló	& candidate, march	& 1.0 \\
+    0.187	& nemes	& peer\bad, noble	& 0.67 \\
+    0.1934	& eltérés	& variance, departure	& 0.4 \\
+    0.2054	& megelőző	& preventive, preceding	& 0.29 \\
+    0.2206	& bemutató	& exhibition, presenter	& 0.67 \\
+    0.2515	& előbbi	& preceding, anterior	& 0.67 \\
+    0.2558	& kötelezettség	& obligation, engagement	& 0.67 \\
+    0.2733	& követ	& haunt, succeed	& 0.67 \\
+    0.3038	& köt	& bind, tie	& 0.67 \\
+    0.3212	& tartós	& substantial, durable	& 1.0 \\
+    0.333	& bír	& possess, bear	& 1.0 \\
+    0.3486	& kerület	& borough, ward, perimeter	& 0.3 \\
+    0.3486	& utas	& passenger, fare\bad	& 1.0 \\
+    0.3564	& szigorú	& stern, strict	& 0.5 \\
+    0.3708	& rendes	& orderly, ordinary	& 0.5 \\
+    0.3824	& eladó	& vendor, salesman	& 0.5 \\
+    0.3986	& darab	& chunk, fragment	& 0.4 \\
+    0.4012	& hiány	& poverty, shortage	& 0.5 \\
+    0.4087	& uralkodó	& ruler, sovereign, prince	& 0.5 \\
+    0.4093	& kutatás	& quest, exploration	& 0.5 \\
+    &$\vdots$ \\
+    %   0.4138	& tanítás	& tuition, lesson	& 0.67 \\
+    %   0.4196	& őszinte	& sincere, frank	& 0.67 \\
+    %   0.4501	& gyerek	& childish, kid	& 0.67 \\
+    %   0.4551	& ritka	& rare, odd	& 0.5 \\
+    %   0.4608	& szeretet	& affection, liking	& 0.67 \\
+    %   0.4723	& vizsgálat	& inquiry, examination	& 0.67 \\
+    %   0.4853	& tömeg	& crowd, mob	& 0.5 \\
+    %   0.4903	& puszta	& plain, pure	& 0.22 \\
+    %   0.4971	& képviselő	& representative, delegate	& 0.67 \\
+    %   0.4975	& határ	& border, boundary	& 0.67 \\
+    %   0.5001	& drága	& precious, dear, expensive	& 1.0 \\
+    %   0.5144	& szövetség	& alliance, union, coalition	& 0.75 \\
+    %   0.5217	& noha	& albeit, notwithstanding	& 1.0 \\
+    %   0.5311	& hulladék	& litter, garbage, rubbish	& 0.43 \\
+    %   0.5311	& szemét	& litter, garbage, rubbish	& 0.43 \\
+    %   0.5797	& anya	& mummy, mum	& 1.0 \\
+    %   0.5824	& szomszédos	& neighbouring, neighbour	& 0.4 \\
+    %   0.5931	& szabadság	& independence, liberty	& 1.0 \\
+    %   0.6722	& tilos	& forbidden, prohibited	& 1.0 \\
+    %   0.7066	& kiállítás	& exhibition, exhibit	& 0.67 \\
+    %   0.8122	& furcsa	& strange, odd	& 0.4 \\
+    %   0.8277	& azután	& afterward, afterwards	& 0.67 \\
+    %   0.8689	& megbízható	& reliable, dependable	& 0.67 \\
+    \bottomrule
+  \end{tabular} 
+  }
+  \caption{Words with sense vectors corrensponding to different senses as
+  witnessed by rNN@1s.
+  % Alternatives like mob/crowd denote more good non-common translations
+  }
+  \label{tab:alkoto}
+\end{table}
+
+\subsection{Todo}
 
 The clearest case of homonymy is when senses belong to different POS, and the
 translations reflect these POSs, e.g.~\emph{nő} `woman; increase' or \emph{vár}
@@ -495,11 +528,11 @@ translations reflect these POSs, e.g.~\emph{nő} `woman; increase' or \emph{vár
 blurred borders, e.g.  it is debatable whether the nominal \emph{önkéntes}
 `voluntary; volunteer' is ambiguous. 
 
-\todo{Note that in the \fl~approach, POS-difference alone is not enough for
+Note that in the \fl~approach, POS-difference alone is not enough for
 analyzing a word as ambiguous, e.g.~the only difference between the senses of
 \emph{alkalmazott}, `employee; applied' is that employment is the application
 of people for work; in the case of \emph{belső} `internal; interior', the noun
-\emph{interior} refers to the \emph{internal} part of a building.} 
+\emph{interior} refers to the \emph{internal} part of a building.
 
 % More interesting are words whose one sense is a special case of an other
 % sense of the same word, e.g.~ \emph{cikk}, `item; article' (an article is an
