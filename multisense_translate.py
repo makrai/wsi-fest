@@ -180,7 +180,8 @@ class MultiSenseLinearTranslator():
                     msg = '{:.4}\t{}\t{}\t{:.2}'.format(
                         sim, sr_word, uniq_hit_sets,
                         len(good_trans)/len(self.test_dict[sr_word]))
-                    print(msg)
+                    if self.args.verbose:
+                        print(msg)
                     logging.debug(msg)
             if not self.test_size_act % 1000 and self.test_size_act:
                 log_prec()
@@ -320,6 +321,7 @@ def parse_args():
         help='non-reverse NN search')
     parser.add_argument('--restrict_vocab', type=int, default=2**15)
     parser.add_argument('--prec_level', type=int, default=10)
+    parser.add_argument('--non-verbose', dest='verbose', action='store_false')
     return parser.parse_args()
 
 
