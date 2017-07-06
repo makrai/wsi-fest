@@ -70,14 +70,14 @@ class MultiSenseLinearTranslator():
         self.target_embed = get_first_vectors(self.args.target_embed)
 
     def main(self):
+        if self.args.normalize:
+            self.normalize(self.source_firsts.syn0)
+            self.normalize(self.target_embed.syn0)
         if self.args.centralize:
             self.sr_center = self.get_center(self.source_firsts.syn0)
             self.tg_center = self.get_center(self.target_embed.syn0)
             self.source_firsts.syn0 -= self.sr_center
             self.target_embed.syn0 -= self.tg_center 
-        if self.args.normalize:
-            self.normalize(self.source_firsts.syn0)
-            self.normalize(self.target_embed.syn0)
         with open(self.args.seed_dict) as self.seed_f:
             self.train()
             return self.test()
@@ -206,10 +206,10 @@ class MultiSenseLinearTranslator():
                 self.args.source_mse, skip_header=1, max_rows=self.args.restrict_vocab,
                 usecols=np.arange(1, int(dim)+1), dtype='float16',
                 comments=None)
-            if self.args.centralize: 
-                source_mse -= self.sr_center
             if self.args.normalize:
                 self.normalize(source_mse)
+            if self.args.centralize: 
+                source_mse -= self.sr_center
             logging.info(
                 'Source vocab and mx read {}'.format(source_mse.shape))
             return sr_vocab, source_mse
@@ -284,10 +284,10 @@ class MultiSenseLinearTranslator():
                             if len(sr_vecs) > 1:
                                 self.sys_ambig += 1
                             tg_vecs = np.concatenate(sr_vecs).dot(self.regression.coef_.T)
-                            if self.args.centralize: 
-                                tg_vecs -= self.tg_center
                             if self.args.normalize:
                                 self.normalize(tg_vecs)
+                            if self.args.centralize: 
+                                tg_vecs -= self.tg_center
                             neighbor_by_vec = [neighbors_by_vector(v) for v in tg_vecs]
                         eval_word(sr_word, neighbor_by_vec)
                     sr_word = new_sr_word
