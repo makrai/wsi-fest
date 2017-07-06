@@ -319,8 +319,9 @@ def parse_args():
     parser.add_argument('--target_embed')
     parser.add_argument('--seed_dict')
     parser.add_argument( '--orthog', action='store_true')
-    parser.add_argument( '--cent-norm', dest='cent_norm', choices=['vanilla', 'cent', 'norm',
-                                                 'cent_norm', 'norm_cent'])
+    parser.add_argument( 
+        '--cent_norm', nargs=1, 
+        choices=['vanilla', 'cent', 'norm', 'cent_norm', 'norm_cent'])
     parser.add_argument('--translate_all', action='store_true')
     parser.add_argument(
         '--fwd-nn-search', dest='reverse', action='store_false',
