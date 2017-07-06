@@ -22,8 +22,7 @@ class MultiSenseLinearTranslator():
 
     def __init__(self, args=None, source_mse=None, target_embed=None,
                  seed_dict=None, orthog=False, translate_all=False, reverse=True,
-                 restrict_vocab=2**15, prec_level=10, normalize=False,
-                 centralize=True):
+                 restrict_vocab=2**15, prec_level=10):
 
         def get_first_vectors(filen):
             root, ext = os.path.splitext(filen)
@@ -46,8 +45,6 @@ class MultiSenseLinearTranslator():
         else:
             self.args = argparse.Namespace()
             self.args.orthog = orthog
-            self.args.normalize = normalize
-            self.args.centralize = centralize
             self.args.translate_all = translate_all
             self.args.reverse = reverse
             self.args.restrict_vocab = restrict_vocab
@@ -70,10 +67,15 @@ class MultiSenseLinearTranslator():
         self.target_embed = get_first_vectors(self.args.target_embed)
 
     def main(self):
-        if self.args.normalize:
+        if self.args.cent_norm in ['cent', 'cent_norm']:
+            self.sr_center = self.get_center(self.source_firsts.syn0)
+            self.tg_center = self.get_center(self.target_embed.syn0)
+            self.source_firsts.syn0 -= self.sr_center
+            self.target_embed.syn0 -= self.tg_center 
+        if self.args.cent_norm in ['norm', 'cent_norm', 'norm_cent']:
             self.normalize(self.source_firsts.syn0)
             self.normalize(self.target_embed.syn0)
-        if self.args.centralize:
+        if self.args.cent_norm == 'norm_cent':
             self.sr_center = self.get_center(self.source_firsts.syn0)
             self.tg_center = self.get_center(self.target_embed.syn0)
             self.source_firsts.syn0 -= self.sr_center
@@ -205,10 +207,12 @@ class MultiSenseLinearTranslator():
             source_mse = np.genfromtxt(
                 self.args.source_mse, skip_header=1, max_rows=self.args.restrict_vocab,
                 usecols=np.arange(1, int(dim)+1), dtype='float16',
-                comments=None)
-            if self.args.normalize:
+                comments=None) 
+            if self.args.cent_norm in ['cent', 'cent_norm']:
+                source_mse -= self.sr_center
+            if self.args.cent_norm in ['norm', 'cent_norm', 'norm_cent']:
                 self.normalize(source_mse)
-            if self.args.centralize: 
+            if self.args.cent_norm == 'norm_cent':
                 source_mse -= self.sr_center
             logging.info(
                 'Source vocab and mx read {}'.format(source_mse.shape))
@@ -284,10 +288,12 @@ class MultiSenseLinearTranslator():
                             if len(sr_vecs) > 1:
                                 self.sys_ambig += 1
                             tg_vecs = np.concatenate(sr_vecs).dot(self.regression.coef_.T)
-                            if self.args.normalize:
-                                self.normalize(tg_vecs)
-                            if self.args.centralize: 
+                            if self.args.cent_norm in ['cent', 'cent_norm']:
                                 tg_vecs -= self.tg_center
+                            if self.args.cent_norm in ['norm', 'cent_norm', 'norm_cent']:
+                                self.normalize(tg_vecs)
+                            if self.args.cent_norm == 'norm_cent':
+                                tg_vecs -= self.tg_center 
                             neighbor_by_vec = [neighbors_by_vector(v) for v in tg_vecs]
                         eval_word(sr_word, neighbor_by_vec)
                     sr_word = new_sr_word
@@ -313,9 +319,8 @@ def parse_args():
     parser.add_argument('--target_embed')
     parser.add_argument('--seed_dict')
     parser.add_argument( '--orthog', action='store_true')
-    parser.add_argument( '--normalize', action='store_true')
-    parser.add_argument( '--no-centralize', dest='centralize',
-                        action='store_false')
+    parser.add_argument( '--cent-norm', dest='cent_norm', choices=['vanilla', 'cent', 'norm',
+                                                 'cent_norm', 'norm_cent'])
     parser.add_argument('--translate_all', action='store_true')
     parser.add_argument(
         '--fwd-nn-search', dest='reverse', action='store_false',
