@@ -67,6 +67,7 @@ class MultiSenseLinearTranslator():
         self.target_embed = get_first_vectors(self.args.target_embed)
 
     def main(self):
+        logging.debug(self.args.cent_norm)
         if self.args.cent_norm in ['cent', 'cent_norm']:
             self.sr_center = self.get_center(self.source_firsts.syn0)
             self.tg_center = self.get_center(self.target_embed.syn0)
@@ -310,6 +311,7 @@ class MultiSenseLinearTranslator():
 
 def parse_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument('cent_norm', choices=['vanilla', 'cent', 'norm', 'cent_norm', 'norm_cent'])
     parser.add_argument(
         '--config_file', default='hlt_bp.ini',
         help='Name of the seed dictionary file. The order of the source and'
@@ -319,9 +321,6 @@ def parse_args():
     parser.add_argument('--target_embed')
     parser.add_argument('--seed_dict')
     parser.add_argument( '--orthog', action='store_true')
-    parser.add_argument( 
-        '--cent_norm', nargs=1, 
-        choices=['vanilla', 'cent', 'norm', 'cent_norm', 'norm_cent'])
     parser.add_argument('--translate_all', action='store_true')
     parser.add_argument(
         '--fwd-nn-search', dest='reverse', action='store_false',
