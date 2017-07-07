@@ -39,8 +39,8 @@
 %\usepackage{dcolumn}
 %\newcolumntype{d}[1]{D{.}{.}{#1}}
 
-\usepackage{todonotes}
-%\newcommand{\todo}[1]{}
+%\usepackage{todonotes}
+\newcommand{\todo}[1]{}
 \usepackage{wasysym}
 
 \newcommand{\paprika}{
@@ -77,11 +77,11 @@ translation}
 %\hspace{2cm}
 
 \begin{abstract}
-  We analize whether different sense vectors of the same word form in
+  We analyze whether different sense vectors of the same word form in
   multi-sense word embeddings correspond to different concepts. On the more
   technical side of embedding-based dictionary induction, we also test whether
   the orthogonality constraint and related vector preprocessing techniques help
-  in reverse nearest neighbour seach, Both questions get answered negatively.
+  in reverse nearest neighbor search, Both questions get answered negatively.
 \end{abstract}
 
 
@@ -106,7 +106,7 @@ target embedding remained single-sense.)
 introduces MSEs.  In \cref{sec:linTrans}, we develop on the cross-lingual
 evaluation. Part of the evaluation task is to decide on empirical grounds
 whether different good translations of a word are synonyms or translations in
-different senses.  Reverse nearest neighbor seach, the orthogonality constraint
+different senses.  Reverse nearest neighbor search, the orthogonality constraint
 on the translation mapping, and related techniques are also discussed.
 \Cref{sec:exper} offers experimental result with quantitative and qualitative
 analysis.  The reader should be noted that our evaluation is not very strict,
@@ -174,7 +174,7 @@ nap} `day' and {\it nap} `sun'.
 The goal of WSI can be set at two levels. We may more modestly aim to
 distinguish homophony from polysemy. In ideal case, we could even differentiate
 between metonymy and metaphor, two subtypes of polysemy, that are discussed in
-the next section, by Veronika Lipp, in more detail.  
+the next section, by Veronika Lipp, in more detail.
 
 \subsection{Lexicographic Background \\ (Veronika Lipp)}
 
@@ -427,7 +427,7 @@ search is similar to that in Xing et al.~(\citeyear{Xing:2015}) and
 \cite{Artetxe:2016}: the best combination is an orthogonal mapping between
 length-normalized vectors, however, centering did not help in our experiments.
 Reverse NNs are quite different: none of the orthogonality-related techniques
-help. 
+help.
 
 \section{Experiments}
 \label{sec:exper}
@@ -487,7 +487,7 @@ least one good translation among its $k$ reverse nearest neighbors (rNN@$k$).
       HNC	        & 600	& .05	& 5     & 100	  & 68.6\%	&  16.6\% \\
       HNC	        & 600	& .1  & 3     & 50	  & 69.1\%	&  18.8\% \\
       Webkorpusz	    & 800	& .1  &       & 100	  & 73.9\%	&  23.9\% \\
-      \bottomrule 
+      \bottomrule
     \end{tabular}
   %}
   \caption{Precision of \any~reverse NN and the number of word forms with
@@ -530,205 +530,20 @@ We see that most words with $s<.3$ are really ambiguous from a standard
 lexicographic point of view, but the translations with $s>.35$ are rather
 synonyms.
 
-\begin{table} \resizebox{\columnwidth}{!}{%
+\begin{table*}
+  %\resizebox{\columnwidth}{!}{%
+  \centering
+    \small
   \begin{tabular}{llll}
     \toprule
     $s$     &         &                       & covg \\
     \midrule
-    0.01821	& alkotó	& constituent, creator	& 0.5 \\
-    0.05096	& előzetes	& preliminary, trailer	& 1.0 \\
-    0.07632	& kapcsolat	& affair, linkage, conjunction	& 0.33 \\
-    0.1142	& sorozat	& succession, suite, serial	& 1.0 \\
-    0.1873	& induló	& candidate, march	& 1.0 \\
-    0.187	& nemes	& peer\bad, noble	& 0.67 \\
-    0.1934	& eltérés	& variance, departure	& 0.4 \\
-    0.2054	& megelőző	& preventive, preceding	& 0.29 \\
-    0.2206	& bemutató	& exhibition, presenter	& 0.67 \\
-    0.2515	& előbbi	& preceding, anterior	& 0.67 \\
-    0.2558	& kötelezettség	& obligation, engagement	& 0.67 \\
-    0.2733	& követ	& haunt, succeed	& 0.67 \\
-    0.3038	& köt	& bind, tie	& 0.67 \\
-    0.3212	& tartós	& substantial, durable	& 1.0 \\
-    0.333	& bír	& possess, bear	& 1.0 \\
-    0.3486	& kerület	& borough, ward, perimeter	& 0.3 \\
-    0.3486	& utas	& passenger, fare\bad	& 1.0 \\
-    0.3564	& szigorú	& stern, strict	& 0.5 \\
-    0.3708	& rendes	& orderly, ordinary	& 0.5 \\
-    0.3824	& eladó	& vendor, salesman	& 0.5 \\
-    0.3986	& darab	& chunk, fragment	& 0.4 \\
-    0.4012	& hiány	& poverty, shortage	& 0.5 \\
-    0.4087	& uralkodó	& ruler, sovereign, prince	& 0.5 \\
-    0.4093	& kutatás	& quest, exploration	& 0.5 \\
-    &$\vdots$ \\
-    %   0.4138	& tanítás	& tuition, lesson	& 0.67 \\
-    %   0.4196	& őszinte	& sincere, frank	& 0.67 \\
-    %   0.4501	& gyerek	& childish, kid	& 0.67 \\
-    %   0.4551	& ritka	& rare, odd	& 0.5 \\
-    %   0.4608	& szeretet	& affection, liking	& 0.67 \\
-    %   0.4723	& vizsgálat	& inquiry, examination	& 0.67 \\
-    %   0.4853	& tömeg	& crowd, mob	& 0.5 \\
-    %   0.4903	& puszta	& plain, pure	& 0.22 \\
-    %   0.4971	& képviselő	& representative, delegate	& 0.67 \\
-    %   0.4975	& határ	& border, boundary	& 0.67 \\
-    %   0.5001	& drága	& precious, dear, expensive	& 1.0 \\
-    %   0.5144	& szövetség	& alliance, union, coalition	& 0.75 \\
-    %   0.5217	& noha	& albeit, notwithstanding	& 1.0 \\
-    %   0.5311	& hulladék	& litter, garbage, rubbish	& 0.43 \\
-    %   0.5311	& szemét	& litter, garbage, rubbish	& 0.43 \\
-    %   0.5797	& anya	& mummy, mum	& 1.0 \\
-    %   0.5824	& szomszédos	& neighbouring, neighbour	& 0.4 \\
-    %   0.5931	& szabadság	& independence, liberty	& 1.0 \\
-    %   0.6722	& tilos	& forbidden, prohibited	& 1.0 \\
-    %   0.7066	& kiállítás	& exhibition, exhibit	& 0.67 \\
-    %   0.8122	& furcsa	& strange, odd	& 0.4 \\
-    %   0.8277	& azután	& afterward, afterwards	& 0.67 \\
-    %   0.8689	& megbízható	& reliable, dependable	& 0.67 \\
-    \bottomrule
-  \end{tabular}
-  }
-  \caption{Words with sense vectors corresponding to different senses as
-  witnessed by rNN@1s.  \emph{covg} denotes coverage of the NN@1 translations
-  over all gold translations.  \bad denotes cases where we think the ``gold''
-  seed translation is (totally) wrong.
-  % Alternatives like mob/crowd denote more good non-common translations
-  }
-  \label{tab:alkoto}
-\end{table}
-
-\subsection{POS}
-
-The clearest case of homonymy is when senses belong to different POS, and the
-translations reflect these POSs, e.g.~\emph{nő} `woman; increase' or \emph{vár}
-\todo{update examples} `wait; case'.  We note that some POSs in Hungarian have
-blurred borders, e.g.  it is debatable whether the nominal \emph{önkéntes}
-`voluntary; volunteer' is ambiguous for its POS.
-
-In the \fl~approach\cite{Kornai:2017,Kornai:2015a}, POS-difference alone is not
-enough for analyzing a word as ambiguous, e.g.~we see the only difference
-between the noun and participle senses of \emph{alkalmazott}, `employee;
-applied' as that \emph{employ}ment is the \emph{appli}cation of people for
-work; in the case of \emph{belső} `internal; interior', the noun refers to the
-part of a building described by the adjective.
-
-\paprika
-
-\subsection{Monosemy for language understanding by machines}
-
-More interesting are word forms with related senses in the same POS,
-e.g.~\emph{cikk}, `item; article' (an article is an item in a newspaper);
-\emph{eredmény}, `score; result' (a score is a result measured by a number);
-\emph{magas}, `tall; high' (tall is used for people in spite of high).  The
-meanings of \emph{idegen}, `strange, alien; foreign' are special cases of
-unfamiliar (person versus language).
-
-Finally we mention two cases where the relation between the two senses is
-more idiosyncratic, but in a monosemic approach, they will have a single
-representation: \emph{beteg} means `ill, sick; patient'. Though \emph{ill} is
-a health state and \emph{patient} is a situational role, the fact that
-patients of doctors are usually ill, may suffice for identifying the `patent'
-based on the representation shared with \emph{ill}; and a monosemic system is designed
-to give account of metaphorical relations like the one between the meanings
-of \emph{világos}, `bright; clear' as well.
-
-
-\todo{missing sense \\ édes [['sweetheart'], ['cute \\
-  közvetlen [['informal'], ['casual}
-
-
-\subsection{Three or more vectors}
-
-When a word has more than two sense vectors with good non-common translations,
-with most of the words there is a more ``general'' vector (or two, in the case
-of \emph{tud}) that has more good translations, and good translations of the
-other vectors are mostly among the good translations of this general vector,
-see \cref{tab:like_than}.
-
-\begin{table*}[t]
-  %\footnotesize
-  \begin{tabular}{ll}
-    \toprule
-    mint	& \{like, than, as\}, \{like\}, \{than\}	\\
-    majd	& \{then, later\}, \{then\}, \{later\}	\\
-    talán	& \{probably, perhaps\}, \{probably, maybe\}, \{perhaps\}	\\
-    tud	& \{understand, can\}, \{know, understand\}, \{know\}, \{can\}	\\
-    program	& \{project, programme, program\}, \{project, programme\}, \{project, program\}	\\
-    terület	& \{region, area, territory\}, \{region, district\}, \{region, area\}, \{area\}	\\
-    felső	& \{upper, top\}, \{upper\}, \{higher\}	\\
-    díj	& \{charge, fee, rate\}, \{fee\}, \{award\}	\\
-    kicsi	& \{little, small\}, \{little\}, \{small\}	\\
-    erő	& \{strength, power, force, stress, energy\}, \{strength, power\}, \{force\}	\\
-    lakás	& \{apartment, housing\}, \{residence, housing\}, \{rooms, apartment\}	\\
-    kérelem	& \{application, appeal\}, \{application\}, \{appeal\}	\\
-    figyel	& \{watch, listen\}, \{watch\}, \{listen\}	\\
-    \bottomrule
-  \end{tabular}
-  \caption{Words with at least three good sense vectors (forward NNs, source is
-  the AdaGram model trained on HNC (600 dimensions, $\alpha=.05$)}
-  \label{tab:like_than}
-\end{table*}
-
-\section{Acknowledgments}
-
-1957 was an influential year in linguistics: \cite{Harris:1957} developed on the
-frequency-aware variant of the distributional method, \cite{Osgood:1957}
-pioneered vector space models, and the author of a more recent conceptual
-meaning representation framework \citep{Kornai:2010,Kornai:2017} was born.
-Fifty years later (more precisely in fall 2006) I learned András during a class
-he taught on the book he was writing \citep{Kornai:2007}. I heard about
-\emph{deep cases} and \emph{k\={a}rakas} sooner than I did about \emph{thematic
-roles}. The fact that he taught me computational linguistics in a master and
-disciple fashion comes at no surprise as there have been no such PhD school in
-Hungary, not to mention mathematical linguistics proper.
-% He advised my so called \emph{topic labor} and MSc at the Budapest University
-% of Technology and Economics, and I started my PhD as a member of the 4lang
-% project at the Institute for Computer Science and Control of the Hungarian
-% Academy of Sciences.
-
-Laozi says that a good leader does not leave a footprint, and András encouraged
-us to be independent and effective. One of his remarkable citations is that
-``It's easier to ask forgiveness than it is to get permission''. The proverb is
-sometimes attributed to the Jesuits, who are similar to András in having had a
-great impact on what I've become in the past ten years. The real source of the
-proverb is Grace Hopper, a computer scientist and US navy admiral who invented
-the first compiler.
-% and popularized the idea of machine-independent programming languages.
-This paper is a step in my learning to be so effective as the sources
-mentioned above.
-
-\bigskip
-
-I would like to thank Veronika Lipp (Institute for Linguistics, Hungarian
-Academy of Sciences), the author of the otherwise unpublished
-\cref{sec:bground} and Gábor Recski (Department of Automation and Applied
-Informatics, Budapest University of Technology and Economics) for useful
-comments. The orthogonal approximation was implemented following a
-code\footnote{\url{https://github.com/hlt-bme-hu/eval-embed}} by Gábor Borbély.
-
-\bibliographystyle{acl_natbib}
-\bibliography{ml}
-
-\end{document}
-
-\footnotetext{Both the original skip-gram model and its multi-sense variant
-have two kind of vector for each word, the vanilla ``word'' vector, and a
-context vector. The first \mutli model denotes context vectors.  otherwise we
-used word vectors.}
-
-If the distribution turns out to be multi-modal (i.e.~some words have
-stipulated meanings with similar translations and others have senses with
-greater distance, but intermediate distances are less frequent), we can
-separate synonyms from true ambiguity. Then we say that the MSE discovered a
-real ambiguous word, if two sense vectors have such translations that are
-licensed by the gold dictionary, and the distance of these words in the target
-space is above the threshold judged significant by the analysis of the distance
-distribution.
-\begin{tabular}{llll}
-0.01821	& alkotó	& constituent, creator	& 0.5 \\
 -0.04849	& függő	& addict, aerial	& 0.4 \\
+0.01821	& alkotó	& constituent, creator	& 0.5 \\
 0.05096	& előzetes	& preliminary, trailer	& 1.0 \\
 0.0974	& kapcsolat	& affair, conjunction, linkage	& 0.33 \\
 0.1361	& kocsi	& coach, carriage	& 1.0 \\
-0.136	& futó	& runner, bishop	& 1.0 \\
+    0.136	& futó	& runner, bishop \emph{(chess)}	& 1.0 \\
 0.1518	& keresés	& quest, scan	& 0.67 \\
 0.1574	& látvány	& outlook, scenery, prospect	& 0.6 \\
 0.1626	& fogad	& bet, greet	& 1.0 \\
@@ -793,40 +608,231 @@ distribution.
 0.4911	& büntetés	& penalty, sentence	& 0.29 \\
 0.4971	& képviselő	& delegate, representative	& 0.67 \\
 0.4975	& határ	& boundary, border	& 0.67 \\
-0.5001	& drága	& precious, dear, expensive	& 1.0 \\
-0.5093	& uralkodó	& prince, ruler, sovereign	& 0.5 \\
-0.5097	& válás	& separation, divorce	& 0.67 \\
-0.5103	& ügyvéd	& lawyer, advocate	& 0.67 \\
-0.5167	& előnyös	& advantageous, profitable, favourable	& 1.0 \\
-0.5169	& merev	& rigid, strict	& 1.0 \\
-0.5204	& nyíltan	& openly, outright	& 1.0 \\
-0.5217	& noha	& notwithstanding, albeit	& 1.0 \\
-0.5311	& hulladék	& litter, garbage, rubbish	& 0.43 \\
-0.5311	& szemét	& litter, garbage, rubbish	& 0.43 \\
-0.5612	& kielégítő	& satisfying, satisfactory	& 1.0 \\
-0.5617	& vicc	& joke, humour	& 1.0 \\
-0.5737	& szállító	& supplier, vendor	& 1.0 \\
-0.5747	& óvoda	& nursery, daycare, kindergarten	& 1.0 \\
-0.5754	& hétköznapi	& mundane, everyday, ordinary	& 0.75 \\
-0.5797	& anya	& mum, mummy	& 1.0 \\
-0.5824	& szomszédos	& neighbouring, neighbour	& 0.4 \\
-0.5931	& szabadság	& liberty, independence	& 1.0 \\
-0.6086	& lelkész	& pastor, priest	& 0.4 \\
-0.6304	& fogalom	& notion, conception	& 1.0 \\
-0.6474	& fizetés	& salary, wage	& 0.67 \\
-0.6551	& táj	& landscape, scenery	& 1.0 \\
-0.6583	& okos	& clever, smart	& 0.67 \\
-0.6707	& autópálya	& highway, motorway	& 0.5 \\
-0.6722	& tilos	& prohibited, forbidden	& 1.0 \\
-0.6811	& bevezető	& introduction, introductory	& 1.0 \\
-0.7025	& szövetség	& coalition, alliance, union	& 0.75 \\
-0.7065	& fáradt	& exhausted, tired, weary	& 1.0 \\
-0.7066	& kiállítás	& exhibit, exhibition	& 0.67 \\
-0.7135	& hirdetés	& advert, advertisement	& 1.0 \\
-0.7147	& ésszerű	& rational, logical	& 1.0 \\
-0.7664	& logikai	& logic, logical	& 1.0 \\
-0.7757	& szervez	& organise, organize, arrange	& 1.0 \\
-0.8122	& furcsa	& strange, odd	& 0.4 \\
-0.8277	& azután	& afterwards, afterward	& 0.67 \\
-0.8689	& megbízható	& dependable, reliable	& 0.67 \\
-\end{tabular}
+    &$\vdots$ \\
+% 0.5001	& drága	& precious, dear, expensive	& 1.0 \\
+% 0.5093	& uralkodó	& prince, ruler, sovereign	& 0.5 \\
+% 0.5097	& válás	& separation, divorce	& 0.67 \\
+% 0.5103	& ügyvéd	& lawyer, advocate	& 0.67 \\
+% 0.5167	& előnyös	& advantageous, profitable, favourable	& 1.0 \\
+% 0.5169	& merev	& rigid, strict	& 1.0 \\
+% 0.5204	& nyíltan	& openly, outright	& 1.0 \\
+% 0.5217	& noha	& notwithstanding, albeit	& 1.0 \\
+% 0.5311	& hulladék	& litter, garbage, rubbish	& 0.43 \\
+% 0.5311	& szemét	& litter, garbage, rubbish	& 0.43 \\
+% 0.5612	& kielégítő	& satisfying, satisfactory	& 1.0 \\
+% 0.5617	& vicc	& joke, humour	& 1.0 \\
+% 0.5737	& szállító	& supplier, vendor	& 1.0 \\
+% 0.5747	& óvoda	& nursery, daycare, kindergarten	& 1.0 \\
+% 0.5754	& hétköznapi	& mundane, everyday, ordinary	& 0.75 \\
+% 0.5797	& anya	& mum, mummy	& 1.0 \\
+% 0.5824	& szomszédos	& neighbouring, neighbour	& 0.4 \\
+% 0.5931	& szabadság	& liberty, independence	& 1.0 \\
+% 0.6086	& lelkész	& pastor, priest	& 0.4 \\
+% 0.6304	& fogalom	& notion, conception	& 1.0 \\
+% 0.6474	& fizetés	& salary, wage	& 0.67 \\
+% 0.6551	& táj	& landscape, scenery	& 1.0 \\
+% 0.6583	& okos	& clever, smart	& 0.67 \\
+% 0.6707	& autópálya	& highway, motorway	& 0.5 \\
+% 0.6722	& tilos	& prohibited, forbidden	& 1.0 \\
+% 0.6811	& bevezető	& introduction, introductory	& 1.0 \\
+% 0.7025	& szövetség	& coalition, alliance, union	& 0.75 \\
+% 0.7065	& fáradt	& exhausted, tired, weary	& 1.0 \\
+% 0.7066	& kiállítás	& exhibit, exhibition	& 0.67 \\
+% 0.7135	& hirdetés	& advert, advertisement	& 1.0 \\
+% 0.7147	& ésszerű	& rational, logical	& 1.0 \\
+% 0.7664	& logikai	& logic, logical	& 1.0 \\
+% 0.7757	& szervez	& organise, organize, arrange	& 1.0 \\
+% 0.8122	& furcsa	& strange, odd	& 0.4 \\
+% 0.8277	& azután	& afterwards, afterward	& 0.67 \\
+% 0.8689	& megbízható	& dependable, reliable	& 0.67 \\
+
+    %%% Eslő ezerből:
+
+% 0.01821	& alkotó	& constituent, creator	& 0.5 \\
+% 0.05096	& előzetes	& preliminary, trailer	& 1.0 \\
+% 0.07632	& kapcsolat	& affair, linkage, conjunction	& 0.33 \\
+% 0.1142	& sorozat	& succession, suite, serial	& 1.0 \\
+% 0.1873	& induló	& candidate, march	& 1.0 \\
+% 0.187	& nemes	& peer\bad, noble	& 0.67 \\
+% 0.1934	& eltérés	& variance, departure	& 0.4 \\
+% 0.2054	& megelőző	& preventive, preceding	& 0.29 \\
+% 0.2206	& bemutató	& exhibition, presenter	& 0.67 \\
+% 0.2515	& előbbi	& preceding, anterior	& 0.67 \\
+% 0.2558	& kötelezettség	& obligation, engagement	& 0.67 \\
+% 0.2733	& követ	& haunt, succeed	& 0.67 \\
+% 0.3038	& köt	& bind, tie	& 0.67 \\
+% 0.3212	& tartós	& substantial, durable	& 1.0 \\
+% 0.333	& bír	& possess, bear	& 1.0 \\
+% 0.3486	& kerület	& borough, ward, perimeter	& 0.3 \\
+% 0.3486	& utas	& passenger, fare\bad	& 1.0 \\
+% 0.3564	& szigorú	& stern, strict	& 0.5 \\
+% 0.3708	& rendes	& orderly, ordinary	& 0.5 \\
+% 0.3824	& eladó	& vendor, salesman	& 0.5 \\
+% 0.3986	& darab	& chunk, fragment	& 0.4 \\
+% 0.4012	& hiány	& poverty, shortage	& 0.5 \\
+% 0.4087	& uralkodó	& ruler, sovereign, prince	& 0.5 \\
+% 0.4093	& kutatás	& quest, exploration	& 0.5 \\
+    %   0.4138	& tanítás	& tuition, lesson	& 0.67 \\
+    %   0.4196	& őszinte	& sincere, frank	& 0.67 \\
+    %   0.4501	& gyerek	& childish, kid	& 0.67 \\
+    %   0.4551	& ritka	& rare, odd	& 0.5 \\
+    %   0.4608	& szeretet	& affection, liking	& 0.67 \\
+    %   0.4723	& vizsgálat	& inquiry, examination	& 0.67 \\
+    %   0.4853	& tömeg	& crowd, mob	& 0.5 \\
+    %   0.4903	& puszta	& plain, pure	& 0.22 \\
+    %   0.4971	& képviselő	& representative, delegate	& 0.67 \\
+    %   0.4975	& határ	& border, boundary	& 0.67 \\
+    %   0.5001	& drága	& precious, dear, expensive	& 1.0 \\
+    %   0.5144	& szövetség	& alliance, union, coalition	& 0.75 \\
+    %   0.5217	& noha	& albeit, notwithstanding	& 1.0 \\
+    %   0.5311	& hulladék	& litter, garbage, rubbish	& 0.43 \\
+    %   0.5311	& szemét	& litter, garbage, rubbish	& 0.43 \\
+    %   0.5797	& anya	& mummy, mum	& 1.0 \\
+    %   0.5824	& szomszédos	& neighbouring, neighbour	& 0.4 \\
+    %   0.5931	& szabadság	& independence, liberty	& 1.0 \\
+    %   0.6722	& tilos	& forbidden, prohibited	& 1.0 \\
+    %   0.7066	& kiállítás	& exhibition, exhibit	& 0.67 \\
+    %   0.8122	& furcsa	& strange, odd	& 0.4 \\
+    %   0.8277	& azután	& afterward, afterwards	& 0.67 \\
+    %   0.8689	& megbízható	& reliable, dependable	& 0.67 \\
+    \bottomrule
+  \end{tabular}
+  %}
+   \caption{
+     % Words with sense vectors corresponding to different senses as witnessed
+     % by rNN@1s.  
+     \emph{covg} denotes coverage of the NN@1 translations over all gold
+     translations.  
+     % \bad denotes cases where we think the ``gold'' seed translation is
+     % (totally) wrong.
+  }
+  \label{tab:alkoto} \end{table*}
+
+\subsection{Part of speech}
+
+The clearest case of homonymy is when unrelated senses belong to different
+parts of speech (POSs), and the translations reflect these POSs, e.g.~\emph{nő}
+`woman; increase' or \emph{vár} \todo{update examples} `wait;
+case'.\footnote{We note that some POSs in Hungarian have blurred borders,
+e.g.~it is debatable whether the nominal \emph{önkéntes} `voluntary; volunteer'
+is ambiguous for its POS.} In purely semantic approaches, like
+\fl~\citep{Kornai:2017,Kornai:2015a}, POS-difference alone is not enough for
+analyzing a word as ambiguous, e.g.~we see the only difference between the noun
+and participle senses of \emph{alkalmazott}, `employee; applied' as that
+\emph{employ}ment is the \emph{appli}cation of people for work; in the case of
+\emph{belső} `internal; interior', the noun refers to the part of a building
+described by the adjective.
+
+%\paprika
+
+%\subsection{Related meanings and monosemy}
+
+More interesting are word forms with related senses in the same POS,
+e.g.~\emph{cikk}, `item; article' (an article is an item in a newspaper);
+\emph{eredmény}, `score; result' (a score is a result measured by a number);
+\emph{magas}, `tall; high' (tall is used for people rather than high); or
+\emph{idegen}, `strange, alien; foreign', where the English translations are
+special cases of `unfamiliar' (person versus language).
+
+% Finally we mention two cases where the relation between the two senses is
+% more idiosyncratic, but in a monosemic approach, they will have a single
+% representation: \emph{beteg} means `ill, sick; patient'. Though \emph{ill} is
+% a health state and \emph{patient} is a situational role, the fact that
+% patients of doctors are usually ill, may suffice for identifying the `patent'
+% based on the representation shared with \emph{ill}; and a monosemic system is
+% designed to give account of metaphorical relations like the one between the
+% meanings of \emph{világos}, `bright; clear' as well.
+
+\todo{missing sense \\ édes [['sweetheart'], ['cute \\
+  közvetlen [['informal'], ['casual}
+
+% \subsection{Three or more vectors}
+% 
+% When a word has more than two sense vectors with good non-common translations,
+% with most of the words there is a more ``general'' vector (or two, in the case
+% of \emph{tud}) that has more good translations, and good translations of the
+% other vectors are mostly among the good translations of this general vector,
+% see \cref{tab:like_than}.
+% 
+% \begin{table}[t]
+%     \resizebox{\columnwidth}{!} {
+%   %\footnotesize
+%   \begin{tabular}{ll}
+%     \toprule
+%     mint	& like/than/as, like, than	 \\
+%     majd	& then/later, then, later	 \\
+%     talán	& probably/perhaps, probably/maybe, perhaps	 \\
+%     tud	& understand/can, know/understand, know, can	 \\
+%     program	& project/programme/program, project/programme, \\&%\hskip{1cm} 
+%     project/program	 \\
+%     terület	& region/area/territory, region/district, region/area, area	 \\
+%     felső	& upper/top, upper, higher	 \\
+%     díj	& charge/fee/rate, fee, award	 \\
+%     kicsi	& little/small, little, small	 \\
+%     erő	& strength/power/force/stress/energy, strength/power, force	 \\
+%     lakás	& apartment/housing, residence/housing, rooms/apartment	 \\
+%     kérelem	& application/appeal, application, appeal	 \\
+%     figyel	& watch/listen, watch, listen	 \\
+%     \bottomrule
+%   \end{tabular}
+% }
+%   \caption{Words with at least three good sense vectors (forward NNs, source is
+%   the AdaGram model trained on HNC (600 dimensions, $\alpha=.05$)}
+%   \label{tab:like_than}
+% \end{table}
+
+\section{Acknowledgments}
+
+1957 was an influential year in linguistics: \cite{Harris:1957} developed on the
+frequency-aware variant of the distributional method, \cite{Osgood:1957}
+pioneered vector space models, and the author of a more recent conceptual
+meaning representation framework \citep{Kornai:2010,Kornai:2017} was born.
+Fifty years later (more precisely in fall 2006) I learned András during a class
+he taught on the book he was writing \citep{Kornai:2007}. I heard about
+\emph{deep cases} and \emph{k\={a}rakas} sooner than I did about \emph{thematic
+roles}. The fact that he taught me computational linguistics in a master and
+disciple fashion comes at no surprise as there have been no such PhD school in
+Hungary, not to mention mathematical linguistics proper.
+% He advised my so called \emph{topic labor} and MSc at the Budapest University
+% of Technology and Economics, and I started my PhD as a member of the 4lang
+% project at the Institute for Computer Science and Control of the Hungarian
+% Academy of Sciences.
+
+Laozi says that a good leader does not leave a footprint, and András encouraged
+us to be independent and effective. One of his remarkable citations is that
+``It's easier to ask forgiveness than it is to get permission''. The proverb is
+sometimes attributed to the Jesuits, who are similar to András in having had a
+great impact on what I've become in the past ten years. The real source of the
+proverb is Grace Hopper, a computer scientist and US navy admiral who invented
+the first compiler.
+% and popularized the idea of machine-independent programming languages.
+This paper is a step in my learning to be so effective as the sources
+mentioned above.
+
+\bigskip
+
+I would like to thank Veronika Lipp (Institute for Linguistics, Hungarian
+Academy of Sciences), the author of the otherwise unpublished
+\cref{sec:bground} and Gábor Recski (Department of Automation and Applied
+Informatics, Budapest University of Technology and Economics) for useful
+comments. The orthogonal approximation was implemented following a
+code\footnote{\url{https://github.com/hlt-bme-hu/eval-embed}} by Gábor Borbély.
+
+\bibliographystyle{acl_natbib}
+\bibliography{ml}
+
+\end{document}
+
+\footnotetext{Both the original skip-gram model and its multi-sense variant
+have two kind of vector for each word, the vanilla ``word'' vector, and a
+context vector. The first \mutli model denotes context vectors.  otherwise we
+used word vectors.}
+
+If the distribution turns out to be multi-modal (i.e.~some words have
+stipulated meanings with similar translations and others have senses with
+greater distance, but intermediate distances are less frequent), we can
+separate synonyms from true ambiguity. Then we say that the MSE discovered a
+real ambiguous word, if two sense vectors have such translations that are
+licensed by the gold dictionary, and the distance of these words in the target
+space is above the threshold judged significant by the analysis of the distance
+distribution.
