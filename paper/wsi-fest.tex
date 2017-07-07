@@ -76,11 +76,13 @@ translation}
 
 %\hspace{2cm}
 
-%\begin{abstract}
-%As far as we now, we are the fist to test the effect of orthogonality
-%constraint and related vector preprocessing techniques in reverse nearest
-%neighbour seach.
-%\end{abstract}
+\begin{abstract}
+  We analize whether different sense vectors of the same word form in
+  multi-sense word embeddings correspond to different concepts. On the more
+  technical side of embedding-based dictionary induction, we also test whether
+  the orthogonality constraint and related vector preprocessing techniques help
+  in reverse nearest neighbour seach, Both questions get answered negatively.
+\end{abstract}
 
 
 \emph{Word sense induction} (WSI) is the task of discovering senses of words
@@ -100,14 +102,21 @@ source word vector is the nearest neighbor of its image by the mapping in the
 target space. In the multi-sense setting, we have translated from MSEs. (The
 target embedding remained single-sense.)
 
-Now we develop the evaluation further. Part of the evaluation task is to decide
-on empirical grounds whether different good translations of a word are synonyms
-or translations in different senses.  The reader should be noted that the
-evaluation is not very strict, rather a process of discovering something
-meaningful in present-day MSE implementations.\footnote{The code for these
-experiments can be found at \url{https://github.com/makrai/wsi-fest}.}
+\Cref{sec:delicious} discusses our linguistic motivation, and \cref{sec:mse}
+introduces MSEs.  In \cref{sec:linTrans}, we develop on the cross-lingual
+evaluation. Part of the evaluation task is to decide on empirical grounds
+whether different good translations of a word are synonyms or translations in
+different senses.  Reverse nearest neighbor seach, the orthogonality constraint
+on the translation mapping, and related techniques are also discussed.
+\Cref{sec:exper} offers experimental result with quantitative and qualitative
+analysis.  The reader should be noted that our evaluation is not very strict,
+rather a process of looking for something conceptually meaningful in
+present-day unsupervised MSE models.\footnote{The code for these experiments
+can be found at \url{https://github.com/makrai/wsi-fest}.}
 
 \section{Towards a less \emph{delicious} inventory}
+
+\label{sec:delicious}
 
 \begin{figure}
     \centering
@@ -239,6 +248,8 @@ animal.
 
 \section{Multi-sense word embeddings}
 
+\label{sec:mse}
+
 Vector-space language models with more vectors for each meaning of a
 word originate with \cite{Reisinger:2010}.
 \cite{Huang:2012} trained the first neural-network-based MSE.
@@ -283,6 +294,7 @@ similar improvements can also e achieved by simply increasing the dimension of
 a single-sense embedding.
 
 \section{Linear translation from MSEs}
+\label{sec:linTrans}
 
  \cite{Mikolov:2013x} discovered that embeddings of different languages are so
  similar that a linear transformation can map vectors of the source language
@@ -418,6 +430,7 @@ Reverse NNs are quite different: none of the orthogonality-related techniques
 help. 
 
 \section{Experiments}
+\label{sec:exper}
 
 \subsection{Data}
 
@@ -590,12 +603,14 @@ translations reflect these POSs, e.g.~\emph{nő} `woman; increase' or \emph{vár
 blurred borders, e.g.  it is debatable whether the nominal \emph{önkéntes}
 `voluntary; volunteer' is ambiguous for its POS.
 
-In the \fl~approach\cite{Kornai:2017,Kornai:2015}, POS-difference alone is not
+In the \fl~approach\cite{Kornai:2017,Kornai:2015a}, POS-difference alone is not
 enough for analyzing a word as ambiguous, e.g.~we see the only difference
 between the noun and participle senses of \emph{alkalmazott}, `employee;
 applied' as that \emph{employ}ment is the \emph{appli}cation of people for
 work; in the case of \emph{belső} `internal; interior', the noun refers to the
 part of a building described by the adjective.
+
+\paprika
 
 \subsection{Monosemy for language understanding by machines}
 
@@ -615,7 +630,6 @@ based on the representation shared with \emph{ill}; and a monosemic system is de
 to give account of metaphorical relations like the one between the meanings
 of \emph{világos}, `bright; clear' as well.
 
-\paprika
 
 \todo{missing sense \\ édes [['sweetheart'], ['cute \\
   közvetlen [['informal'], ['casual}
