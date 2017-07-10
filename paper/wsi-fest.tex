@@ -42,6 +42,9 @@
 %\usepackage{todonotes}
 \newcommand{\todo}[1]{}
 \usepackage{wasysym}
+\usepackage{supertabular}
+\usepackage{longtable}
+\usepackage{multicol}
 
 \newcommand{\paprika}{
 \begin{figure}
@@ -530,183 +533,9 @@ We see that most words with $s<.3$ are really ambiguous from a standard
 lexicographic point of view, but the translations with $s>.35$ are rather
 synonyms.
 
-\begin{table*}
-  %\resizebox{\columnwidth}{!}{%
-  \centering
-    \small
-  \begin{tabular}{llll}
-    \toprule
-    $s$     &         &                       & covg \\
-    \midrule
--0.04849	& függő	& addict, aerial	& 0.4 \\
-0.01821	& alkotó	& constituent, creator	& 0.5 \\
-0.05096	& előzetes	& preliminary, trailer	& 1.0 \\
-0.0974	& kapcsolat	& affair, conjunction, linkage	& 0.33 \\
-0.1361	& kocsi	& coach, carriage	& 1.0 \\
-    0.136	& futó	& runner, bishop \emph{(chess)}	& 1.0 \\
-0.1518	& keresés	& quest, scan	& 0.67 \\
-0.1574	& látvány	& outlook, scenery, prospect	& 0.6 \\
-0.1626	& fogad	& bet, greet	& 1.0 \\
-0.1873	& induló	& march, candidate	& 1.0 \\
-0.187	& nemes	& noble, peer	& 0.67 \\
-0.1934	& eltérés	& variance, departure	& 0.4 \\
-0.1943	& alkalmazás	& employ, adaptation	& 0.33 \\
-0.2016	& szünet	& interval, cease, recess	& 0.43 \\
-0.2032	& kezdeményezés	& initiation, initiative	& 1.0 \\
-0.2052	& zavar	& disturbance, annoy, disturb, turmoil	& 0.57 \\
-0.2054	& megelőző	& preceding, preventive	& 0.29 \\
-0.2169	& csomó	& knot, lump, mat	& 1.0 \\
-0.21	& remény	& outlook, promise, expectancy	& 0.6 \\
-0.2206	& bemutató	& exhibition, presenter	& 0.67 \\
-0.2208	& egyeztetés	& reconciliation, correlation	& 0.5 \\
-0.237	& előadó	& auditorium, lecturer	& 0.67 \\
-0.2447	& nyilatkozat	& profession, declaration	& 0.4 \\
-0.2494	& gazda	& farmer, boss	& 0.67 \\
-0.2506	& kapu	& gate, portal	& 1.0 \\
-0.2515	& előbbi	& anterior, preceding	& 0.67 \\
-0.2558	& kötelezettség	& engagement, obligation	& 0.67 \\
-0.265	& hangulat	& morale, humour	& 0.5 \\
-0.2733	& követ	& succeed, haunt	& 0.67 \\
-0.276	& minta	& norm, formula, specimen	& 0.75 \\
-0.2807	& sorozat	& suite, serial, succession	& 1.0 \\
-0.2935	& durva	& coarse, gross	& 0.18 \\
-0.3038	& köt	& bind, tie	& 0.67 \\
-0.3045	& egyezmény	& treaty, protocol	& 0.67 \\
-0.3097	& megkülönböztetés	& discrimination, differentiation	& 0.5 \\
-0.309	& ered	& stem, originate	& 0.5 \\
-0.319	& hirdet	& advertise, proclaim	& 1.0 \\
-0.3212	& tartós	& substantial, durable	& 1.0 \\
-0.3218	& ajánlattevő	& bidder, supplier, contractor	& 0.6 \\
-0.3299	& aláírás	& signing, signature	& 0.67 \\
-0.333	& bír	& bear, possess	& 1.0 \\
-0.3432	& áldozat	& sacrifice, victim, casualty	& 1.0 \\
-0.3486	& kerület	& ward, borough, perimeter	& 0.3 \\
-0.3486	& utas	& fare, passenger	& 1.0 \\
-0.3564	& szigorú	& stern, strict	& 0.5 \\
-0.3589	& bűnös	& sinful, guilty	& 0.5 \\
-0.3708	& rendes	& orderly, ordinary	& 0.5 \\
-0.3824	& eladó	& salesman, vendor	& 0.5 \\
-0.3861	& enyhe	& tender, mild, slight	& 0.6 \\
-0.3897	& maradék	& residue, remainder	& 0.33 \\
-0.3986	& darab	& chunk, fragment	& 0.4 \\
-0.4012	& hiány	& poverty, shortage	& 0.5 \\
-0.4093	& kutatás	& exploration, quest	& 0.5 \\
-0.4138	& tanítás	& tuition, lesson	& 0.67 \\
-0.4196	& őszinte	& frank, sincere	& 0.67 \\
-0.4229	& környék	& neighborhood, surroundings, vicinity	& 0.38 \\
-0.4446	& ítélet	& judgement, sentence	& 0.67 \\
-0.4501	& gyerek	& childish, kid	& 0.67 \\
-0.4521	& csatorna	& ditch, sewer	& 0.4 \\
-0.4547	& felügyelet	& surveillance, inspection, supervision	& 0.43 \\
-0.4551	& ritka	& rare, odd	& 0.5 \\
-0.4563	& szerető	& fond, lover, affectionate, mistress	& 0.67 \\
-0.4608	& szeretet	& affection, liking	& 0.67 \\
-0.4723	& vizsgálat	& inquiry, examination	& 0.67 \\
-0.4853	& tömeg	& mob, crowd	& 0.5 \\
-0.4903	& puszta	& pure, plain	& 0.22 \\
-0.4904	& srác	& kid, lad	& 1.0 \\
-0.4911	& büntetés	& penalty, sentence	& 0.29 \\
-0.4971	& képviselő	& delegate, representative	& 0.67 \\
-0.4975	& határ	& boundary, border	& 0.67 \\
-    &$\vdots$ \\
-% 0.5001	& drága	& precious, dear, expensive	& 1.0 \\
-% 0.5093	& uralkodó	& prince, ruler, sovereign	& 0.5 \\
-% 0.5097	& válás	& separation, divorce	& 0.67 \\
-% 0.5103	& ügyvéd	& lawyer, advocate	& 0.67 \\
-% 0.5167	& előnyös	& advantageous, profitable, favourable	& 1.0 \\
-% 0.5169	& merev	& rigid, strict	& 1.0 \\
-% 0.5204	& nyíltan	& openly, outright	& 1.0 \\
-% 0.5217	& noha	& notwithstanding, albeit	& 1.0 \\
-% 0.5311	& hulladék	& litter, garbage, rubbish	& 0.43 \\
-% 0.5311	& szemét	& litter, garbage, rubbish	& 0.43 \\
-% 0.5612	& kielégítő	& satisfying, satisfactory	& 1.0 \\
-% 0.5617	& vicc	& joke, humour	& 1.0 \\
-% 0.5737	& szállító	& supplier, vendor	& 1.0 \\
-% 0.5747	& óvoda	& nursery, daycare, kindergarten	& 1.0 \\
-% 0.5754	& hétköznapi	& mundane, everyday, ordinary	& 0.75 \\
-% 0.5797	& anya	& mum, mummy	& 1.0 \\
-% 0.5824	& szomszédos	& neighbouring, neighbour	& 0.4 \\
-% 0.5931	& szabadság	& liberty, independence	& 1.0 \\
-% 0.6086	& lelkész	& pastor, priest	& 0.4 \\
-% 0.6304	& fogalom	& notion, conception	& 1.0 \\
-% 0.6474	& fizetés	& salary, wage	& 0.67 \\
-% 0.6551	& táj	& landscape, scenery	& 1.0 \\
-% 0.6583	& okos	& clever, smart	& 0.67 \\
-% 0.6707	& autópálya	& highway, motorway	& 0.5 \\
-% 0.6722	& tilos	& prohibited, forbidden	& 1.0 \\
-% 0.6811	& bevezető	& introduction, introductory	& 1.0 \\
-% 0.7025	& szövetség	& coalition, alliance, union	& 0.75 \\
-% 0.7065	& fáradt	& exhausted, tired, weary	& 1.0 \\
-% 0.7066	& kiállítás	& exhibit, exhibition	& 0.67 \\
-% 0.7135	& hirdetés	& advert, advertisement	& 1.0 \\
-% 0.7147	& ésszerű	& rational, logical	& 1.0 \\
-% 0.7664	& logikai	& logic, logical	& 1.0 \\
-% 0.7757	& szervez	& organise, organize, arrange	& 1.0 \\
-% 0.8122	& furcsa	& strange, odd	& 0.4 \\
-% 0.8277	& azután	& afterwards, afterward	& 0.67 \\
-% 0.8689	& megbízható	& dependable, reliable	& 0.67 \\
-
-    %%% Eslő ezerből:
-
-% 0.01821	& alkotó	& constituent, creator	& 0.5 \\
-% 0.05096	& előzetes	& preliminary, trailer	& 1.0 \\
-% 0.07632	& kapcsolat	& affair, linkage, conjunction	& 0.33 \\
-% 0.1142	& sorozat	& succession, suite, serial	& 1.0 \\
-% 0.1873	& induló	& candidate, march	& 1.0 \\
-% 0.187	& nemes	& peer\bad, noble	& 0.67 \\
-% 0.1934	& eltérés	& variance, departure	& 0.4 \\
-% 0.2054	& megelőző	& preventive, preceding	& 0.29 \\
-% 0.2206	& bemutató	& exhibition, presenter	& 0.67 \\
-% 0.2515	& előbbi	& preceding, anterior	& 0.67 \\
-% 0.2558	& kötelezettség	& obligation, engagement	& 0.67 \\
-% 0.2733	& követ	& haunt, succeed	& 0.67 \\
-% 0.3038	& köt	& bind, tie	& 0.67 \\
-% 0.3212	& tartós	& substantial, durable	& 1.0 \\
-% 0.333	& bír	& possess, bear	& 1.0 \\
-% 0.3486	& kerület	& borough, ward, perimeter	& 0.3 \\
-% 0.3486	& utas	& passenger, fare\bad	& 1.0 \\
-% 0.3564	& szigorú	& stern, strict	& 0.5 \\
-% 0.3708	& rendes	& orderly, ordinary	& 0.5 \\
-% 0.3824	& eladó	& vendor, salesman	& 0.5 \\
-% 0.3986	& darab	& chunk, fragment	& 0.4 \\
-% 0.4012	& hiány	& poverty, shortage	& 0.5 \\
-% 0.4087	& uralkodó	& ruler, sovereign, prince	& 0.5 \\
-% 0.4093	& kutatás	& quest, exploration	& 0.5 \\
-    %   0.4138	& tanítás	& tuition, lesson	& 0.67 \\
-    %   0.4196	& őszinte	& sincere, frank	& 0.67 \\
-    %   0.4501	& gyerek	& childish, kid	& 0.67 \\
-    %   0.4551	& ritka	& rare, odd	& 0.5 \\
-    %   0.4608	& szeretet	& affection, liking	& 0.67 \\
-    %   0.4723	& vizsgálat	& inquiry, examination	& 0.67 \\
-    %   0.4853	& tömeg	& crowd, mob	& 0.5 \\
-    %   0.4903	& puszta	& plain, pure	& 0.22 \\
-    %   0.4971	& képviselő	& representative, delegate	& 0.67 \\
-    %   0.4975	& határ	& border, boundary	& 0.67 \\
-    %   0.5001	& drága	& precious, dear, expensive	& 1.0 \\
-    %   0.5144	& szövetség	& alliance, union, coalition	& 0.75 \\
-    %   0.5217	& noha	& albeit, notwithstanding	& 1.0 \\
-    %   0.5311	& hulladék	& litter, garbage, rubbish	& 0.43 \\
-    %   0.5311	& szemét	& litter, garbage, rubbish	& 0.43 \\
-    %   0.5797	& anya	& mummy, mum	& 1.0 \\
-    %   0.5824	& szomszédos	& neighbouring, neighbour	& 0.4 \\
-    %   0.5931	& szabadság	& independence, liberty	& 1.0 \\
-    %   0.6722	& tilos	& forbidden, prohibited	& 1.0 \\
-    %   0.7066	& kiállítás	& exhibition, exhibit	& 0.67 \\
-    %   0.8122	& furcsa	& strange, odd	& 0.4 \\
-    %   0.8277	& azután	& afterward, afterwards	& 0.67 \\
-    %   0.8689	& megbízható	& reliable, dependable	& 0.67 \\
-    \bottomrule
-  \end{tabular}
-  %}
-   \caption{
-     % Words with sense vectors corresponding to different senses as witnessed
-     % by rNN@1s.  
-     \emph{covg} denotes coverage of the NN@1 translations over all gold
-     translations.  
-     % \bad denotes cases where we think the ``gold'' seed translation is
-     % (totally) wrong.
-  }
-  \label{tab:alkoto} \end{table*}
+\newcommand{\e}{$^E$}
+\newcommand{\id}{$^I$}
+\newcommand{\s}{$^S$}
 
 \subsection{Part of speech}
 
@@ -747,13 +576,13 @@ special cases of `unfamiliar' (person versus language).
   közvetlen [['informal'], ['casual}
 
 % \subsection{Three or more vectors}
-% 
+%
 % When a word has more than two sense vectors with good non-common translations,
 % with most of the words there is a more ``general'' vector (or two, in the case
 % of \emph{tud}) that has more good translations, and good translations of the
 % other vectors are mostly among the good translations of this general vector,
 % see \cref{tab:like_than}.
-% 
+%
 % \begin{table}[t]
 %     \resizebox{\columnwidth}{!} {
 %   %\footnotesize
@@ -763,7 +592,7 @@ special cases of `unfamiliar' (person versus language).
 %     majd	& then/later, then, later	 \\
 %     talán	& probably/perhaps, probably/maybe, perhaps	 \\
 %     tud	& understand/can, know/understand, know, can	 \\
-%     program	& project/programme/program, project/programme, \\&%\hskip{1cm} 
+%     program	& project/programme/program, project/programme, \\&%\hskip{1cm}
 %     project/program	 \\
 %     terület	& region/area/territory, region/district, region/area, area	 \\
 %     felső	& upper/top, upper, higher	 \\
@@ -819,8 +648,138 @@ Bálint Sass (RIL-HAS) for useful comments. The orthogonal approximation was
 implemented following a
 code\footnote{\url{https://github.com/hlt-bme-hu/eval-embed}} by Gábor Borbély.
 
-\bibliographystyle{acl_natbib}
-\bibliography{ml}
+\section{Appendix}
+
+\begin{table*} 
+  %\setlength{\tabcolsep}{3pt}
+  \resizebox{\textwidth}{!}{%
+    %\centering
+    \begin{tabular}{lllll}
+      \toprule
+      &$s$     &         &                       & covg \\
+      \midrule
+      E	& -0.04849	& függő	& addict, aerial	& 0.4 \\
+      S	& 0.01821	& alkotó	& constituent, creator	& 0.5 \\
+      S	& 0.05096	& előzetes	& preliminary, trailer	& 1.0 \\
+      S	& 0.0974	& kapcsolat	& affair, conjunction, linkage	& 0.33 \\
+      I	& 0.1361	& kocsi	& coach, carriage	& 1.0 \\
+      S	& 0.136	& futó	& runner, bishop	& 1.0 \\
+      S	& 0.1518	& keresés	& quest, scan	& 0.67 \\
+      S	& 0.1574	& látvány	& outlook, scenery, prospect	& 0.6 \\
+      S	& 0.1626	& fogad	& bet, greet	& 1.0 \\
+      S	& 0.1873	& induló	& march, candidate	& 1.0 \\
+      I	& 0.187	& nemes	& noble, peer	& 0.67 \\
+      E	& 0.1934	& eltérés	& variance, departure	& 0.4 \\
+      E	& 0.1943	& alkalmazás	& employ, adaptation	& 0.33 \\
+      S	& 0.2016	& szünet	& interval, cease, recess	& 0.43 \\
+      E	& 0.2032	& kezdeményezés	& initiation, initiative	& 1.0 \\
+      S	& 0.2052	& zavar	& disturbance, annoy, disturb, turmoil	& 0.57 \\
+      S	& 0.2054	& megelőző	& preceding, preventive	& 0.29 \\
+      IE& 0.2169	& csomó	& knot\id, lump\id, mat\e	& 1.0  \\
+      E%\footnote{ The basic translations \emph{hope} is missing}
+      & 0.21	& remény	& outlook, promise, expectancy	& 0.6	  \\
+      S	& 0.2206	& bemutató	& exhibition, presenter	& 0.67 \\
+      E	& 0.2208	& egyeztetés	& reconciliation, correlation	& 0.5 \\
+      S	& 0.237	& előadó	& auditorium, lecturer	& 0.67 \\
+      E	& 0.2447	& nyilatkozat	& profession, declaration	& 0.4 \\
+      I	& 0.2494	& gazda	& farmer, boss	& 0.67 \\
+      I	& 0.2506	& kapu	& gate, portal	& 1.0 \\
+      I	& 0.2515	& előbbi	& anterior, preceding	& 0.67 \\
+      I	& 0.2558	& kötelezettség	& engagement, obligation	& 0.67 \\
+      E	& 0.265	& hangulat	& morale, humour	& 0.5 \\
+      E	& 0.2733	& követ	& succeed, haunt	& 0.67 \\
+      SE	& 0.276	& minta	& norm\s, formula\e, specimen\s	& 0.75  \\
+      S	& 0.2807	& sorozat	& suite, serial, succession	& 1.0 \\
+      S	& 0.2935	& durva	& coarse, gross	& 0.18 \\
+      I	& 0.3038	& köt	& bind, tie	& 0.67 \\
+      E	& 0.3045	& egyezmény	& treaty, protocol	& 0.67 \\
+      I	& 0.3097	& megkülönböztetés	& discrimination, differentiation	& 0.5 \\
+      I	& 0.309	& ered	& stem, originate	& 0.5 \\
+      I	& 0.319	& hirdet	& advertise, proclaim	& 1.0 \\
+      E	& 0.3212	& tartós	& substantial, durable	& 1.0 \\
+      I	& 0.3218	& ajánlattevő	& bidder, supplier, contractor	& 0.6 \\
+      I	& 0.3299	& aláírás	& signing, signature	& 0.67 \\
+      I	& 0.333	& bír	& bear, possess	& 1.0 \\
+      I	& 0.3432	& áldozat	& sacrifice, victim, casualty	& 1.0 \\
+      IE	& 0.3486	& kerület	& ward\id, borough\id, perimeter\e	& 0.3  \\
+      I	& 0.3486	& utas	& fare, passenger	& 1.0 \\
+      I	& 0.3564	& szigorú	& stern, strict	& 0.5 \\
+      I	& 0.3589	& bűnös	& sinful, guilty	& 0.5 \\
+      I	& 0.3708	& rendes	& orderly, ordinary	& 0.5 \\
+      I	& 0.3824	& eladó	& salesman, vendor	& 0.5 \\
+      I	& 0.3861	& enyhe	& tender, mild, slight	& 0.6 \\
+      I	& 0.3897	& maradék	& residue, remainder	& 0.33 \\
+      I	& 0.3986	& darab	& chunk, fragment	& 0.4 \\
+      E	& 0.4012	& hiány	& poverty, shortage	& 0.5 \\
+      I	& 0.4093	& kutatás	& exploration, quest	& 0.5 \\
+      \vdots
+    \end{tabular} 
+  \begin{tabular}{lllll}
+      \vdots\\
+    I	& 0.4138	& tanítás	& tuition, lesson	& 0.67 \\
+    I	& 0.4196	& őszinte	& frank, sincere	& 0.67 \\
+    I	& 0.4229	& környék	& neighborhood, surroundings, vicinity	& 0.38 \\
+    I	& 0.4446	& ítélet	& judgement, sentence	& 0.67 \\
+    I	& 0.4501	& gyerek	& childish, kid	& 0.67 \\
+    I	& 0.4521	& csatorna	& ditch, sewer	& 0.4 \\
+    I	& 0.4547	& felügyelet	& surveillance, inspection, supervision	& 0.43 \\
+    E	& 0.4551	& ritka	& rare, odd	& 0.5 \\
+    S	& 0.4563	& szerető	& fond, lover, affectionate, mistress	& 0.67 \\
+    I	& 0.4608	& szeretet	& affection, liking	& 0.67 \\
+    I	& 0.4723	& vizsgálat	& inquiry, examination	& 0.67 \\
+    I	& 0.4853	& tömeg	& mob, crowd	& 0.5 \\
+    I	& 0.4903	& puszta	& pure, plain	& 0.22 \\
+    I	& 0.4904	& srác	& kid, lad	& 1.0 \\
+    I	& 0.4911	& büntetés	& penalty, sentence	& 0.29 \\
+    I	& 0.4971	& képviselő	& delegate, representative	& 0.67 \\
+    I	& 0.4975	& határ	& boundary, border	& 0.67 \\
+    I	& 0.5001	& drága	& precious, dear, expensive	& 1.0 \\
+    S	& 0.5093	& uralkodó	& prince, ruler, sovereign	& 0.5 \\
+    I	& 0.5097	& válás	& separation, divorce	& 0.67 \\
+    I	& 0.5103	& ügyvéd	& lawyer, advocate	& 0.67 \\
+    I	& 0.5167	& előnyös	& advantageous, profitable, favourable	& 1.0 \\
+    I	& 0.5169	& merev	& rigid, strict	& 1.0 \\
+    I	& 0.5204	& nyíltan	& openly, outright	& 1.0 \\
+    I	& 0.5217	& noha	& notwithstanding, albeit	& 1.0 \\
+    I	& 0.5311	& hulladék	& litter, garbage, rubbish	& 0.43 \\
+    I	& 0.5311	& szemét	& litter, garbage, rubbish	& 0.43 \\
+    I	& 0.5612	& kielégítő	& satisfying, satisfactory	& 1.0 \\
+    E	& 0.5617	& vicc	& joke, humour	& 1.0 \\
+    I	& 0.5737	& szállító	& supplier, vendor	& 1.0 \\
+    I	& 0.5747	& óvoda	& nursery, daycare, kindergarten	& 1.0 \\
+    I	& 0.5754	& hétköznapi	& mundane, everyday, ordinary	& 0.75 \\
+    I	& 0.5797	& anya	& mum, mummy	& 1.0 \\
+    I	& 0.5824	& szomszédos	& neighbouring, neighbour	& 0.4 \\
+    E	& 0.5931	& szabadság	& liberty, independence	& 1.0 \\
+    I	& 0.6086	& lelkész	& pastor, priest	& 0.4 \\
+    I	& 0.6304	& fogalom	& notion, conception	& 1.0 \\
+    I	& 0.6474	& fizetés	& salary, wage	& 0.67 \\
+    I	& 0.6551	& táj	& landscape, scenery	& 1.0 \\
+    I	& 0.6583	& okos	& clever, smart	& 0.67 \\
+    I	& 0.6707	& autópálya	& highway, motorway	& 0.5 \\
+    I	& 0.6722	& tilos	& prohibited, forbidden	& 1.0 \\
+    I	& 0.6811	& bevezető	& introduction, introductory	& 1.0 \\
+    I	& 0.7025	& szövetség	& coalition, alliance, union	& 0.75 \\
+    I	& 0.7065	& fáradt	& exhausted, tired, weary	& 1.0 \\
+    I	& 0.7066	& kiállítás	& exhibit, exhibition	& 0.67 \\
+    I	& 0.7135	& hirdetés	& advert, advertisement	& 1.0 \\
+    I	& 0.7147	& ésszerű	& rational, logical	& 1.0 \\
+    I	& 0.7664	& logikai	& logic, logical	& 1.0 \\
+    I	& 0.7757	& szervez	& organise, organize, arrange	& 1.0 \\
+    I	& 0.8122	& furcsa	& strange, odd	& 0.4 \\
+    I	& 0.8277	& azután	& afterwards, afterward	& 0.67 \\
+    I	& 0.8689	& megbízható	& dependable, reliable	& 0.67 \\
+    \bottomrule
+  \end{tabular}
+    }
+  \caption{The table below shows Hungarian words with the rNN@1 translations of
+  their sense vectors .  The first column is a post-hoc human annotation by
+  András Kornai (\emph E error in translation, \emph I identical, \emph S
+  separate meanings), $s$ is the cosine similarity of the translations. and
+  \emph{covg} denotes the coverage of the @1 translations over all gold
+  translations.}
+  \label{tab:alkoto} 
+    \end{table*}
 
 \end{document}
 
