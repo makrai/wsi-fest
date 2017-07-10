@@ -42,9 +42,6 @@
 %\usepackage{todonotes}
 \newcommand{\todo}[1]{}
 \usepackage{wasysym}
-\usepackage{supertabular}
-\usepackage{longtable}
-\usepackage{multicol}
 
 \newcommand{\paprika}{
 \begin{figure}
@@ -355,7 +352,7 @@ limit (but remains far below that of reverse NN).
 
 \newcommand{\wordtovec}{\texttt{word2vec}}
 
-\cite{Xing:2015} notes that the original linear translation method is
+\cite{Xing:2015} note that the original linear translation method is
 theoretically inconsistent being based on three different similarity measures:
 \wordtovec~itself uses the dot-product of unnormalized vectors, the translation
 is trained based on Euclidean distance, and neighbors are queried based on
@@ -364,7 +361,7 @@ the embeddings, and restricting $W$ to preserve vector length: their matrix
 $W$ is orthogonal, i.e.~the mapping is a rotation.  \citep{Faruqui:2014} gains
 even better results by mapping the two embeddings to a lower-dimensional
 bilingual space with canonical correlation analysis.  \citep{Artetxe:2016}
-analyses elements of these two works both theoretically and empirically, and
+analyse elements of these two works both theoretically and empirically, and
 find a combination that improves upon dictionary generation and also preserves
 analogies \citep{Mikolov:2013l} like
 
@@ -426,7 +423,7 @@ where $\mathbf 1$ is the rectangular identity matrix of appropriate shape.
 \end{table*}
 
 \Cref{tab:orthog} shows our experimental results. Precision in forward NN
-search is similar to that in Xing et al.~(\citeyear{Xing:2015}) and
+search shows a similar trend to that in Xing et al.~(\citeyear{Xing:2015}) and
 \cite{Artetxe:2016}: the best combination is an orthogonal mapping between
 length-normalized vectors, however, centering did not help in our experiments.
 Reverse NNs are quite different: none of the orthogonality-related techniques
@@ -515,140 +512,9 @@ that the sets of corresponding good rNN@$k$ translations are different. The
 ratio of words satisfying this requirement among all words with more than one
 sense vector is show as \disamb~in \cref{tab:prec}. The values are low.
 
-\newcommand{\bad}{$^\text{\frownie}$}
-
-\Cref{tab:alkoto} shows the successfully disambiguated words sorted by the
-cosine similarity $s$ of good rNN@1 translations of different sense vectors. (We
-found that most of the few cases when there are more than two sense vectors
-with a good rNN@1 translation are due to that the seed dictionary contains some
-non-basic translation e.g. \emph{kapcsolat} `relationship, conjunction' has
-`affair' among its seed translations. In these cases, we chose two sense
-vectors arbitraryly.\todo{When there are sense vectors with more than two
-rNN@$k$ hits , the choice of the corresponding target words is also
-arbitrary.})  Relying on $s$ is similar to the monolingual setting of
-clustering the sense vectors for each word, but here we restrict our analysis
-to sense vectors that prove to be sensible in linear translation.
-
-We see that most words with $s<.3$ are really ambiguous from a standard
-lexicographic point of view, but the translations with $s>.35$ are rather
-synonyms.
-
 \newcommand{\e}{$^E$}
 \newcommand{\id}{$^I$}
 \newcommand{\s}{$^S$}
-
-\subsection{Part of speech}
-
-The clearest case of homonymy is when unrelated senses belong to different
-parts of speech (POSs), and the translations reflect these POSs, e.g.~\emph{nő}
-`woman; increase' or \emph{vár} \todo{update examples} `wait;
-case'.\footnote{We note that some POSs in Hungarian have blurred borders,
-e.g.~it is debatable whether the nominal \emph{önkéntes} `voluntary; volunteer'
-is ambiguous for its POS.} In purely semantic approaches, like
-\fl~\citep{Kornai:2017,Kornai:2015a}, POS-difference alone is not enough for
-analyzing a word as ambiguous, e.g.~we see the only difference between the noun
-and participle senses of \emph{alkalmazott}, `employee; applied' as that
-\emph{employ}ment is the \emph{appli}cation of people for work; in the case of
-\emph{belső} `internal; interior', the noun refers to the part of a building
-described by the adjective.
-
-%\paprika
-
-%\subsection{Related meanings and monosemy}
-
-More interesting are word forms with related senses in the same POS,
-e.g.~\emph{cikk}, `item; article' (an article is an item in a newspaper);
-\emph{eredmény}, `score; result' (a score is a result measured by a number);
-\emph{magas}, `tall; high' (tall is used for people rather than high); or
-\emph{idegen}, `strange, alien; foreign', where the English translations are
-special cases of `unfamiliar' (person versus language).
-
-% Finally we mention two cases where the relation between the two senses is
-% more idiosyncratic, but in a monosemic approach, they will have a single
-% representation: \emph{beteg} means `ill, sick; patient'. Though \emph{ill} is
-% a health state and \emph{patient} is a situational role, the fact that
-% patients of doctors are usually ill, may suffice for identifying the `patent'
-% based on the representation shared with \emph{ill}; and a monosemic system is
-% designed to give account of metaphorical relations like the one between the
-% meanings of \emph{világos}, `bright; clear' as well.
-
-\todo{missing sense \\ édes [['sweetheart'], ['cute \\
-  közvetlen [['informal'], ['casual}
-
-% \subsection{Three or more vectors}
-%
-% When a word has more than two sense vectors with good non-common translations,
-% with most of the words there is a more ``general'' vector (or two, in the case
-% of \emph{tud}) that has more good translations, and good translations of the
-% other vectors are mostly among the good translations of this general vector,
-% see \cref{tab:like_than}.
-%
-% \begin{table}[t]
-%     \resizebox{\columnwidth}{!} {
-%   %\footnotesize
-%   \begin{tabular}{ll}
-%     \toprule
-%     mint	& like/than/as, like, than	 \\
-%     majd	& then/later, then, later	 \\
-%     talán	& probably/perhaps, probably/maybe, perhaps	 \\
-%     tud	& understand/can, know/understand, know, can	 \\
-%     program	& project/programme/program, project/programme, \\&%\hskip{1cm}
-%     project/program	 \\
-%     terület	& region/area/territory, region/district, region/area, area	 \\
-%     felső	& upper/top, upper, higher	 \\
-%     díj	& charge/fee/rate, fee, award	 \\
-%     kicsi	& little/small, little, small	 \\
-%     erő	& strength/power/force/stress/energy, strength/power, force	 \\
-%     lakás	& apartment/housing, residence/housing, rooms/apartment	 \\
-%     kérelem	& application/appeal, application, appeal	 \\
-%     figyel	& watch/listen, watch, listen	 \\
-%     \bottomrule
-%   \end{tabular}
-% }
-%   \caption{Words with at least three good sense vectors (forward NNs, source is
-%   the AdaGram model trained on HNC (600 dimensions, $\alpha=.05$)}
-%   \label{tab:like_than}
-% \end{table}
-
-\section{Acknowledgments}
-
-1957 was an influential year in linguistics: \cite{Harris:1957} developed on the
-frequency-aware variant of the distributional method, \cite{Osgood:1957}
-pioneered vector space models, and the author of a more recent conceptual
-meaning representation framework \citep{Kornai:2010,Kornai:2017} was born.
-Fifty years later (more precisely in fall 2006) I learned András during a class
-he taught on the book he was writing \citep{Kornai:2007}. I heard about
-\emph{deep cases} and \emph{k\={a}rakas} sooner than I did about \emph{thematic
-roles}. The fact that he has since taught me computational linguistics in a
-master and disciple fashion comes at no surprise as there has been no such PhD
-school in Hungary, not to mention mathematical linguistics proper.
-% He advised my so called \emph{topic labor} and MSc at the Budapest University
-% of Technology and Economics, and I started my PhD as a member of the 4lang
-% project at the Institute for Computer Science and Control of the Hungarian
-% Academy of Sciences.
-
-Laozi says that a good leader does not leave a footprint, and András encouraged
-us to be independent and effective. One of his remarkable citations is that
-``It's easier to ask forgiveness than it is to get permission''. The proverb is
-sometimes attributed to the Jesuits, who are similar to András in having had a
-great impact on what I've become in the past ten years. The real source of the
-proverb is Grace Hopper, a computer scientist and US navy admiral who invented
-the first compiler.
-% and popularized the idea of machine-independent programming languages.
-This paper is a step in my learning to be so effective as the sources
-mentioned above.
-
-\bigskip
-
-I would like to thank Veronika Lipp (Research Institute for Linguistics,
-Hungarian Academy of Sciences, RIL-HAS), the author of the otherwise
-unpublished \cref{sec:bground} and Gábor Recski (Department of Automation and
-Applied Informatics, Budapest University of Technology and Economics) and
-Bálint Sass (RIL-HAS) for useful comments. The orthogonal approximation was
-implemented following a
-code\footnote{\url{https://github.com/hlt-bme-hu/eval-embed}} by Gábor Borbély.
-
-\section{Appendix}
 
 \begin{table*} 
   %\setlength{\tabcolsep}{3pt}
@@ -676,7 +542,7 @@ code\footnote{\url{https://github.com/hlt-bme-hu/eval-embed}} by Gábor Borbély
       S	& 0.2052	& zavar	& disturbance, annoy, disturb, turmoil	& 0.57 \\
       S	& 0.2054	& megelőző	& preceding, preventive	& 0.29 \\
       IE& 0.2169	& csomó	& knot\id, lump\id, mat\e	& 1.0  \\
-      E%\footnote{ The basic translations \emph{hope} is missing}
+      E\footnotemark
       & 0.21	& remény	& outlook, promise, expectancy	& 0.6	  \\
       S	& 0.2206	& bemutató	& exhibition, presenter	& 0.67 \\
       E	& 0.2208	& egyeztetés	& reconciliation, correlation	& 0.5 \\
@@ -772,14 +638,140 @@ code\footnote{\url{https://github.com/hlt-bme-hu/eval-embed}} by Gábor Borbély
     \bottomrule
   \end{tabular}
     }
-  \caption{The table below shows Hungarian words with the rNN@1 translations of
-  their sense vectors .  The first column is a post-hoc human annotation by
-  András Kornai (\emph E error in translation, \emph I identical, \emph S
-  separate meanings), $s$ is the cosine similarity of the translations. and
-  \emph{covg} denotes the coverage of the @1 translations over all gold
-  translations.}
+  \caption{Hungarian words with the rNN@1 translations of their sense vectors.
+  The first column is a post-hoc annotation by András Kornai (\emph E error in
+  translation, \emph I identical, \emph S separate meanings), $s$ is the cosine
+  similarity of the translations, and \emph{covg} denotes the coverage of the
+  @1 translations over all gold translations.}
   \label{tab:alkoto} 
+  {\footnotesize $^7$ The basic translations \emph{hope} is missing}
     \end{table*}
+
+\Cref{tab:alkoto} shows the successfully disambiguated words sorted by the
+cosine similarity $s$ of good rNN@1 translations of different sense vectors. (We
+found that most of the few cases when there are more than two sense vectors
+with a good rNN@1 translation are due to that the seed dictionary contains some
+non-basic translation e.g. \emph{kapcsolat} `relationship, conjunction' has
+`affair' among its seed translations. In these cases, we chose two sense
+vectors arbitraryly.\todo{When there are sense vectors with more than two
+rNN@$k$ hits , the choice of the corresponding target words is also
+arbitrary.})  Relying on $s$ is similar to the monolingual setting of
+clustering the sense vectors for each word, but here we restrict our analysis
+to sense vectors that prove to be sensible in linear translation.
+
+We see that most words with $s<.3$ are really ambiguous from a standard
+lexicographic point of view, but the translations with $s>.35$ are rather
+synonyms.
+
+
+\subsection{Part of speech}
+
+The clearest case of homonymy is when unrelated senses belong to different
+parts of speech (POSs), and the translations reflect these POSs, e.g.~\emph{nő}
+`woman; increase' or \emph{vár} \todo{update examples} `wait;
+case'.\footnote{We note that some POSs in Hungarian have blurred borders,
+e.g.~it is debatable whether the nominal \emph{önkéntes} `voluntary; volunteer'
+is ambiguous for its POS.} In purely semantic approaches, like
+\fl~\citep{Kornai:2017,Kornai:2015a}, POS-difference alone is not enough for
+analyzing a word as ambiguous, e.g.~we see the only difference between the noun
+and participle senses of \emph{alkalmazott}, `employee; applied' as that
+\emph{employ}ment is the \emph{appli}cation of people for work; in the case of
+\emph{belső} `internal; interior', the noun refers to the part of a building
+described by the adjective.
+
+%\paprika
+
+%\subsection{Related meanings and monosemy}
+
+More interesting are word forms with related senses in the same POS,
+e.g.~\emph{cikk}, `item; article' (an article is an item in a newspaper);
+\emph{eredmény}, `score; result' (a score is a result measured by a number);
+\emph{magas}, `tall; high' (tall is used for people rather than high); or
+\emph{idegen}, `strange, alien; foreign', where the English translations are
+special cases of `unfamiliar' (person versus language).
+
+% Finally we mention two cases where the relation between the two senses is
+% more idiosyncratic, but in a monosemic approach, they will have a single
+% representation: \emph{beteg} means `ill, sick; patient'. Though \emph{ill} is
+% a health state and \emph{patient} is a situational role, the fact that
+% patients of doctors are usually ill, may suffice for identifying the `patent'
+% based on the representation shared with \emph{ill}; and a monosemic system is
+% designed to give account of metaphorical relations like the one between the
+% meanings of \emph{világos}, `bright; clear' as well.
+
+% \subsection{Three or more vectors}
+%
+% When a word has more than two sense vectors with good non-common translations,
+% with most of the words there is a more ``general'' vector (or two, in the case
+% of \emph{tud}) that has more good translations, and good translations of the
+% other vectors are mostly among the good translations of this general vector,
+% see \cref{tab:like_than}.
+%
+% \begin{table}[t]
+%     \resizebox{\columnwidth}{!} {
+%   %\footnotesize
+%   \begin{tabular}{ll}
+%     \toprule
+%     mint	& like/than/as, like, than	 \\
+%     majd	& then/later, then, later	 \\
+%     talán	& probably/perhaps, probably/maybe, perhaps	 \\
+%     tud	& understand/can, know/understand, know, can	 \\
+%     program	& project/programme/program, project/programme, \\&%\hskip{1cm}
+%     project/program	 \\
+%     terület	& region/area/territory, region/district, region/area, area	 \\
+%     felső	& upper/top, upper, higher	 \\
+%     díj	& charge/fee/rate, fee, award	 \\
+%     kicsi	& little/small, little, small	 \\
+%     erő	& strength/power/force/stress/energy, strength/power, force	 \\
+%     lakás	& apartment/housing, residence/housing, rooms/apartment	 \\
+%     kérelem	& application/appeal, application, appeal	 \\
+%     figyel	& watch/listen, watch, listen	 \\
+%     \bottomrule
+%   \end{tabular}
+% }
+%   \caption{Words with at least three good sense vectors (forward NNs, source is
+%   the AdaGram model trained on HNC (600 dimensions, $\alpha=.05$)}
+%   \label{tab:like_than}
+% \end{table}
+
+\section{Acknowledgments}
+
+1957 was an influential year in linguistics: \cite{Harris:1957} developed on the
+frequency-aware variant of the distributional method, \cite{Osgood:1957}
+pioneered vector space models, and the author of a more recent conceptual
+meaning representation framework \citep{Kornai:2010,Kornai:2017} was born.
+Fifty years later (more precisely in fall 2006) I learned András during a class
+he taught on the book he was writing \citep{Kornai:2007}. I heard about
+\emph{deep cases} and \emph{k\={a}rakas} sooner than I did about \emph{thematic
+roles}. The fact that he has since taught me computational linguistics in a
+master and disciple fashion comes at no surprise as there has been no such PhD
+school in Hungary, not to mention mathematical linguistics proper.
+% He advised my so called \emph{topic labor} and MSc at the Budapest University
+% of Technology and Economics, and I started my PhD as a member of the 4lang
+% project at the Institute for Computer Science and Control of the Hungarian
+% Academy of Sciences.
+
+Laozi says that a good leader does not leave a footprint, and András encouraged
+us to be independent and effective. One of his remarkable citations is that
+``It's easier to ask forgiveness than it is to get permission''. The proverb is
+sometimes attributed to the Jesuits, who are similar to András in having had a
+great impact on what I've become in the past ten years. The real source of the
+proverb is Grace Hopper, a computer scientist and US navy admiral who invented
+the first compiler.
+% and popularized the idea of machine-independent programming languages.
+This paper is a step in my learning to be so effective as the sources
+mentioned above.
+
+\bigskip
+
+I would like to thank Veronika Lipp, the author of the otherwise unpublished
+\cref{sec:bground}, András Kornai who, besides the work already discussed,
+rated each item in \cref{tab:alkoto}, and Gábor Recski and Bálint Sass  for
+useful comments. The orthogonal approximation was implemented following a
+code\footnote{\url{https://github.com/hlt-bme-hu/eval-embed}} by Gábor Borbély.
+
+\bibliographystyle{acl_natbib}
+\bibliography{ml} 
 
 \end{document}
 
