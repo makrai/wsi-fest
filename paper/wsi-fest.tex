@@ -290,7 +290,7 @@ MSEs are yet in research phase: \cite{Li:2015}  demonstrate that, when
 meta-parameters are carefully controlled for, MSEs introduce a slight
 performance boost in semantics-related tasks (semantic similarity for words and
 sentences, semantic relation identification, part-of-speech tagging), but
-similar improvements can also e achieved by simply increasing the dimension of
+similar improvements can also be achieved by simply increasing the dimension of
 a single-sense embedding.
 
 \section{Linear translation from MSEs}
@@ -358,9 +358,9 @@ theoretically inconsistent being based on three different similarity measures:
 is trained based on Euclidean distance, and neighbors are queried based on
 cosine similarity. They make the framework more coherent by length-normalizing
 the embeddings, and restricting $W$ to preserve vector length: their matrix
-$W$ is orthogonal, i.e.~the mapping is a rotation.  \citep{Faruqui:2014} gains
+$W$ is orthogonal, i.e.~the mapping is a rotation.  \cite{Faruqui:2014} gain
 even better results by mapping the two embeddings to a lower-dimensional
-bilingual space with canonical correlation analysis.  \citep{Artetxe:2016}
+bilingual space with canonical correlation analysis.  \cite{Artetxe:2016}
 analyse elements of these two works both theoretically and empirically, and
 find a combination that improves upon dictionary generation and also preserves
 analogies \citep{Mikolov:2013l} like
@@ -415,8 +415,8 @@ where $\mathbf 1$ is the rectangular identity matrix of appropriate shape.
   }
   \caption{Precision@10 of forward and reverse NN translations with and
   without the orthogonality constraint and related techniques at vocabulary
-  cutoffs 8192 to 32768. (\any~and \disamb~will be explained in
-  \cref{sec:res}.) The source has been an \adagram~model in 800 dimensions,
+  cutoffs 8192 to 32768. \any~and \disamb~are explained in
+  \cref{sec:res}. The source has been an \adagram~model in 800 dimensions,
   $\alpha=.1$, trained on Webkorpusz with the vocabulary cut off at 8192 sense
   vectors.}
   \label{tab:orthog}
@@ -493,10 +493,10 @@ least one good translation among its $k$ reverse nearest neighbors (rNN@$k$).
   \caption{Precision of \any~reverse NN and the number of word forms with
   non-synonymic vectors (\disamb).  The source embedding has been trained with
   \adagram, except for when indicated otherwise (\neelakantan, \mutli).  The
-  meta-parameters are $d$imension, the resolution parameter ($\alpha$ in
-  \adagram and $\gamma$ in \mutli), the maximum number of $p$rototypes (sense
-  vectors), and the vocabulary cutoff ($m$in-freq). The two models with
-  \emph{big} have practically no cut-off.}
+  meta-parameters are \emph{dim}ension, the resolution parameter ($\alpha$ in
+  \adagram~and $\gamma$ in \mutli), the maximum number of $p$rototypes (sense
+  vectors), and the vocabulary cutoff ($m$in-freq, the two models with
+  \emph{big} have practically no cut-off.)}
     \label{tab:prec}
 \end{table}
 
@@ -659,8 +659,8 @@ arbitrary.})  Relying on $s$ is similar to the monolingual setting of
 clustering the sense vectors for each word, but here we restrict our analysis
 to sense vectors that prove to be sensible in linear translation.
 
-We see that most words with $s<.3$ are really ambiguous from a standard
-lexicographic point of view, but the translations with $s>.35$ are rather
+We see that most words with $s<.25$ are really ambiguous from a standard
+lexicographic point of view, and the translations with $s>.35$ are rather
 synonyms.
 
 
@@ -743,9 +743,8 @@ meaning representation framework \citep{Kornai:2010,Kornai:2017} was born.
 Fifty years later (more precisely in fall 2006) I learned András during a class
 he taught on the book he was writing \citep{Kornai:2007}. I heard about
 \emph{deep cases} and \emph{k\={a}rakas} sooner than I did about \emph{thematic
-roles}. The fact that he has since taught me computational linguistics in a
-master and disciple fashion comes at no surprise as there has been no such PhD
-school in Hungary, not to mention mathematical linguistics proper.
+roles}. He has since taught me computational linguistics and mathematical
+linguistics in a master and disciple fashion.
 % He advised my so called \emph{topic labor} and MSc at the Budapest University
 % of Technology and Economics, and I started my PhD as a member of the 4lang
 % project at the Institute for Computer Science and Control of the Hungarian
@@ -765,7 +764,7 @@ mentioned above.
 \bigskip
 
 I would like to thank Veronika Lipp, the author of the otherwise unpublished
-\cref{sec:bground}, András Kornai who, besides the work already discussed,
+\cref{sec:bground}, András Kornai who, besides the work already ackowledged,
 rated each item in \cref{tab:alkoto}, and Gábor Recski and Bálint Sass  for
 useful comments. The orthogonal approximation was implemented following a
 code\footnote{\url{https://github.com/hlt-bme-hu/eval-embed}} by Gábor Borbély.
