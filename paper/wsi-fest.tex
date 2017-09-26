@@ -328,15 +328,14 @@ A common problem when looking for nearest neighbors in high-dimensional spaces
 embedding-based dictionary induction \citep{Dinu:2015,Lazaridou:2015} is when
 there are \emph{hubs}, data points (target words) returned as the NN
 (translation) of many points ($Wx$s), which is wrong (translation) in most of
-the cases.  \cite{Dinu:2015} attack the problem explicitly with a method they
-call \emph{global correction}.  Here, instead of the original NN that we will
-call \emph{forward} NN search to contrast with the more sophisticated method,
-they first rank source words by their similarity to target words. In
-\emph{reverse} nearest neighbor (rNN) search, source words are translated to
-the target words to which they have the lowest (forward) NN rank.\footnote{If
-more target words have the same forward rank, \cite{Dinu:2015} make the
-decision based on cosine similarity. This tie braking has not proven useful in
-our experiments.}
+the cases.  \cite{Dinu:2015} attack the problem with a method they call
+\emph{global correction}.  Here, instead of the original NN that we will call
+\emph{forward} NN search to contrast with the more sophisticated method, they
+first rank source words by their similarity to target words. In \emph{reverse}
+nearest neighbor (rNN) search, source words are translated to the target words
+to which they have the lowest (forward) NN rank.\footnote{If more target words
+have the same forward rank, \cite{Dinu:2015} make the decision based on cosine
+similarity. This tie braking has not proven useful in our experiments.}
 
 We found that in reverse NN search it is important to restrict the vocabulary to
 the some tens of thousands most frequent words not only for memory saving (the
