@@ -84,12 +84,12 @@ translation}
   multi-sense word embeddings correspond to different concepts. On the more
   technical side of embedding-based dictionary induction, we also test whether
   the orthogonality constraint and related vector preprocessing techniques help
-  in reverse nearest neighbor search, Both questions get answered negatively.
+  in reverse nearest neighbor search. Both questions receive a negative answer.
 \end{abstract}
 
 \emph{Word sense induction} (WSI) is the task of discovering senses of words
 without supervision \citep{Schutze:1998}. Recent approaches include multi-sense
-word embeddings (MSEs), vector space models of word distribution with more
+word embeddings (MSEs), i.e.~vector space models of word distribution with more
 vectors for ambiguous words. In MSEs, each vector is supposed to correspond
 to a different word sense, but in practice models frequently have different
 sense vectors for the same word form without an interpretable difference in
@@ -97,24 +97,24 @@ meaning.
 
 In \cite{Borbely:2016}, we proposed a cross-lingual method for the evaluation
 of sense resolution in MSEs. The method is based on the principle that
-words may be ambiguous as far as the postulated senses translate to different
+words may be ambiguous to the extent to which their postulated senses translate to different
 words in some other language.  For the translation of words, we applied the
 method by \citet{Mikolov:2013x} who train a translation mapping from the source
-languages embedding to the target as a least-squares regression supervised by a
+language embedding to the target as a least-squares regression supervised by a
 seed dictionary of the few thousand most frequent words. The translation of a
 source word vector is the nearest neighbor of its image by the mapping in the
 target space. In the multi-sense setting, we have translated from MSEs. (The
 target embedding remained single-sense.)
 
-\Cref{sec:delicious} discusses our linguistic motivation, and \cref{sec:mse}
-introduces MSEs.  In \cref{sec:linTrans}, we develop on the cross-lingual
+\Cref{sec:delicious} discusses our linguistic motivation; and \cref{sec:mse}
+introduces MSEs.  In \cref{sec:linTrans}, we elaborate on the cross-lingual
 evaluation. Part of the evaluation task is to decide on empirical grounds
 whether different good translations of a word are synonyms or translations in
 different senses.  Reverse nearest neighbor search, the orthogonality constraint
 on the translation mapping, and related techniques are also discussed.
 \Cref{sec:exper} offers experimental results with quantitative and qualitative
-analysis.  The reader should be noted that our evaluation is not very strict,
-rather a process of looking for something conceptually meaningful in
+analysis.  It should be noted that our evaluation is not very strict,
+but rather a process of looking for something conceptually meaningful in
 present-day unsupervised MSE models.\footnote{The code for these experiments
 can be found at \url{https://github.com/makrai/wsi-fest}.}
 
@@ -162,7 +162,7 @@ form to different elements of a sense inventory pre-defined by some experts.
 Our goal in WSI is to probe the granularity of the inventory itself.  The
 differentiation of word senses, as already noted in \cite{Borbely:2016}, is
 fraught with difficulties, especially when we wish to distinguish homophony,
-using the same written or spoken form to express different concepts, such as
+i.e.~using the same written or spoken form to express different concepts, such as
 Russian {\it mir} `world' and {\it mir} `peace' from polysemy, where speakers
 feel that the two senses are very strongly connected, such as in Hungarian {\it
 nap} `day' and {\it nap} `sun'.
@@ -176,9 +176,9 @@ nap} `day' and {\it nap} `sun'.
 % be used to recover the universal clustering \citep{Youn:2016}.
 
 The goal of WSI can be set at two levels. We may more modestly aim to
-distinguish homophony from polysemy. In ideal case, we could even differentiate
-between metonymy and metaphor, two subtypes of polysemy, that are discussed in
-the next section, by Veronika Lipp, in more detail.
+distinguish homophony from polysemy. Ideally, we could even differentiate
+between metonymy and metaphor, two subtypes of polysemy, discussed in more
+detail by Veronika Lipp in the next section.
 
 \subsection{Lexicographic Background \\ (Veronika Lipp)}
 
@@ -255,15 +255,15 @@ animal.
 \label{sec:mse}
 
 Vector-space language models with more vectors for each meaning of a
-word originate with \cite{Reisinger:2010}.
+word originate from \cite{Reisinger:2010}.
 \cite{Huang:2012} trained the first neural-network-based MSE.
 Both works use a uniform number of clusters for all words that they select
 before training as potentially ambiguous.
 The first system with adaptive sense numbers and an effective open-source
-implementation is the
-modification of skip-gram \cite{Mikolov:2013d}, multi-sense skip-gram by
-\cite{Neelakantan:2014}, where new senses are introduced during training by
-thresholding the similarity of the present context to earlier contexts.
+implementation is a modification of skip-gram \cite{Mikolov:2013d},
+\emph{multi-sense} skip-gram by \cite{Neelakantan:2014}, where new senses are
+introduced during training by thresholding the similarity of the present
+context to earlier contexts.
 
 % \cite{Tian:2014}, Guo et al., 2014, Wu and Giles, 2015, Liu et al., 2015, Vu
 % and Parker 2016, Šuster et al., 2016
@@ -282,7 +282,7 @@ t$ metathesis in the name of the repo which is the only way of distinguishing it
 from the other two multi-sense skip-gram models.} \citep{Li:2015} applies the
 Chinese restaurant process formalization of the Dirichlet process. Both
 \adagram~and \mutli~have a parameter for semantics resolution (more or less
-senses) $\alpha$ and $\gamma$ respectively.
+senses): $\alpha$ and $\gamma$, respectively.
 
 % https://sites.google.com/site/senseworkshop2017/
 
@@ -290,7 +290,7 @@ senses) $\alpha$ and $\gamma$ respectively.
 % such as text classification (Li and Jurafsky, 2015, Flekova and Gurevych,
 % 2016) and knowledge base construction (Delli Bovi et al. 2015, Espinosa-Anke
 % et al. 2016) and completion (Bordes et al. 2013, Wang et al. 2014)},
-MSEs are still in research phase: \cite{Li:2015}  demonstrate that, when
+MSEs are still in the research phase: \cite{Li:2015}  demonstrate that, when
 meta-parameters are carefully controlled for, MSEs introduce a slight
 performance boost in semantics-related tasks (semantic similarity for words and
 sentences, semantic relation identification, part-of-speech tagging), but
@@ -314,7 +314,7 @@ The translation model is trained with linear regression on the seed dictionary
 and can be used to collect translations for the whole vocabulary by choosing
 $z_i$ to be the nearest neighbor (NN) of $Wx_i$.  We follow
 \cite{Mikolov:2013x} in (i) using different metrics, Euclidean distance in training
-and cosine similarity in collection of translations and in (ii) training the
+and cosine similarity in collection of translations, and in (ii) training the
 source model with approximately three times greater dimension than that of the
 target embedding.
 
@@ -333,9 +333,9 @@ A common problem when looking for nearest neighbors in high-dimensional spaces
 \citep{Radovanovic:2010,Suzuki:2013,Tomasev:2013}, and especially in
 embedding-based dictionary induction \citep{Dinu:2015,Lazaridou:2015} is when
 there are \emph{hubs}, data points (target words) returned as the NN
-(translation) of many points ($Wx$s), which is wrong (translation) in most of
+(translation) of many points ($Wx$s), resulting in incorrect hits (translations) in most of
 the cases.  \cite{Dinu:2015} attack the problem with a method they call
-\emph{global correction}.  Here, instead of the original NN that we will call
+\emph{global correction}.  Here, instead of the original NN, which we will call
 \emph{forward} NN search to contrast with the more sophisticated method, they
 first rank source words by their similarity to target words. In \emph{reverse}
 nearest neighbor (rNN) search, source words are translated to the target words
@@ -359,12 +359,12 @@ with vocabulary limit (but remains far below that of reverse NN).
 \newcommand{\wordtovec}{\texttt{word2vec}}
 
 \cite{Xing:2015} note that the original linear translation method is
-theoretically inconsistent being based on three different similarity measures:
+theoretically inconsistent due to its being based on three different similarity measures:
 \wordtovec~itself uses the dot-product of unnormalized vectors, the translation
 is trained based on Euclidean distance, and neighbors are queried based on
 cosine similarity. They make the framework more coherent by length-normalizing
 the embeddings, and restricting $W$ to preserve vector length: their matrix
-$W$ is orthogonal, i.e.~the mapping is a rotation.  \cite{Faruqui:2014} gain
+$W$ is orthogonal, i.e.~the mapping is a rotation.  \cite{Faruqui:2014} achieve
 even better results by mapping the two embeddings to a lower-dimensional
 bilingual space with canonical correlation analysis.  \cite{Artetxe:2016}
 analyze elements of these two works both theoretically and empirically, and
@@ -386,7 +386,7 @@ monolingual performance.
 
 We trained \neelakantan, \adagram~and \mutli~models on (original and stemmed
 forms of) two semi-gigaword (.7--.8 B words) Hungarian corpora, the Hungarian
-Wecorpus (Webkorpusz, \cite{Halacsy:2004}) and (the non-social-media part of)
+Webcorpus (Webkorpusz, \cite{Halacsy:2004}) and (the non-social-media part of)
 the Hungarian National Corpus (HNC, \cite{Oravecz:2014}).  We used Wiktionary
 as our seed dictionary, extracted with
 \texttt{wikt2dict}\footnote{\url{https://github.com/juditacs/wikt2dict}}
@@ -404,7 +404,7 @@ decomposition
 
 \[U\Sigma V=S_t^\top T_t\] where $S_t$ and $T_t$ are the matrices consisting of
 the embedding vectors of
-the training words pairs in the source and the target space respectively, and
+the training word pairs in the source and the target space respectively, and
 taking
 
 \[W=U\mathbf{1}V\]
@@ -451,8 +451,8 @@ where $\mathbf 1$ is the rectangular identity matrix of appropriate shape.
 \Cref{tab:orthog} shows the effect of these factors. Precision in forward NN
 search follows a similar trend to that in \cite{Xing:2015} and
 Artetxe (\citeyear{Artetxe:2016}): the best combination is an orthogonal mapping between
-length-normalized vectors, however, centering did not help in our experiments.
-Reverse NNs yields much better results than the simpler method, bot none of the
+length-normalized vectors; however, centering did not help in our experiments.
+Reverse NNs yield much better results than the simpler method, but none of the
 orthogonality-related techniques give further improvement here. The cause of
 reverse NN's apparent insensitivity to length may be the topic of further
 research.
@@ -462,13 +462,13 @@ research.
 \label{sec:res}
 
 
-We evaluate MSE models in two ways referred to as \any~and \disamb.  The method
+We evaluate MSE models in two ways, referred to as \any~and \disamb.  The method
 \any~has been used for tuning the (meta)parameters of the source embedding and
 to choose the target: a traditional, single-sense translation has been trained
 between the first\todo{all} sense vector of each word form and its
 translations. (If the training word is ambiguous in the seed dictionary, all
 translations have been included in the training data.)  Exploiting the multiple
-sense vectors, one word can have more than one translation.  During test, a
+sense vectors, one word can have more than one translation.  During the test, a
 source word was accepted if \any~\todo{the 1st}of its sense vectors had at
 least one good translation among its $k$ reverse nearest neighbors (rNN@$k$).
 \Cref{tab:prec} shows results by the best models\footnote{ Note that the
@@ -511,7 +511,7 @@ among these different architectures.}.
   The meta-parameters are \emph{dim}ension, the
   resolution parameter ($\alpha$ in \adagram~and $\gamma$ in \mutli), the
   maximum number of $p$rototypes (sense vectors), and the vocabulary cutoff
-  ($m$in-freq, the two models with \emph{big} have practically no cut-off.)}
+  ($m$in-freq, the two models with \emph{big} have practically no cut-off).}
     \label{tab:prec}
 \end{table}
 
@@ -523,7 +523,7 @@ model different senses rather than synonyms.
 % $t$ of a source word such that all the source sense vectors that have at
 % least one good translation have $t$ among their translations.  Common
 % translations do not evidence different senses. Instead
-The lowest requirement for sense vectors $s_1, s_2$ for not being synonyms is
+The lowest requirement for the non-synonymy of sense vectors $s_1, s_2$ is
 that the sets of corresponding good rNN@$k$ translations are different. The
 ratio of words satisfying this requirement among all words with more than one
 sense vector is shown as \disamb~in \cref{tab:prec}. The values are low.
@@ -658,7 +658,7 @@ sense vector is shown as \disamb~in \cref{tab:prec}. The values are low.
   The first column is a post-hoc annotation by András Kornai (\emph E error in
   translation, \emph I identical, \emph S separate meanings), $s$ is the cosine
   similarity of the translations, and \emph{covg} denotes the coverage of the
-  @1 translations over all gold translations.}
+  @1 translations over all gold (good) translations.}
   \label{tab:alkoto} 
   {\footnotesize $^7$ The basic translations \emph{hope} is missing}
     \end{table*}
@@ -667,7 +667,7 @@ sense vector is shown as \disamb~in \cref{tab:prec}. The values are low.
 cosine similarity $s$ of good rNN@1 translations of different sense vectors. (We
 found that most of the few cases when there are more than two sense vectors
 with a good rNN@1 translation are due to the fact that the seed dictionary
-contains some non-basic translation e.g. \emph{kapcsolat} `relationship,
+contains some non-basic translation, e.g. \emph{kapcsolat} `relationship,
 conjunction' has `affair' among its seed translations. In these cases, we chose
 two sense vectors arbitrarily.\todo{When there are sense vectors with more than
 two rNN@$k$ hits , the choice of the corresponding target words is also
@@ -685,13 +685,13 @@ synonyms instead.
 The clearest case of homonymy is when unrelated senses belong to different
 parts of speech (POSs), and the translations reflect these POSs, e.g.~\emph{nő}
 `woman; increase' or \emph{vár} \todo{update examples} `wait;
-case'.\footnote{We note that some POSs in Hungarian have blurred borders,
+castle'.\footnote{We note that some POSs in Hungarian have blurred borders,
 e.g.~it is debatable whether the nominal \emph{önkéntes} `voluntary; volunteer'
 is ambiguous for its POS.} In purely semantic approaches, like
-\fl~\citep{Kornai:2018,Kornai:2015a}. POS-difference alone is not enough for
+\fl~\citep{Kornai:2018,Kornai:2015a}, POS-difference alone is not enough for
 analyzing a word as ambiguous, e.g.~we see the only difference between the noun
-and participle senses of \emph{alkalmazott}, `employee; applied' as that
-\emph{employ}ment is the \emph{appli}cation of people for work; in the case of
+and participle senses of \emph{alkalmazott}, `employee; applied' as 
+\emph{employ}ment being the \emph{appli}cation of people for work; in the case of
 \emph{belső} `internal; interior', the noun refers to the part of a building
 described by the adjective.
 
@@ -752,11 +752,11 @@ special cases of `unfamiliar' (person versus language).
 
 \section{Acknowledgments}
 
-1957 was an influential year in linguistics: \cite{Harris:1957} developed on the
+1957 was an influential year in linguistics: \cite{Harris:1957} developed the
 frequency-aware variant of the distributional method, \cite{Osgood:1957}
 pioneered vector space models, and the author of a more recent conceptual
 meaning representation framework \citep{Kornai:2010,Kornai:2018} was born.
-Fifty years later (more precisely in fall 2006) I've met András during a class
+Fifty years later (more precisely in fall 2006) I met András during a class
 he taught on the book he was writing \citep{Kornai:2007}. I heard about
 \emph{deep cases} and \emph{k\={a}rakas} sooner than I did about \emph{thematic
 roles}. He has since taught me computational linguistics and mathematical
@@ -780,7 +780,8 @@ mentioned above.
 
 András Kornai, besides the work already acknowledged, rated each item in
 \cref{tab:alkoto}. I would like to thank the anonymous reviewer for detailed
-critique, both substantial and linguistic and Gábor Recski and Bálint Sass for
+critique, both substantial and linguistic, Mátyás Lagos for reviewing language
+errors, and Gábor Recski and Bálint Sass for
 their useful comments. The orthogonal approximation was implemented following a
 code\footnote{\url{https://github.com/hlt-bme-hu/eval-embed}} by Gábor Borbély.
 
