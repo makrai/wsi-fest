@@ -1,14 +1,16 @@
-\documentclass{beamer}
-%[hyperref={colorlinks, citecolor=hltyellow, linkcolor=hltdarkgreen,
+\documentclass[10pt]{beamer}%t: top aligned frames
+%[hyperref={colorlinks, citecolor=hltyellow,linkcolor=hltdarkgreen,
   %urlcolor=hltdarkgreen}]
+\usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
+\usepackage[english]{babel} % [magyar]
 \usepackage[backend=bibtex,natbib=true,style=authoryear,backref=true]{biblatex}%autocite=superscript
 \renewcommand*{\bibfont}{\footnotesize}
 \bibliography{../../paper/Common/Bib/ml}
 \usepackage{lmodern}
-\usepackage[T1]{fontenc}
 \usepackage{booktabs}
 \usepackage{mathabx}
+\usepackage{amsmath}
 %\usepackage{mathtools}
 %\usepackage[all]{xy}
 \usepackage{graphicx}
@@ -28,7 +30,7 @@
       \draw[##1,/tikz/.cd,bar width=3pt,yshift=-0.2em,bar shift=0pt]
       plot coordinates {(0cm,0.8em)};},
     },
-} 
+}
 \usetheme{hlt}
 %\usecolortheme{rose}
 %\definecolor{hltblue}{RGB}{3,61,92}
@@ -58,8 +60,6 @@
 \newcommand{\mutli}{\texttt{mutli}}
 \newcommand{\osub}{\texttt{OSub}}
 
-\title{Do multi-sense word embeddings learn more senses?}
-
 \newcommand{\Ro}{\mathbb{R}^{d_1}}
 \newcommand{\Rt}{\mathbb{R}^{d_2}}
 \newcommand{\any}{\texttt{any}}
@@ -68,15 +68,17 @@
 \newcommand{\id}{$^I$}
 \newcommand{\s}{$^S$}
 
-\newcommand{\logoheight}{1cm}
+%\newcommand{\logoheight}{1cm}
 
+\title{%Do 
+  Multi-sense word embeddings}%learn more senses?}
 \author{Márton Makrai}
 %[Makrai Márton]{
 %  Makrai Márton \\
 %\vspace{5mm}
-%\includegraphics[height=\logoheight]{../../paper/Common/Logo/nytud.png}
+\logo{\includegraphics[width=1cm]{../../paper/Common/Logo/nytud}}
 %\hspace{5mm}
-%    \includegraphics[height=\logoheight]{../../paper/Common/Logo/hlt/blue_white_bg.png} \\ 
+%    \includegraphics[height=\logoheight]{../../paper/Common/Logo/hlt/blue_white_bg.png} \\
 %  }
 \date{K + K = 120 Workshop}
 %[Fiatal kutatók félidőben 2017]{
@@ -86,7 +88,7 @@
 %2017. szeptember 28.}
 \begin{document}
 \AtBeginSection[]{
-  \begin{frame}{Áttekintés}
+  \begin{frame}{Overview}
     \tableofcontents[currentsection,subsectionstyle=shaded]
   \end{frame}
 }
@@ -94,7 +96,7 @@
 \maketitle
 
 
-\begin{frame}{Áttekintés}
+\begin{frame}{Overview}
   \tableofcontents
 \end{frame}
 
@@ -105,329 +107,166 @@
 % e) következtetéseket, amelyek az eredmények alapján levonhatók (18%) 2 dia
 % f) Az előadást záró diaképen összegezze eddigi publikációit
 
-\section{Szóbeágyazások}
+\section{Word embeddings}
 
-\begin{frame}{Mesterséges ideghálók}
-  \centering \includegraphics[width=.7\textwidth]{../../paper/misc/makrai/fiatal/felido/img/deep_neural_network}
+\begin{frame}{Artificial neural networks}
+\centering\includegraphics[width=.7\textwidth]{../../paper/misc/makrai/fiatal/felido/img/deep_neural_network}
   \begin{itemize}
-    \item kibernetika (1949), konnekcionizmus (1974), mély tanulás (2006)
-    \item feature-ök tanulása, egyre absztraktabb rétegek
-    \item 
-      \begin{itemize} 
-        \item gépi látás \citep{Krizhevsky:2012} 
-        \item beszédfelismerés \citep{Hinton:2012}
-      \end{itemize}
-    \item gyors tanulás a grafikus kártyán
-    \item mint az agyban?
-  \end{itemize}
-\end{frame}
-\begin{frame}{Szóbeágyazások (\emph{word embeddings})}
-  \begin{itemize}
-    \item szavak reprezentációja ideghálókban
-    \item vektor: a tér pontjai számsorozatokként
-    \item 300 dimenzió
-    \item szóalak $\mapsto$ vektor
-    \item hasonló eloszlású szó $\mapsto$ közeli pont
-      \bull{eloszlás: milyen kontextusokban milyen gyakori}
-      %\item változatok
-      %\begin{itemize}
-    \item milliárd szavas korpuszokon tanítjuk (\emph{giga-word corpus}),  \\
-      pl.~\cite{Halacsy:2004,Oravecz:2014}
-    \item word2vec, skip-gram, continuous bag of words \citep{Mikolov:2013d}
-      %\item GloVe \citep{Pennington:2014}
-      %\end{itemize} 
-    \item közös reprezentáció \citep{Collobert:2011,Hashimoto:2017}
-    \item kompozíció: karakter, morféma, szó, query, mondat, retorika
+    \item cybernetics (1949), connectionism (1974), deep learning (2006)
+    \item Learning features, more and more abstract layers
+    \item
       \begin{itemize}
-        \item morfémák \citep{Lazaridou:2013}
-        \item szó alatti: fastText \citep{Bojanowski:2016}
-        \item gondolatvektor \citep{Vaswani:2017}
+        \item computer vision \citep{Krizhevsky:2012}
+        \item speech recognition \citep{Hinton:2012}
+      \end{itemize}
+    \item fast learning on the graphics card
+    \item like in the brain?
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Word embeddings}
+  \begin{itemize}
+    \item Representation of words in neural networks
+    \item $\mathbf w \in \mathbb R^{300}$
+    \item words with similar distribution $\leadsto$ similar points
+    \item unsupervised training on giga-word corpora
+      %TODO Data \cite{Halácsy:2004,Oravecz:2014}
+    \item word2vec: skip-gram or continuous bag of words \\ \citep{Mikolov:2013d}
+    \item representation sharing \\ \citep{Collobert:2011,Hashimoto:2017}
+    \item compositionality \\ character, morph, word, query, sentence, rhetorics
+      \begin{itemize}
+        \item morphs \citep{Lazaridou:2013}
+        \item bellow the word level: fastText \citep{Bojanowski:2016}
+        \item thought vector \citep{Vaswani:2017}
       \end{itemize}
   \end{itemize}
 \end{frame}
-\begin{frame}{Jelentésfelbontás vektorokkal}{\citep{Mikolov:2013l}}
-         \cite{Katz:1963}
+
+\begin{frame}{Meaning decomposition with vectors}
+  \cite{Katz:1963,Mikolov:2013l}
   \includegraphics[width=\textwidth]{../../paper/misc/makrai/fiatal/felido/img/analogy}
-      \[\text{\bf király} + \text{\bf nő} - \text{\bf férfi} \approx 
-      \text{\bf királynő}\]
+  \[ \text{\bf king} + \text{\bf woman} - \text{\bf man} \approx \text{\bf queen}\]
       \begin{itemize}
-        \item legközelebbi szomszéd (NN)
-        %\item más relációk?
+        \item nearest neighbors (NN)
+        % \item other relationships?
       \end{itemize}
 \end{frame}
 
-
-\begin{frame}%{Lineáris fordítás}
-  {Szavak fordítása \citep{Mikolov:2013x}}
-    \begin{columns}
-      \begin{column}{.4\textwidth}
-        \begin{figure}
-          \centering
-          \includegraphics[width=\columnwidth]{../../paper/misc/makrai/mtu15/img/red-pill} 
-        \end{figure}
-      \end{column}
-      \pause
-      \begin{column}{.6\textwidth}
-        \begin{itemize}
-          \item két vektortér között a legegyszerűbb leképezés a lineáris (mátrix)
-          \item most két nyelv beágyazása között
-            %\[W: \Ro \rightarrow \Rt \quad z \approx Wx\]
-          \item a fordítási leképezés tanítása néhány~ezer szópáron + teszt
-            \[\min_W \sum_i || Wx_i - z_i ||^2 \]
-        \end{itemize}
-      \end{column}
-    \end{columns}
+\begin{frame} {Word translation (Mikolov et al., \citeyear{Mikolov:2013x})}
+  \begin{columns}
+    \begin{column}{.65\textwidth}
+  \begin{itemize}
+    \item linear mapping between embeddings 
+      %\\ the simplest between two vector spaces
+      %\item now embedding two languages
+    \item training on the 5~000 most frequent pairs  \\
+    \item test on the next 1~000
+  \end{itemize}
+    \end{column}
+    \begin{column}{.4\textwidth}
+      \begin{align*}
+        W : \Ro \rightarrow \Rt \quad z\approx Wx \\
+        \min_W \sum_i || Wx_i - z_i &|| ^ 2
+      \end{align*}
+    \end{column}
+  \end{columns}
     \begin{figure}
-      \includegraphics[width=.9\textwidth]{../../paper/misc/makrai/fiatal/skip_gram_mapping}
+      \includegraphics[width=\textwidth]{../../paper/misc/makrai/fiatal/skip_gram_mapping}
     \end{figure}
 \end{frame}
 
-\section{Több jelentés}
+\section {Multi-sense}
 
-\begin{frame}{Szótöbbértelműség}
+\begin{frame}{Word ambiguity}
   \begin{itemize}
-    \item homonímia: \emph{ár} `ellenérték; zúdulás`
-    \item poliszémia
+    \item homonymy: Russian \emph{mir} `world'; `peace'
+    \item polysemy
+    \item evidence for differentiation
       \begin{itemize}
-        \item metonímia: \emph{iskola} (emberek, épület)
-        \item rendszertelen: \emph{nap} (időszak, égitest)
+        \item etymology, if any
+          \bull{common origin. How far back?}
+        \item relatedness of meanings (intuition. Agreement?)
+        \item part-of-speech (Hungarian \emph{vár} `wait'; `castle')
       \end{itemize}
-    \item a különbség alapja
-      \begin{itemize} 
-        \item etimológia, ha van
-        \item kapcsolat a jelentések között (nem empirikus)
-      \end{itemize}
-
-    \item poliszémiagráfok, hasonlóság nyelvek között \citep{Youn:2016}
+    \item suptypes of polysemy
+      \begin{tabular}{llll}
+        metonymy & regular    & \emph{school} (people, building)  & both literal \\
+        metaphor & irregular  & Hungarian \emph{nap} `Sun; day'   & lit $\leadsto$ fig
+      \end{tabular}
+    \item polysemy gaphs, similarities between languages 
       \begin{itemize}
-        \item mely fogalmak poliszémek gyakran
-        \item fogalomklaszterek
+        \item \citep{Youn:2016}
+        \item which terms tend to be polysomes 
+        \item concept clusters
       \end{itemize}
-    \item szófaji különbség (\emph{vár})
   \end{itemize}
 \end{frame}
-\begin{frame}{Szójelentés-klaszterezés}
-  \begin{tabular}{lll}
-    word sense disambiguation (WSD) & osztályozás & felügyelt \\
-      word sense induction (WSI) \citep{Schutze:1998} & klaszterezés & felügyeletlen \\
+\begin{frame}{Word sense induction}
+  \begin{tabular} {lll}
+    disambiguation (WSD) & classification & supervised \\
+    induction (WSI) \citep{Schutze:1998} & clustering & unsupervised \\
   \end{tabular}
     \begin{itemize}
-      \item többjelentésű vektoros szómodell \citep{Reisinger:2010}
-      \item ideghálóval \citep{Huang:2012}
-      \item szabadon elérhető, hatékony eszköz \citep{Neelakantan:2014}
-      \item Dirichlet-folyamatként 
+      \item multi-``prototype'' embeddings \citep{Reisinger:2010}
+      \item with neural network \citep{Huang:2012}
+      \item open-source tool \citep{Neelakantan:2014}
+      \item as a Dirichlet Process \cite{Li:2015,Bartunov:2015}
+      \item yet in research phase
+      \item sense resolution is too fine (duplicates)
+      \item if the number of parameters is controlled 
         \begin{itemize}
-          \item \cite{Li:2015}
-          \item jelentések összevonása tanuláskor \citep{Bartunov:2015}
+          \item slight performance boost \\ 
+            only in semantics-related tasks \citep{Li:2015}
         \end{itemize}
-      \item elvileg érdekes, de túl finom a felbontás (duplumok)
-      \item a paraméterek számát kontrollálva kis javulás szemantikai
-        feladatokban \citep{Li:2015}
     \end{itemize}
 \end{frame}
 
-%\section{A jelentések számának eloszlása}
+% TODO distribution of the number of senses
 
-%\begin{frame}[fragile]{A jelentések számának eloszlása}
-%  Közös munka Borbély Gáborral, Nemeskey Dáviddal és Kornai Andrással
-%  \newcommand{\lexdistri}[7]{
-%    \addplot[style={fill=#7}]
-%    %bblue, mark=none
-%    coordinates {(CED,#1) (LDOCE,#2) (OEn,#3) (EKSZ,#4) (NSZ,#5) (OHu,#6) };
-%  }
-%  \begin{table}
-%    {\tiny
-%    \begin{tikzpicture}
-%      \begin{axis}[
-%          ymode = log,
-%        log origin=infty,
-%        width  = 0.9*\textwidth,
-%        height = .5\textheight,
-%        %8cm, %major x tick style = transparent,
-%        ybar=0pt,%=2*\pgflinewidth,
-%        bar width=5pt,
-%        %ymajorgrids = true, %ylabel = {Run time speed}, %symbolic x coords={EgyptHD,Hover,Navi},
-%        symbolic x coords={CED,LDOCE,OEn,EKSZ,NSZ,OHu},
-%        xtick = data,
-%        %scaled y ticks = false, %enlarge x limits=0.25, %ymin=0, %legend cell align=left, %
-%        legend style={ at={(1.05,1.05)}, anchor=north west, column sep=1ex }
-%      ]
-%        \lexdistri{0.98}{0.88}{0.77}{0.55}{0.93}{0.94}{hltblue}
-%        \lexdistri{0.02}{0.11}{0.20}{0.01}{0.02}{0.05}{hltdarkgreen}
-%        \lexdistri{0.00}{0.01}{0.03}{0.00}{0.00}{0.00}{hltlightgreen}
-%        \lexdistri{0.00}{0.00}{0.01}{0.00}{0.00}{0.00}{hltyellow}
-%        \lexdistri{0.00}{0.00}{0.00}{0.00}{0.00}{0.00}{black}
-%        \lexdistri{0.00}{0.00}{0.00}{0.00}{0.00}{0.00}{grey}
-%        \legend{1,2,3,4,5,6+}
-%      \end{axis}
-%    \end{tikzpicture}
-%    }
-%
-%    \newcommand{\embeddistri}[7]{
-%      \addplot[style={fill=#7}]
-%      %bblue,mark=none
-%    coordinates {(AdaGramEn,#1) (huang,#2) (neelaNP6k,#3) (AdaGram,#4)
-%    (jiweil,#5) (neelas2,#6)
-%    };
-%  }
-%    {\tiny
-%      \begin{tikzpicture}
-%        \begin{axis}[
-%            ymode = log,
-%          log origin=infty,
-%          width  = .9\textwidth,
-%          height = .5\textheight,
-%          %major x tick style = transparent,
-%          ybar=0pt,%=2*\pgflinewidth,
-%          bar width=5pt,
-%          %ymajorgrids = true,
-%          %ylabel = {Run time speed},
-%          %symbolic x coords={EgyptHD,Hover,Navi},
-%          symbolic x coords={AdaGramEn,huang,neelaNP6k,AdaGram,jiweil,neelas2},
-%          %xtick = data,
-%          %scaled y ticks = false,
-%          %enlarge x limits=0.25,
-%          %ymin=0,
-%          %legend cell align=left,
-%          legend style={ at={(1.05,1.05)}, anchor=north west, column sep=1ex }
-%        ]
-%          \embeddistri{0.26}{0.94}{0.95}{0.57}{0.20}{7.74}{hltblue}
-%          \embeddistri{0.69}{0.00}{0.03}{0.32}{0.32}{0.04}{hltdarkgreen}
-%          \embeddistri{0.02}{0.00}{0.01}{0.06}{0.26}{0.00}{hltlightgreen}
-%          \embeddistri{0.01}{0.00}{0.00}{0.02}{0.14}{0.00}{hltyellow}
-%          \embeddistri{0.02}{0.00}{0.00}{0.03}{0.05}{0.00}{gray}
-%          \embeddistri{0.00}{0.06}{0.00}{0.00}{0.02}{0.00}{white}
-%          \legend{1,2,3,4,5,6+}
-%        \end{axis}
-%      \end{tikzpicture}
-%      }
-%\end{table}
-%\end{frame}
-%\begin{frame}{Problémák}
-%  \begin{itemize}
-%    \item ferde eloszlás
-%      \begin{itemize}
-%        \item majdnem minden szó egyjelentésű
-%        \item osztályozás: $\pm$többértelmű, F-pontszám
-%      \end{itemize}
-%    \item gyakorisági hatás
-%      \bull{Zipf-törvény többértelműségre \citep{Manin:2008}}
-%  \end{itemize}
-%\end{frame}
-%\begin{frame}
-%  \begin{table}[!b]
-%    \resizebox{.45\framewidth}{!}{%
-%      \begin{tabular}{l|rc}
-%        \toprule
-%            Resources compared & $n$ & $\rho$\\
-%            \midrule
-%            LDOCE vs CED & 23702 & 0.266 \\
-%            EKSZ vs NSZ (b) & 3484 & 0.648 \\
-%            \midrule
-%            \neela.30k vs CED & 23508 & 0.089 \\
-%            \neela.NP.6k vs CED & 23508 & 0.084 \\
-%            \neela.NP.30k vs CED & 23508 & 0.112 \\
-%            \neela.30k vs LDOCE &  21715 & 0.226 \\
-%            \neela.NP.6k vs LDOCE  & 21715 & {\bf 0.292} \\
-%            \neela.NP.30k vs LDOCE & 21715 & 0.278 \\
-%            \huang\ vs CED & 23706 & 0.078 \\
-%            \huang\ vs LDOCE & 21763 & {\bf 0.280} \\
-%            \neela.s4 vs EKSZ & 45401 & 0.067 \\
-%            \jiweil\ vs EKSZ & 32007 & 0.023 \\
-%            AdaGram vs EKSZ & 26739 & 0.086 \\
-%            AdaGram.a05 vs EKSZ & 26739 & 0.088 \\
-%            %\midrule
-%            %\neela.30k vs \huang  & 99156 & 0.349 \\
-%            %\neela.NP.6k vs \huang & 99156 & {\bf 0.901} \\
-%            %\neela.NP.30k vs \huang & 99156 & 0.413 \\
-%            %\neela.s4 vs \jiweil & 283083 & 0.123 \\
-%            %AdaGram vs \neela.s4 & 199370 & {\bf 0.389} \\
-%            %AdaGram vs \jiweil & 201291 & 0.140 \\
-%            \bottomrule
-%      \end{tabular}
-%        }
-%        %\caption{Word sense distribution similarity between various resources}
-%        \label{tab:corrHu}  \label{tab:corrEn}
-%        \resizebox{.45\framewidth}{!}{%
-%          \begin{tabular}{l|rc}
-%            \toprule
-%            Resources compared & $n$ & $\rho$\\
-%            \midrule
-%            %CED vs POS & 42532 & 0.052 \\
-%            %LDOCE vs POS & 28549 & {\bf 0.206} \\
-%            %\osub vs POS  & 48587 & {\bf 0.141} \\
-%            %EKSZ vs POS  & 52158 & 0.080 \\
-%            %NSZ vs POS  & 3532 & 0.046 \\
-%            %\huang\ vs POS & 98405 & 0.026\\
-%            %\midrule
-%            AdaGram vs freq & 399985 & 0.343 \\
-%            \huang\ vs freq & 94770 & 0.376 \\
-%            CED vs freq  & 36709 & 0.124 \\
-%            LDOCE vs freq  & 27859 & 0.317 \\
-%            \neela.s4 vs freq &  94044 & {\bf 0.649} \\
-%            \neela.NP.30k vs freq  & 94044 & 0.368 \\
-%            \neela.NP.6k vs freq  & 94044 & {\bf 0.635}\\
-%            UMBC POS vs freq & 136040 & -0.054\\
-%            \bottomrule
-%          \end{tabular}
-%        }
-%  \end{table}
-%      \begin{itemize}
-%        \item freq $\approx$ MSE $\napprox$ CED
-%      \end{itemize}
-%\end{frame}
-%\begin{frame}{A gyakoriság hatását kivonva (részleges korreláció)}
-%  \begin{table}
-%    \resizebox{.9\textwidth}{!} {
-%      \begin{tabular}{l|rcrcrc}
-%        \toprule
-%        &\multicolumn{2}{c}{\textbf{CED}} &\multicolumn{2}{c}{LDOCE} &\multicolumn{2}{c}{\osub}\\
-%        \midrule
-%        CED	& 36709	& 1.0	& 22375	& \textbf{0.546}	& 20937	& -0.365	\\
-%        LDOCE	& 22375	& \textbf{0.546}	& 27859	& 1.0	& 19283	& -0.002	\\
-%        \osub	& 20937	& -0.365	& 19283	& -0.002	& 58296	& 1.0	\\
-%        \midrule
-%        AdaGram umbc	& 36709	& -0.344	& 27859	& -0.307	& 58296	& 0.267	\\
-%        cmultivec umbc	& 25231	& \textbf{0.844}	& 23702	& 0.521	& 39965	& -0.485	\\
-%        %cmultivec umbc.z05.s95	& 25231	& 0.620	& 23702	& 0.363	& 39965	& -0.392	\\
-%        \huang release	& 23600	& 0.274	& 21734	& 0.312	& 42331	& -0.207	\\
-%        %huang release.z05.s95	& 23600	& 0.270	& 21734	& 0.310	& 42331	& -0.207	\\
-%        %\neela MSSG.300D.30K	& 23423	& -0.237	& 21688	& -0.137	& 42325	& 0.125	\\
-%        \neela NP-MSSG.300D.6K	& 23423	& 0.331	& 21688	& 0.350	& 42325	& -0.252	\\
-%        \neela NP-MSSG.50D.30K	& 23423	& -0.307	& 21688	& -0.119	& 42325	& 0.168	\\
-%        \neela umbc	& 36709	& 0.536	& 27859	& 0.411	& 58296	& -0.349\\
-%        \toprule
-%        &\multicolumn{2}{c}{EKSZ} &\multicolumn{2}{c}{NSZ (b)} &\multicolumn{2}{c}{\osub}\\
-%        \midrule
-%        EKSZ	& 33235	& 1 0	& 1680	& \textbf{0.950}	& 17336	& -0.313	\\
-%        NSZ b	& 1680	& \textbf{0.950}	& 1999	& 1.0	& 995	& -0.318	\\
-%        \osub	& 17336	& -0 313	& 995	& -0.318	& 76876	& 1.0	\\
-%        \midrule
-%        AdaGram a05 Webkorpusz	& 26739	& 0.411	& 1535	& 0.506	& 67212	& -0.012	\\
-%        AdaGram Webkorpusz	& 26739	& -0.576	& 1535	& -0.451	& 67212	& 0.186	\\
-%        %jiweil webkorp.sense.context	& 31411	& -0.044	& 1863	& -0.020	& 74450	& 0.022	\\
-%        %jiweil webkorp.sense.context.z05.s95	& 31411	& -0.044	& 1863	& -0.021	& 74450	& 0.022	\\
-%        \jiweil Webkorpusz & 31411	& -0.044	& 1863	& -0.020	& 74450	& 0.022	\\
-%        %jiweil webkorp.sense.z05.s95	& 31411	& -0.263	& 1863	& -0.299	& 74450	& 0.025	\\
-%        \neela Webkorpusz	& 33182	& \textbf{0.658}	& 1995	& \textbf{0.744}	& 76758	& -0.085	\\
-%        \bottomrule
-%      \end{tabular}
-%    }
-%  \end{table}
-%\end{frame}
-
-\begin{frame}{Lineáris fordítás többjelentésű embeddingből}
+\begin{frame}{Linear translation from multi-sense embedding}
   \begin{itemize}
-    \item elv: más jelentés, más fordítás
-      \bull{de szinonim fordítások}
-    \item a célembedding marad egyjelentésű
+    \item Borbély, Makrai, Nemeskey, and Kornai \citeyear{Borbely:2016}
+    \item principle: other meaning, other translation
+    \item target embedding remains single-sense \\
       \citep{Pennington:2014,Mikolov:2013f}
-    \item tanítás az első jelentésen 
-      \bull{szótár: \citep{Acs:2013}}
   \end{itemize}
+      \begin{figure}
+        \centering
+        \resizebox{\textwidth} {!} {%
+          \begin{tikzpicture}[line width=2pt] %[&gt;=stealth']
+            \tikzstyle{every node}=[font=\LARGE]
+            %\tikzset{every edge thick}
+            \node[text=hltdarkgreen] (hf) at (2, 2) {finom};
+            \node (hf) at (1.7, 1.4)  {durva};
+            \node[text=hltdarkgreen] (hs) at (5, 4)  {finom};
+            \node (hs) at (4.5, 4.6)  {ízletes};
+            \node[text=hltdarkgreen] (gf) at (11, 2) {fine};
+            \node (gf) at (11, 1.4) {coarse};
+            \node[text=hltdarkgreen] (gs) at (14, 4) {delicious};
+            \node (gs) at (12.5, 4.6) {tasty};
+            \node (ho) at (0, 0) {};
+            \node (hx) at (8, 0) {};
+            \node (hy) at (0, 6) {};
+            \node (go) at (9,0) {};
+            \node (gx) at (17,0) {};
+            \node (gy) at (9,6) {};
+
+            \draw[->] (ho) edge (hx);
+            \draw[->] (ho) edge (hy);
+            \draw[->] (go) edge (gx);
+            \draw[->] (go) edge (gy);
+          \end{tikzpicture}
+        }
+        % \caption{Linear translation of word senses. The Hungarian word
+        % \emph{fine} is ambiguous between `fine 'and' delicious'.}
+        % \label{fig: AdaGram}
+      \end{figure}
+\end{frame}
+
+\begin{frame}{Problem: synonymous translations}
   \begin{figure}
     \centering
-      \resizebox{\textwidth}{!} {
+      \resizebox{\textwidth} {!} {%
         \begin{tikzpicture}[line width=2pt] %[&gt;=stealth']
           \tikzstyle{every node}=[font=\LARGE]
           %\tikzset{every edge thick}
@@ -453,40 +292,52 @@
         \end{tikzpicture}
       }
       % \caption{Linear translation of word senses. The Hungarian word
-      % \emph{finom} is ambiguous between `fine' and `delicious'.}
-      % \label{fig:AdaGram}
+      % \emph{fine} is ambiguous between `fine 'and' delicious'.}
+      % \label{fig: AdaGram}
   \end{figure}
 \end{frame}
-\begin{frame}[allowframebreaks]{Kiértékelés}
+\begin{frame}{Data}
   \begin{itemize}
-        \item  különböző vektor $\xRightarrow ?$ különböző jelentés
-        \item a paraméterek és a célembedding választása
-          \bull{jónak vesszük, ha legalább egy jelentésvektornak van jó
-          fordítása}
-        \item két vektor jó fordításainak halmaza legyen különböző
-        \item ilyenek arányát nézzük az többértelműnek jósoltak között
+    \item source corpus
+      \bull{
+      de-glutinized version \citep{Borbely:2016d,Nemeskey:2017} of the
+      Hungarian National Corpus \citep{Oravecz:2014}}
+    \item target embedding: GloVe 840B 300d \citep{Pennington:2014}
+    \item seed dictionary: wikt2dict \citep{Acs:2013}
+    \item training on the first meaning
   \end{itemize}
 \end{frame}
-\begin{frame}
-  \begin{table}
-    %\resizebox{\columnwidth}{!}{%
-    \begin{tabular}{lcccc|cc}
-      \toprule
-        & dim & $\alpha/\gamma$ & $p$ & $m$ & any & disamb \\
-        % & \multicolumn{6}{c|}{forward NN search} & \multicolumn{6}{c}{reverse NN search} \\
-        %vocab cutoff &&&&& \multicolumn{2}{c}{8192} & \multicolumn{2}{c}{16384} & \multicolumn{2}{c|}{32768} & \multicolumn{2}{c}{8192} & \multicolumn{2}{c}{16384} & \multicolumn{2}{c}{32768} \\
-        \midrule
-        %/jiweil/mnsz/stemmed/mnsz-stemmed-CRP-800-w15-joint_vect_sense.mse 23.0% 2.200%
-        %/jiweil/mnsz/stemmed/mnsz-stemmed-CRP-800-w15-joint_vect_sense_context.mse 26.1% 3.300%
-        %/neelakantan/mnsz/stemmed/mnsz2-stemmed-neela-np-800-s2_cluscent.mse 36.3% 6.400%
-        %/neelakantan/webkorp_1-sense_sense.mse 37.8% 5.900%
-        %/neelakantan/mnsz/stemmed/mnsz2-stemmed-neela-np-800-s2_sense.mse 38.1% 6.500%
-        HNC	        & 800	& .02	&       & 100   & 48.5\%	&  7.6\% \\
-        \neela~Wk&300&--&2   &big  & 54.0\%	&  12.4\% \\
-        HNC stem & 800	& .05	&       &  big & 55.1\%	&  10.4\% \\
-        %	& \mutli~Webkorp\footnotemark  &&&&    & 1.0 & 55.0% 13.5\% \\
-        HNC         & 160 & .05 & 3     & 200   & 62.2\%	&  15.0\% \\
-        \mutli~Wk &300&.25 &       & 71    & 62.9\%	&  17.4\% \\
+
+\begin{frame}{Evaluation metrics}
+    \begin{itemize}
+      \item different vectors $ \xRightarrow ? $ different meanings
+      \item selection of parameters and target embedding 
+        \bull{at least one meaninging vector should have a good translation}
+      \item different sense vectors should have a different set of good
+        translations 
+        \bull{ratio of such items among those predicted to be ambiguous}
+    \end{itemize}
+  \end{frame}
+    \begin{frame}
+      \begin{table}[allowframebreaks]
+        % \Resizebox {\columnwidth} {!} {%
+        \begin{tabular}{lcccc|cc}
+          \toprule
+          & dim & $\alpha/\gamma$ & $p$ & $m$ & any & disamb \\
+          % & \multicolumn{6}{c|}{forward NN search} & \multicolumn{6}{c}{reverse NN search} \\
+          %vocab cutoff &&&&& \multicolumn{2}{c}{8192} & \multicolumn{2}{c}{16384} & \multicolumn{2}{c|}{32768} & \multicolumn{2}{c}{8192} & \multicolumn{2}{c}{16384} & \multicolumn{2}{c}{32768} \\
+          \midrule
+          %/jiweil/mnsz/stemmed/mnsz-stemmed-CRP-800-w15-joint_vect_sense.mse 23.0% 2.200%
+          %/jiweil/mnsz/stemmed/mnsz-stemmed-CRP-800-w15-joint_vect_sense_context.mse 26.1% 3.300%
+          %/neelakantan/mnsz/stemmed/mnsz2-stemmed-neela-np-800-s2_cluscent.mse 36.3% 6.400%
+          %/neelakantan/webkorp_1-sense_sense.mse 37.8% 5.900%
+          %/neelakantan/mnsz/stemmed/mnsz2-stemmed-neela-np-800-s2_sense.mse 38.1% 6.500%
+          HNC	        & 800	& .02	&       & 100   & 48.5\%	&  7.6\% \\
+          \neela~Wk&300&--&2   &big  & 54.0\%	&  12.4\% \\
+          HNC stem & 800	& .05	&       &  big & 55.1\%	&  10.4\% \\
+          %	& \mutli~Webkorp\footnotemark  &&&&    & 1.0 & 55.0% 13.5\% \\
+          HNC         & 160 & .05 & 3     & 200   & 62.2\%	&  15.0\% \\
+          \mutli~Wk &300&.25 &       & 71    & 62.9\%	&  17.4\% \\
         Webkorpusz	    & 800	& .05	&       & 100	  & 65.9\%	&  17.4\% \\
         HNC	        & 600	& .05	& 5     & 100	  & 68.6\%	&  16.6\% \\
         HNC	        & 600	& .1  & 3     & 50	  & 69.1\%	&  18.8\% \\
@@ -497,7 +348,7 @@
   \end{table}
 \end{frame}
 
-  \begin{frame}[allowframebreaks]{Jó fordítások hasonlósága} 
+  \begin{frame} [allowframebreaks] {Similarity of good translations}
     \small
     \begin{longtable}{lllll}
       %\setlength{\tabcolsep}{3pt}
@@ -622,173 +473,69 @@
     % \emph{covg} denotes the coverage of the @1 translations over all gold
     % translations.}
   \end{longtable}
-  %\label{tab:alkoto} 
+  %\label{tab:alkoto}
   %{\footnotesize $^7$ The basic translations \emph{hope} is missing}
-\end{frame} 
-\begin{frame}{Konklúzió}
-  \begin{itemize}
-    \item input: korpusz két nyelvből és 5 ezer fordítási szópár
-    \item előálló erőforrás: egyértelműsített fordítás a korpusz szókincsére
-    \item kutatási eredmény: a poliszémia fajtáinak elkülönítése
-      koszinuszhasonlósággal (olyan szavakra ellenőriztük, amik ugyanannak a
-      szónak a fordításai)
-    \item továbblépés: a különféle többjelentésű skip-gram modellek
-      szisztematikusabb vizsgálata
-  \end{itemize}
-\end{frame} 
-%\begin{frame}{Az előadó főbb publikációi}
+\end{frame}
+%\begin{frame} { Conclusion}
+%  \begin{itemize}
+%    \item input: corpus in two languages + 5 thousand translation pairs
+%    \item resource: disambiguated translation of the corpus vocabulary
+%    \item research result: separating the types of polysemy
+%      cosine (we've verified words that are the same
+%      translations)
+%    \item move: the various multiplayer skip-gram models
+%      more systematic examination
+%  \end{itemize}
+%\end{frame}
+%\begin{frame} {Main Performer's Publications}
 %  \newcommand{\vspacelast}{\vspace{6mm}}
 %  \vspacelast
-%  \centering\url{https://hlt.bme.hu/makrai}
+%  \centering \url{https://github.com/makrai/wsi-fest}
 %  \vspacelast
 %  \begin{itemize}
-%    \item A \fl~fogalmi szótár \\ \citep{Kornai:2013,Kornai:2015a}
+%    \item A \fl~conceptual dictionary \\ \citep{Kornai:2013,Kornai:2015a}
 %      \begin{itemize}
-%        \item igei szerepek \citep{Makrai:2014}
-%        \item a definiáló szókincs \citep{Makrai:2013a,Kornai:2015a}
-%        \item aktivációterjedés \citep{Nemeskey:2013}
+%        \item igei roles \citep{Makrai:2014}
+%        \item is the defining vocabulary \citep{Makrai:2013a,Kornai:2015a}
+%        \item activation projection \citep{Nemeskey:2013}
 %      \end{itemize}
-%    \item szóbeágyazások
+%    \item wordings
 %      \begin{itemize}
-%        \item \alert{lexikai relációk} \citep{Makrai:2013b,Makrai:2014b}
-%        \item európai nyelvekre \citep{Makrai:2015,Makrai:2015b} % MSZNY, CogInfoCom
-%        \item vektorok az agyban \citep{Makrai:2014p}
-%        \item többértelműség  háromszögelésben \citep{Makrai:2016l}
-%        \item többjelentésű embeddingek (MSEk) \\ (\cite{Borbely:2016}, Makrai (bírálat alatt))
+%        \item\alert{lexical relations} \citep{Makrai:2013b,Makrai:2014b}
+%        \item for European languages \citep{Makrai:2015,Makrai:2015b}% MSZNY, CogInfoCom
+%        \item vectors in the brain \citep{Makrai:2014p}
+%        \item ambiguity triangulation \citep{Makrai:2016l}
+%        \item multi-report embedding (MSEk) \\ (\cite{Borbely:2016},Makrai (under review))
 %      \end{itemize}
 %  \end{itemize}
 %\end{frame}
-\begin{frame}[allowframebreaks]{Irodalomjegyzék}
+\begin{frame} [allowframebreaks] {Bibliography}
   \printbibliography
 \end{frame}
-%\begin{frame}%{csoportjaim és témáink}
-%  \newcommand{\vspaceaffil}{\vspace{.7cm}}
-%  \begin{columns} 
-%    \begin{column}{0.1\textwidth}
-%      \includegraphics[height=1.3cm]{../../paper/Common/Logo/hlt/blue_white_bg.png}
-%    \end{column}
-%    \begin{column}{0.8\textwidth}
-%      \begin{itemize} 
-%        \item témavezető: Kornai András
-%        \item csoport: \\ szövegértés mesterséges ideghálókkal és a
-%          \fl~szemantikus hálóval
-%      \end{itemize}
-%    \end{column}
-%  \end{columns}
-%  \vspaceaffil
-%  \begin{columns}
-%    \begin{column}{0.1\textwidth}
-%      \includegraphics[height=1.3cm]{../../paper/Common/Logo/nytud.png}
-%    \end{column}
-%    \begin{column}{0.8\textwidth}
-%      \begin{itemize}
-%        \item MTA NYI, Váradi Tamás
-%        \item csoport: \\ a Magyar Nemzeti Szövegtár (milliárd szó), \\ igei szerkezetek,
-%          történeti korpuszok, \\ veszélyeztetett nyelvek
-%      \end{itemize}
-%    \end{column}
-%  \end{columns}
-%  \vspaceaffil
-%  \begin{columns}
-%    \begin{column}{0.1\textwidth}
-%      \includegraphics[height=1.3cm]{../../logo/mta-ttk-logo-01}
-%    \end{column}
-%    \begin{column}{0.8\textwidth}
-%      \begin{itemize}
-%        \item MTA TTK KPI, Balázs László, Ehmann Bea
-%        \item izolált csoportban dolgozók naplóinak pszichológiai
-%          tartalomelemzése szóbeágyazásokkl
-%      \end{itemize}
-%    \end{column}
-%  \end{columns}
-%\end{frame}
-\begin{frame}{Mondatszemantika}
-  \centering \includegraphics[width=\textwidth]{../../paper/misc/makrai/fiatal/felido/img/montague}
-      \bull{igazságfeltételek, modellelmélet \\
-      \citep{Montague:1970,Montague:1970a}}
-\end{frame}
-\begin{frame}{Lexikai felbontás \citep{Katz:1963}}
 
-  \resizebox{\textwidth}{!}{%
-    \begin{tikzpicture}%[grow'=right]
-      \tikzset{every leaf node/.style={text width=3.5cm}, text centered}
-          \Tree
-      [.{bachelor}
-      [.noun
-        [.(Human)
-            [.(Male)
-                [{[who \\ has never married]} ]
-                [{[young knight serving under the standard of another knight]} ]
-            ]
-            [{[who has the first or lowest academic degree]} ]
-        ]
-        [.{(Animal)}
-            [.{(Male)}
-                [{[young fur seal when without a mate during the breeding time]} ]
-            ]
-        ]
-      ]
-      ]
-    \end{tikzpicture}
-  } 
-\end{frame}
-  \begin{frame}{Szemantikus hálók \citep{Quillian:1969}}
-    \includegraphics[width=\columnwidth]{../../paper/misc/makrai/fiatal/felido/img/Semantic_Net}
-  \end{frame}
-
-%\begin{frame}{Konceptuális szemantika} \end{frame}
-
-\begin{frame}[allowframebreaks]{Trükkök lineáris fordításnál}
+\begin{frame} [allowframebreaks] {Tricks for Linear Translation}
   \begin{itemize}
-    \item fordított szomszédok
+    \item inverse neighbors
       \begin{itemize}
-        \item hubok NN-keresésnél \citep{Radovanovic:2010}
-        \item fordított szomszédok \citep{Singh:2003}
-        \item lineáris fordításnál \citep{Dinu:2015,Lazaridou:2015}
+        \item hubs for NN search \citep{Radovanovic:2010}
+        \item inverted neighbors \citep{Singh:2003}
+        \item for linear translation \citep{Dinu:2015,Lazaridou:2015}
       \end{itemize}
-    \item ortogonális megszorítás
+    \item orthogonal constraint
       \begin{itemize}
-        \item eredetileg háromféle távolság 
+        \item originally has three types of spacing
           \begin{itemize}
-            \item az embedding tanításakor skalárszorzat
-            \item a leképezés tanításakor Euklideszi
-            \item fordításkor koszinusztávolság
+            \item is a scalar for embedding training
+            \item when training the mapping Euclidean
+            \item translation
           \end{itemize}
-        \item egységesítés \citep{Xing:2015,Faruqui:2014,Artetxe:2016}
+        \item unification \citep{Xing:2015,Faruqui:2014,Artetxe:2016}
           \begin{itemize}
-            \item vektorok hosszát normalizáljuk
-            \item ortogonális leképezés: forgat, de nem nyújt
-            \item centrálás?
+            \item vectors are normalized
+            \item orthogonal mapping: rotates but does not provide
+            \item centering?
           \end{itemize}
       \end{itemize}
   \end{itemize}
-    \resizebox{\textwidth}{!}{%
-      \begin{tabular}{ll|llll|llll|llll}
-        \toprule
-        && \multicolumn{4}{c|}{8192} & \multicolumn{4}{c|}{16384} & \multicolumn{4}{c}{32768} \\
-        && \multicolumn{2}{c}{general linear} & \multicolumn{2}{c|}{orthogonal} &
-        \multicolumn{2}{c}{general linear} & \multicolumn{2}{c|}{orthogonal} &
-        \multicolumn{2}{c}{general linear} & \multicolumn{2}{c}{orthogonal} \\
-        && any & disamb & any & disamb & any & disamb & any & disamb & any & disamb & any & disamb \\
-        \midrule
-        \multirow{3}{*}{\rotatebox[origin=c]{90}{fwd}}
-        & vanilla & 28.7\%	&  2.40\%	&  32.1\%	&  2.40\%	&  36.2\%	&  3.40\%	&  42.0\%	&
-        4.70\%	& 36.7\%	&  4.20\%	&  44.5\%	&  6.00\%	\\
-        & normalize & 28.2\%	&  2.20\%	& {\bf 33.7\%}	& 3.40\%	&  35.1\%	&
-        2.80\%	&  {\bf 44.4\%}	&
-        5.80\%	&  36.6\%	& 3.80\%	& {\bf 48.2\%}	&  6.00\%	\\
-        & + center &  26.6\%	&  2.10\%	& 32.8\%	&  2.90\%	& 32.9\%	& 2.70\%	&  42.0\%	&
-        4.50\%	&  34.6\%	& 3.50\%	&  43.9\%	& 5.50\%	\\
-        \midrule
-        \multirow{3}{*}{\rotatebox[origin=c]{90}{rev}}
-        & vanilla & {\bf 53.8\%}	&  11.85\%	& 51.7\%	&  11.37\%	& {\bf 58.3\%}	&  11.99\%	& 56.6\% &
-        12.59\%	&  {\bf 74.3\%}	& 23.60\%	&  73.6\%	& 22.30\%	\\
-        & normalize &  53.3\%	& 11.61\%	 & 50.0\%	&  10.90\%	& 58.0\%	&  12.35\%	& 56.5\% &
-        12.59\%	& 73.7\%	& 24.20\%	&  72.8\%	& 22.10\%	\\
-        & + center &  51.7\%	& 11.37\%	& 53.3\%	& 11.14\%	&  57.1\%	&  11.99\%	& 57.7\% &
-        12.35\%	& 69.7\%	& 22.20\%	& 73.5\%	&  23.00\%	\\
-        \bottomrule
-      \end{tabular}
-      }
 \end{frame}
 \end{document}
