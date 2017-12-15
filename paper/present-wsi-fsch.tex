@@ -20,6 +20,7 @@
 \usepackage{longtable}
 \usepackage{multirow}
 \usepackage{mathtools}
+%\usepackage{adjustbox}
 
 \usepackage{pgfplots}
 \pgfplotsset{%compat=1.11,
@@ -70,7 +71,7 @@
 
 %\newcommand{\logoheight}{1cm}
 
-\title{%Do 
+\title{%Do
   Multi-sense word embeddings}%learn more senses?}
 \author{Márton Makrai}
 %[Makrai Márton]{
@@ -156,7 +157,7 @@
   \begin{columns}
     \begin{column}{.65\textwidth}
   \begin{itemize}
-    \item linear mapping between embeddings 
+    \item linear mapping between embeddings, 600 $\rightarrow$ 300 dim
       %\\ the simplest between two vector spaces
       %\item now embedding two languages
     \item training on the 5~000 most frequent pairs  \\
@@ -188,23 +189,25 @@
         \item relatedness of meanings (intuition. Agreement?)
         \item part-of-speech (Hungarian \emph{vár} `wait'; `castle')
       \end{itemize}
-    \item suptypes of polysemy
+    \item sup-types of polysemy
       \begin{tabular}{llll}
         metonymy & regular    & \emph{school} (people, building)  & both literal \\
         metaphor & irregular  & Hungarian \emph{nap} `Sun; day'   & lit $\leadsto$ fig
       \end{tabular}
-    \item polysemy gaphs, similarities between languages 
+    \item polysemy graphs, similarities between languages
       \begin{itemize}
-        \item \citep{Youn:2016}
-        \item which terms tend to be polysomes 
+        \item \cite{Youn:2016}
+        \item which terms tend to be polysemous
         \item concept clusters
       \end{itemize}
   \end{itemize}
 \end{frame}
 \begin{frame}{Word sense induction}
   \begin{tabular} {lll}
+    \toprule
     disambiguation (WSD) & classification & supervised \\
     induction (WSI) \citep{Schutze:1998} & clustering & unsupervised \\
+    \bottomrule
   \end{tabular}
     \begin{itemize}
       \item multi-``prototype'' embeddings \citep{Reisinger:2010}
@@ -213,11 +216,9 @@
       \item as a Dirichlet Process \cite{Li:2015,Bartunov:2015}
       \item still in the research phase
       \item sense resolution is too fine (duplicates)
-      \item if the number of parameters is controlled 
-        \begin{itemize}
-          \item slight performance boost \\ 
+      \item if the number of parameters is controlled \\
+        slight performance boost \\
             only in semantics-related tasks \citep{Li:2015}
-        \end{itemize}
     \end{itemize}
 \end{frame}
 
@@ -232,8 +233,9 @@
       $\xLeftrightarrow\Delta$
       \emph{work} is the $k$th NN of \emph{project}}
     \item there may be zero, one, or more $k$th revNNs of a word
-    \item revNN query: return the words with the lowest revNN ranksi
+    \item revNN query: return the words with the lowest revNN ranks
     \item less prone to hubs
+    \item in linear translation \citep{Dinu:2015,Lazaridou:2015}
   \end{itemize}
 \end{frame}
 
@@ -252,14 +254,14 @@
           \begin{tikzpicture}[line width=2pt] %[&gt;=stealth']
             \tikzstyle{every node}=[font=\LARGE]
             %\tikzset{every edge thick}
-            \node[text=hltdarkgreen] (hf) at (2, 2) {finom};
-            \node (hf) at (1.7, 1.4)  {durva};
-            \node[text=hltdarkgreen] (hs) at (5, 4)  {finom};
-            \node (hs) at (4.5, 4.6)  {ízletes};
-            \node[text=hltdarkgreen] (gf) at (11, 2) {fine};
-            \node (gf) at (11, 1.4) {coarse};
-            \node[text=hltdarkgreen] (gs) at (14, 4) {delicious};
-            \node (gs) at (12.5, 4.6) {tasty};
+            \node[text=hltdarkgreen] (hf) at (2, 2) {becsül};
+            \node (hf) at (1.7, 1.4)  {ünnepel};
+            \node[text=hltdarkgreen] (hs) at (5, 4)  {becsül};
+            \node (hs) at (4.5, 4.6)  {számol};
+            \node[text=hltdarkgreen] (gf) at (11, 2) {honor};
+            \node (gf) at (11, 1.4) {celebrate};
+            \node[text=hltdarkgreen] (gs) at (14, 4) {estimate};
+            \node (gs) at (12.5, 4.6) {calculate};
             \node (ho) at (0, 0) {};
             \node (hx) at (8, 0) {};
             \node (hy) at (0, 6) {};
@@ -274,7 +276,7 @@
           \end{tikzpicture}
         }
         % \caption{Linear translation of word senses. The Hungarian word
-        % \emph{fine} is ambiguous between `fine 'and' delicious'.}
+        % \emph{honor} is ambiguous between `honor 'and' estimate'.}
         % \label{fig: AdaGram}
       \end{figure}
 \end{frame}
@@ -286,14 +288,15 @@
         \begin{tikzpicture}[line width=2pt] %[&gt;=stealth']
           \tikzstyle{every node}=[font=\LARGE]
           %\tikzset{every edge thick}
-            \node[text=hltdarkgreen] (hf) at (2, 2) {finom};
-            \node (hf) at (1.7, 1.4)  {durva};
-            \node[text=hltdarkgreen] (hs) at (5, 4)  {finom};
-            \node (hs) at (4.5, 4.6)  {ízletes};
-            \node[text=hltdarkgreen] (gf) at (11, 2) {fine};
-            \node (gf) at (11, 1.4) {coarse};
-            \node[text=hltdarkgreen] (gs) at (14, 4) {delicious};
-            \node (gs) at (12.5, 4.6) {tasty};
+          wealth', 'prosperity'], ['welfare', ''], ['', '], [''], [''], ['comfort
+            \node[text=hltdarkgreen] (hf) at (2, 2) {jólét};
+            \node (hf) at (1.7, 1.4)  {boldogulás};
+            \node[text=hltdarkgreen] (hs) at (5, 4)  {jólét};
+            \node (hs) at (4.5, 4.6)  {bőség};
+            \node[text=hltdarkgreen] (gf) at (11, 2) {wealth};
+            \node (gf) at (11, 1.4) {prosperity};
+            \node[text=hltdarkgreen] (gs) at (14, 4) {welfare};
+            \node (gs) at (12.5, 4.6) {comfort};
             \node (ho) at (0, 0) {};
             \node (hx) at (8, 0) {};
             \node (hy) at (0, 6) {};
@@ -308,7 +311,7 @@
         \end{tikzpicture}
       }
       % \caption{Linear translation of word senses. The Hungarian word
-      % \emph{fine} is ambiguous between `fine 'and' delicious'.}
+      % \emph{honor} is ambiguous between `honor 'and' estimate'.}
       % \label{fig: AdaGram}
   \end{figure}
 \end{frame}
@@ -318,180 +321,87 @@
       \bull{
       de-glutinized version \citep{Borbely:2016d,Nemeskey:2017} of the
       Hungarian National Corpus \citep{Oravecz:2014}}
+    \begin{center}
+        \resizebox{\textwidth} {!} {%
+      \begin{tabular}{rcll}
+         \texttt{jelmondatával} & $\rightarrow$ & \texttt{jelmondat <POSS> <CAS<INS>>} & `(with its) motto'\\
+    \texttt{akartak} & $\rightarrow$ & \texttt{akar <PAST> <PLUR>} & `(they)
+      want(ed)'\\
+      \end{tabular}
+      }
+    \end{center}
     \item target embedding: GloVe 840B 300d \citep{Pennington:2014}
     \item seed dictionary: wikt2dict \citep{Acs:2013}
     \item training on the first meaning
+    \item target restricted to 20--62 K words
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Evaluation metrics}
-    \begin{itemize}
-      \item different vectors $ \xRightarrow ? $ different meanings
-      \item selection of parameters and target embedding 
-        \bull{at least one meaninging vector should have a good translation}
-      \item different sense vectors should have a different set of good
-        translations 
+  \begin{itemize}
+    \item different vectors $ \xRightarrow ? $ different meanings
+    \item selection of parameters and target embedding
+      \bull{at least one meaning vector should have a good translation}
+    \item different sense vectors should have a different set of good
+      translations
         \bull{ratio of such items among those predicted to be ambiguous}
-    \end{itemize}
-  \end{frame}
+        % TODO cikket hozzáolvasni a Table 3-hoz tartozó szövegtől
+  \end{itemize}
+\end{frame}
     \begin{frame}
       \begin{table}[allowframebreaks]
         % \Resizebox {\columnwidth} {!} {%
-        \begin{tabular}{lcccc|cc}
+        \begin{tabular}{lcc}
           \toprule
-          & dim & $\alpha/\gamma$ & $p$ & $m$ & any & disamb \\
-          % & \multicolumn{6}{c|}{forward NN search} & \multicolumn{6}{c}{reverse NN search} \\
-          %vocab cutoff &&&&& \multicolumn{2}{c}{8192} & \multicolumn{2}{c}{16384} & \multicolumn{2}{c|}{32768} & \multicolumn{2}{c}{8192} & \multicolumn{2}{c}{16384} & \multicolumn{2}{c}{32768} \\
+                                    & any     & disamb \\
           \midrule
-          %/jiweil/mnsz/stemmed/mnsz-stemmed-CRP-800-w15-joint_vect_sense.mse 23.0% 2.200%
-          %/jiweil/mnsz/stemmed/mnsz-stemmed-CRP-800-w15-joint_vect_sense_context.mse 26.1% 3.300%
-          %/neelakantan/mnsz/stemmed/mnsz2-stemmed-neela-np-800-s2_cluscent.mse 36.3% 6.400%
-          %/neelakantan/webkorp_1-sense_sense.mse 37.8% 5.900%
-          %/neelakantan/mnsz/stemmed/mnsz2-stemmed-neela-np-800-s2_sense.mse 38.1% 6.500%
-          HNC	        & 800	& .02	&       & 100   & 48.5\%	&  7.6\% \\
-          \neela~Wk&300&--&2   &big  & 54.0\%	&  12.4\% \\
-          HNC stem & 800	& .05	&       &  big & 55.1\%	&  10.4\% \\
-          %	& \mutli~Webkorp\footnotemark  &&&&    & 1.0 & 55.0% 13.5\% \\
-          HNC         & 160 & .05 & 3     & 200   & 62.2\%	&  15.0\% \\
-          \mutli~Wk &300&.25 &       & 71    & 62.9\%	&  17.4\% \\
-        Webkorpusz	    & 800	& .05	&       & 100	  & 65.9\%	&  17.4\% \\
-        HNC	        & 600	& .05	& 5     & 100	  & 68.6\%	&  16.6\% \\
-        HNC	        & 600	& .1  & 3     & 50	  & 69.1\%	&  18.8\% \\
-        Webkorpusz	    & 800	& .1  &       & 100	  & 73.9\%	&  23.9\% \\
-        \bottomrule
+          \adagram                  & 73.3\%  & 18.53\% \\
+          \mutli~``sense vectors''  & 71.0\%  & 19.46\% \\
+          \mutli~``context vectors''& 69.9\%  & {\bf 20.76\%} \\
+          \bottomrule
     \end{tabular}
     %}
   \end{table}
+      \[p(w_i\mid w_j) \, \propto \, \exp (u_i ^\top v_j)\]
 \end{frame}
 
-  \begin{frame} [allowframebreaks] {Similarity of good translations}
-    \small
-    \begin{longtable}{lllll}
-      %\setlength{\tabcolsep}{3pt}
-      %\resizebox{\textwidth}{!}{%
-      %\centering
-      \toprule
-      %&$s$     &         &                       & covg \\
-      %\midrule
-        E	& -0.04849	& függő	& addict, aerial	& 0.4 \\
-        S	& 0.01821	& alkotó	& constituent, creator	& 0.5 \\
-        S	& 0.05096	& előzetes	& preliminary, trailer	& 1.0 \\
-        S	& 0.0974	& kapcsolat	& affair, conjunction, linkage	& 0.33 \\
-        I	& 0.1361	& kocsi	& coach, carriage	& 1.0 \\
-        S	& 0.136	& futó	& runner, bishop	& 1.0 \\
-        S	& 0.1518	& keresés	& quest, scan	& 0.67 \\
-        S	& 0.1574	& látvány	& outlook, scenery, prospect	& 0.6 \\
-        S	& 0.1626	& fogad	& bet, greet	& 1.0 \\
-        S	& 0.1873	& induló	& march, candidate	& 1.0 \\
-        I	& 0.187	& nemes	& noble, peer	& 0.67 \\
-        E	& 0.1934	& eltérés	& variance, departure	& 0.4 \\
-        E	& 0.1943	& alkalmazás	& employ, adaptation	& 0.33 \\
-        S	& 0.2016	& szünet	& interval, cease, recess	& 0.43 \\
-        E	& 0.2032	& kezdeményezés	& initiation, initiative	& 1.0 \\
-        S	& 0.2052	& zavar	& disturbance, annoy, disturb, turmoil	& 0.57 \\
-        S	& 0.2054	& megelőző	& preceding, preventive	& 0.29 \\
-        IE& 0.2169	& csomó	& knot\id, lump\id, mat\e	& 1.0  \\
-        E\footnotemark
-        & 0.21	& remény	& outlook, promise, expectancy	& 0.6	  \\
-        S	& 0.2206	& bemutató	& exhibition, presenter	& 0.67 \\
-        E	& 0.2208	& egyeztetés	& reconciliation, correlation	& 0.5 \\
-        S	& 0.237	& előadó	& auditorium, lecturer	& 0.67 \\
-        E	& 0.2447	& nyilatkozat	& profession, declaration	& 0.4 \\
-        I	& 0.2494	& gazda	& farmer, boss	& 0.67 \\
-        I	& 0.2506	& kapu	& gate, portal	& 1.0 \\
-        I	& 0.2515	& előbbi	& anterior, preceding	& 0.67 \\
-        I	& 0.2558	& kötelezettség	& engagement, obligation	& 0.67 \\
-        E	& 0.265	& hangulat	& morale, humour	& 0.5 \\
-        E	& 0.2733	& követ	& succeed, haunt	& 0.67 \\
-        SE	& 0.276	& minta	& norm\s, formula\e, specimen\s	& 0.75  \\
-        S	& 0.2807	& sorozat	& suite, serial, succession	& 1.0 \\
-        S	& 0.2935	& durva	& coarse, gross	& 0.18 \\
-        I	& 0.3038	& köt	& bind, tie	& 0.67 \\
-        E	& 0.3045	& egyezmény	& treaty, protocol	& 0.67 \\
-        I	& 0.3097	& megkülönböztetés	& discrimination, differentiation	& 0.5 \\
-        I	& 0.309	& ered	& stem, originate	& 0.5 \\
-        I	& 0.319	& hirdet	& advertise, proclaim	& 1.0 \\
-        E	& 0.3212	& tartós	& substantial, durable	& 1.0 \\
-        I	& 0.3218	& ajánlattevő	& bidder, supplier, contractor	& 0.6 \\
-        I	& 0.3299	& aláírás	& signing, signature	& 0.67 \\
-        I	& 0.333	& bír	& bear, possess	& 1.0 \\
-        I	& 0.3432	& áldozat	& sacrifice, victim, casualty	& 1.0 \\
-        IE	& 0.3486	& kerület	& ward\id, borough\id, perimeter\e	& 0.3  \\
-        I	& 0.3486	& utas	& fare, passenger	& 1.0 \\
-        I	& 0.3564	& szigorú	& stern, strict	& 0.5 \\
-        I	& 0.3589	& bűnös	& sinful, guilty	& 0.5 \\
-        I	& 0.3708	& rendes	& orderly, ordinary	& 0.5 \\
-        I	& 0.3824	& eladó	& salesman, vendor	& 0.5 \\
-        I	& 0.3861	& enyhe	& tender, mild, slight	& 0.6 \\
-        I	& 0.3897	& maradék	& residue, remainder	& 0.33 \\
-        I	& 0.3986	& darab	& chunk, fragment	& 0.4 \\
-        E	& 0.4012	& hiány	& poverty, shortage	& 0.5 \\
-        %I	& 0.4093	& kutatás	& exploration, quest	& 0.5 \\
-        %I	& 0.4138	& tanítás	& tuition, lesson	& 0.67 \\
-        %I	& 0.4196	& őszinte	& frank, sincere	& 0.67 \\
-        %I	& 0.4229	& környék	& neighborhood, surroundings, vicinity	& 0.38 \\
-        %I	& 0.4446	& ítélet	& judgement, sentence	& 0.67 \\
-        %I	& 0.4501	& gyerek	& childish, kid	& 0.67 \\
-        %I	& 0.4521	& csatorna	& ditch, sewer	& 0.4 \\
-        %I	& 0.4547	& felügyelet	& surveillance, inspection, supervision	& 0.43 \\
-        %E	& 0.4551	& ritka	& rare, odd	& 0.5 \\
-        %S	& 0.4563	& szerető	& fond, lover, affectionate, mistress	& 0.67 \\
-        %I	& 0.4608	& szeretet	& affection, liking	& 0.67 \\
-        %I	& 0.4723	& vizsgálat	& inquiry, examination	& 0.67 \\
-        %I	& 0.4853	& tömeg	& mob, crowd	& 0.5 \\
-        %I	& 0.4903	& puszta	& pure, plain	& 0.22 \\
-        %I	& 0.4904	& srác	& kid, lad	& 1.0 \\
-        %I	& 0.4911	& büntetés	& penalty, sentence	& 0.29 \\
-        %I	& 0.4971	& képviselő	& delegate, representative	& 0.67 \\
-        %I	& 0.4975	& határ	& boundary, border	& 0.67 \\
-        %I	& 0.5001	& drága	& precious, dear, expensive	& 1.0 \\
-        %S	& 0.5093	& uralkodó	& prince, ruler, sovereign	& 0.5 \\
-        %I	& 0.5097	& válás	& separation, divorce	& 0.67 \\
-        %I	& 0.5103	& ügyvéd	& lawyer, advocate	& 0.67 \\
-        %I	& 0.5167	& előnyös	& advantageous, profitable, favourable	& 1.0 \\
-        %I	& 0.5169	& merev	& rigid, strict	& 1.0 \\
-        %I	& 0.5204	& nyíltan	& openly, outright	& 1.0 \\
-        %I	& 0.5217	& noha	& notwithstanding, albeit	& 1.0 \\
-        %I	& 0.5311	& hulladék	& litter, garbage, rubbish	& 0.43 \\
-        %I	& 0.5311	& szemét	& litter, garbage, rubbish	& 0.43 \\
-        %I	& 0.5612	& kielégítő	& satisfying, satisfactory	& 1.0 \\
-        %E	& 0.5617	& vicc	& joke, humour	& 1.0 \\
-        %I	& 0.5737	& szállító	& supplier, vendor	& 1.0 \\
-        %I	& 0.5747	& óvoda	& nursery, daycare, kindergarten	& 1.0 \\
-        %I	& 0.5754	& hétköznapi	& mundane, everyday, ordinary	& 0.75 \\
-        %I	& 0.5797	& anya	& mum, mummy	& 1.0 \\
-        %I	& 0.5824	& szomszédos	& neighbouring, neighbour	& 0.4 \\
-        %E	& 0.5931	& szabadság	& liberty, independence	& 1.0 \\
-        %I	& 0.6086	& lelkész	& pastor, priest	& 0.4 \\
-        %I	& 0.6304	& fogalom	& notion, conception	& 1.0 \\
-        %I	& 0.6474	& fizetés	& salary, wage	& 0.67 \\
-        %I	& 0.6551	& táj	& landscape, scenery	& 1.0 \\
-        %I	& 0.6583	& okos	& clever, smart	& 0.67 \\
-        %I	& 0.6707	& autópálya	& highway, motorway	& 0.5 \\
-        %I	& 0.6722	& tilos	& prohibited, forbidden	& 1.0 \\
-        %I	& 0.6811	& bevezető	& introduction, introductory	& 1.0 \\
-        %I	& 0.7025	& szövetség	& coalition, alliance, union	& 0.75 \\
-        %I	& 0.7065	& fáradt	& exhausted, tired, weary	& 1.0 \\
-        %I	& 0.7066	& kiállítás	& exhibit, exhibition	& 0.67 \\
-        %I	& 0.7135	& hirdetés	& advert, advertisement	& 1.0 \\
-        %I	& 0.7147	& ésszerű	& rational, logical	& 1.0 \\
-        %I	& 0.7664	& logikai	& logic, logical	& 1.0 \\
-        %I	& 0.7757	& szervez	& organise, organize, arrange	& 1.0 \\
-        %I	& 0.8122	& furcsa	& strange, odd	& 0.4 \\
-        %I	& 0.8277	& azután	& afterwards, afterward	& 0.67 \\
-        %I	& 0.8689	& megbízható	& dependable, reliable	& 0.67 \\
-    \bottomrule
-    %}
-    % \caption{Hungarian words with the rNN@1 translations of their sense
-    % vectors.  The first column is a post-hoc annotation by András Kornai
-    % (\emph E error in translation, \emph I identical, \emph S separate
-    % meanings), $s$ is the cosine similarity of the translations, and
-    % \emph{covg} denotes the coverage of the @1 translations over all gold
-    % translations.}
-  \end{longtable}
-  %\label{tab:alkoto}
-  %{\footnotesize $^7$ The basic translations \emph{hope} is missing}
+\logo{}
+
+\begin{frame}{Samples from the most different senses}
+	\small
+		\begin{longtable}{lllll}
+			%\setlength{\tabcolsep}{3pt}
+			%\centering
+			\toprule
+			& & sim & & covg \\
+			\midrule
+			\multirow{8}{*}{\rotatebox[origin=c]{90}{\mutli~``context vs''}}
+			&sokaság	& 0.07848	& plurality crowd multitude	& 0.38 \\
+			&kar	& 0.1008	& arm choir	& 1.0 \\
+			&alkalmazás	& 0.1087	& adaptation hiring employ app	& 0.67 \\
+			&bejelent	& 0.1119	& announce lodge	& 1.0 \\
+			&csomó	& 0.116	& lump mat knot	& 1.0 \\
+			&összeállítás	& 0.1247	& binding compilation editing composition	& 0.8 \\
+			&agy	& 0.1746	& butt hub	& 1.0 \\
+			&találkozó	& 0.1898	& reunion appointment	& 1.0 \\
+			\midrule
+			\multirow{8}{*}{\rotatebox[origin=c]{90}{\adagram}}
+			&fordítás	& 0.06056	& turning compilation translation	& 0.75 \\
+			&ruha	& 0.1154	& dress costume rig clothes garment	& 0.62 \\
+			&alkalmazás	& 0.1236	& app employ	& 0.33 \\
+			&törzs	& 0.1308	& tribe stem trunk waist hull	& 0.62 \\
+			&függő	& 0.145	& dependent aerial addict	& 0.6 \\
+			&hangsúlyoz	& 0.1595	& stress accent	& 0.67 \\
+			&nyom	& 0.2582	& clue squeeze weigh hint push trace slot foil	& 0.62 \\
+			&mag	& 0.2634	& kernel seed	& 0.4 \\ 
+			\bottomrule
+		\end{longtable}
 \end{frame}
+\begin{frame} [allowframebreaks] {Bibliography}
+	\printbibliography
+\end{frame}
+\end{document}
+
 %\begin{frame} { Conclusion}
 %  \begin{itemize}
 %    \item input: corpus in two languages + 5 thousand translation pairs
@@ -525,33 +435,3 @@
 %      \end{itemize}
 %  \end{itemize}
 %\end{frame}
-\begin{frame} [allowframebreaks] {Bibliography}
-  \printbibliography
-\end{frame}
-
-\begin{frame} [allowframebreaks] {Tricks for Linear Translation}
-  \begin{itemize}
-    \item inverse neighbors
-      \begin{itemize}
-        \item hubs for NN search \citep{Radovanovic:2010}
-        \item inverted neighbors \citep{Singh:2003}
-        \item for linear translation \citep{Dinu:2015,Lazaridou:2015}
-      \end{itemize}
-    \item orthogonal constraint
-      \begin{itemize}
-        \item originally has three types of spacing
-          \begin{itemize}
-            \item is a scalar for embedding training
-            \item when training the mapping Euclidean
-            \item translation
-          \end{itemize}
-        \item unification \citep{Xing:2015,Faruqui:2014,Artetxe:2016}
-          \begin{itemize}
-            \item vectors are normalized
-            \item orthogonal mapping: rotates but does not provide
-            \item centering?
-          \end{itemize}
-      \end{itemize}
-  \end{itemize}
-\end{frame}
-\end{document}
