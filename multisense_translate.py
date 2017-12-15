@@ -60,6 +60,8 @@ class MultiSenseLinearTranslator():
         if not self.args.seed_dict:
             self.args.seed_dict = seed_dict if seed_dict else default_proxy['SeedDict']
 
+        # This first command is not logged because reading in MSEs with gensim
+        # causes many warnings
         self.source_firsts = get_first_vectors(self.args.source_mse)
         logging.basicConfig(
             format="%(asctime)s %(module)s (%(lineno)s) %(levelname)s %(message)s",
@@ -67,6 +69,12 @@ class MultiSenseLinearTranslator():
         self.target_embed = get_first_vectors(self.args.target_embed)
 
     def main(self):
+        self.norm_cent()
+        with open(self.args.seed_dict) as self.seed_f:
+            self.train()
+            return self.test()
+
+    def norm_cent(self):
         logging.debug(self.args.cent_norm)
         if self.args.cent_norm in ['cent', 'cent_norm']:
             self.sr_center = self.get_center(self.source_firsts.syn0)
@@ -81,9 +89,6 @@ class MultiSenseLinearTranslator():
             self.tg_center = self.get_center(self.target_embed.syn0)
             self.source_firsts.syn0 -= self.sr_center
             self.target_embed.syn0 -= self.tg_center 
-        with open(self.args.seed_dict) as self.seed_f:
-            self.train()
-            return self.test()
 
     def normalize(self, embed):
         embed /= np.apply_along_axis(np.linalg.norm, 1, embed).reshape((-1,1))
@@ -168,15 +173,13 @@ class MultiSenseLinearTranslator():
                     uniq_hit_sets = [neigh.split()
                                      for neigh in uniq_hit_sets]
                     uniq_hit_sets.sort(key=len, reverse=True)
-                    if len(uniq_hit_sets) > 2 and self.args.prec_level != 1:
-                        logging.warning(
-                            'When there are sense vectors with more than two'
-                            ' hits, the choice of the corresponding target'
-                            ' words is arbitrary.')
-                        #inds = [self.target_embed.word2index(wt[0]) 
-                        #for wt in uniq_hit_sets]
-                        #vecs = self.target_embed.syn0[inds]
-                        #logging.debug(vecs.dot(vecs.T))
+                    #if len(uniq_hit_sets) > 2 and self.args.prec_level != 1:
+                    # When there are sense vectors with more than two hits, the
+                    # choice of the corresponding target  words is arbitrary.)
+                    #inds = [self.target_embed.word2index(wt[0]) 
+                    #for wt in uniq_hit_sets]
+                    #vecs = self.target_embed.syn0[inds]
+                    #logging.debug(vecs.dot(vecs.T))
                     w1, w2 = [list(hits)[0] for hits in uniq_hit_sets[:2]]
                     sim = self.target_embed.similarity(w1, w2)
                     self.sims.append(sim)
@@ -311,15 +314,14 @@ class MultiSenseLinearTranslator():
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('cent_norm', choices=['vanilla', 'cent', 'norm', 'cent_norm', 'norm_cent'])
+    parser.add_argument('--config_file', default='hlt_bp.ini')
+    parser.add_argument('--source_mse')
+    parser.add_argument('--target_embed')
     parser.add_argument(
-        '--config_file', default='hlt_bp.ini',
+        '--seed_dict',
         help='Name of the seed dictionary file. The order of the source and'
         ' the target language in the arguments for embeddings and in the word'
         ' pairs in the seed file is opposite')
-    parser.add_argument('--source_mse')
-    parser.add_argument('--target_embed')
-    parser.add_argument('--seed_dict')
     parser.add_argument( '--orthog', action='store_true')
     parser.add_argument('--translate_all', action='store_true')
     parser.add_argument(
@@ -328,6 +330,9 @@ def parse_args():
     parser.add_argument('--restrict_vocab', type=int, default=2**15)
     parser.add_argument('--prec_level', type=int, default=10)
     parser.add_argument('--non-verbose', dest='verbose', action='store_false')
+    parser.add_argument(
+        '--cent_norm', default='vanilla',
+        choices=['vanilla', 'cent', 'norm', 'cent_norm', 'norm_cent'])
     return parser.parse_args()
 
 
