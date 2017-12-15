@@ -147,7 +147,7 @@
   \includegraphics[width=\textwidth]{../../paper/misc/makrai/fiatal/felido/img/analogy}
   \[ \text{\bf king} + \text{\bf woman} - \text{\bf man} \approx \text{\bf queen}\]
       \begin{itemize}
-        \item nearest neighbors (NN)
+        \item nearest neighbors
         % \item other relationships?
       \end{itemize}
 \end{frame}
@@ -211,7 +211,7 @@
       \item with neural network \citep{Huang:2012}
       \item open-source tool \citep{Neelakantan:2014}
       \item as a Dirichlet Process \cite{Li:2015,Bartunov:2015}
-      \item yet in research phase
+      \item still in the research phase
       \item sense resolution is too fine (duplicates)
       \item if the number of parameters is controlled 
         \begin{itemize}
@@ -219,6 +219,22 @@
             only in semantics-related tasks \citep{Li:2015}
         \end{itemize}
     \end{itemize}
+\end{frame}
+
+\begin{frame}{Reverse nearest neighbors}
+  \begin{itemize}
+    \item nearest neighbor (NN) search in high-dimensional spaces $\leadsto$
+    \item \emph{hubs}, data points that are NNs of many points
+      \bull{wrong in most of the cases  \citep{Radovanovic:2010}}
+    \item solution: reverse nearest neighbor (revNN) queries \\ \citep{Korn:2000}
+    \item reverse neighborhood rank
+      \bull{\emph{project} is a $k$th revNN of \emph{work}
+      $\xLeftrightarrow\Delta$
+      \emph{work} is the $k$th NN of \emph{project}}
+    \item there may be zero, one, or more $k$th revNNs of a word
+    \item revNN query: return the words with the lowest revNN ranksi
+    \item less prone to hubs
+  \end{itemize}
 \end{frame}
 
 % TODO distribution of the number of senses
