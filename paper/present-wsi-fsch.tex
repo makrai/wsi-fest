@@ -181,25 +181,32 @@
 \begin{frame}{Word ambiguity}
   \begin{itemize}
     \item homonymy: Russian \emph{mir} `world'; `peace'
-    \item polysemy
+    \item polysemy: Hungarian \emph{nap} `Sun; day'
     \item evidence for differentiation
       \begin{itemize}
-        \item etymology, if any
-          \bull{common origin. How far back?}
+        \item etymology:, common origin
+          \begin{itemize}
+            \item uncertain for many words
+            \item how far back?
+          \end{itemize}
         \item relatedness of meanings (intuition. Agreement?)
         \item part-of-speech (Hungarian \emph{vár} `wait'; `castle')
       \end{itemize}
-    \item sup-types of polysemy
-      \begin{tabular}{llll}
-        metonymy & regular    & \emph{school} (people, building)  & both literal \\
-        metaphor & irregular  & Hungarian \emph{nap} `Sun; day'   & lit $\leadsto$ fig
-      \end{tabular}
-    \item polysemy graphs, similarities between languages
+    \item polysemy graphs, 
       \begin{itemize}
-        \item \cite{Youn:2016}
         \item which terms tend to be polysemous
+        \item similarities between languages  \cite{Youn:2016}
         \item concept clusters
       \end{itemize}
+    \item sup-types of polysemy
+      \begin{tabular}{llll}
+        \toprule
+        metonymy & regular    & \emph{school} (people, building -- both
+        literal) \\
+        metaphor & irregular  & \emph{eye} 
+        (lit `organ' $\leadsto$ fig `hole in needle') \\
+        \bottomrule
+      \end{tabular}
   \end{itemize}
 \end{frame}
 \begin{frame}{Word sense induction}
@@ -220,23 +227,6 @@
         slight performance boost \\
             only in semantics-related tasks \citep{Li:2015}
     \end{itemize}
-\end{frame}
-
-\begin{frame}{Reverse nearest neighbors}
-  \begin{itemize}
-    \item nearest neighbor (NN) search in high-dimensional spaces $\leadsto$
-    \item \emph{hubs}, data points that are NNs of many points
-      \bull{wrong in most of the cases  \citep{Radovanovic:2010}}
-    \item solution: reverse nearest neighbor (revNN) queries \\ \citep{Korn:2000}
-    \item reverse neighborhood rank
-      \bull{\emph{project} is a $k$th revNN of \emph{work}
-      $\xLeftrightarrow\Delta$
-      \emph{work} is the $k$th NN of \emph{project}}
-    \item there may be zero, one, or more $k$th revNNs of a word
-    \item revNN query: return the words with the lowest revNN ranks
-    \item less prone to hubs
-    \item in linear translation \citep{Dinu:2015,Lazaridou:2015}
-  \end{itemize}
 \end{frame}
 
 % TODO distribution of the number of senses
@@ -281,6 +271,73 @@
       \end{figure}
 \end{frame}
 
+\begin{frame}{Reverse nearest neighbors}
+  \begin{itemize}
+    \item nearest neighbor (NN) search in high-dimensional spaces $\leadsto$
+    \item \emph{hubs}, data points that are NNs of many points
+      \bull{wrong in most of the cases  \citep{Radovanovic:2010}}
+    \item solution: reverse nearest neighbor (revNN) queries \\ \citep{Korn:2000}
+    \item reverse neighborhood rank
+      \bull{\emph{project} is a $k$th revNN of \emph{work}
+      $\xLeftrightarrow\Delta$
+      \emph{work} is the $k$th NN of \emph{project}}
+    \item there may be zero, one, or more $k$th revNNs of a word
+    \item revNN query: return the words with the lowest revNN ranks
+    \item less prone to hubs
+    \item in linear translation \citep{Dinu:2015,Lazaridou:2015}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Data}
+  \begin{itemize}
+    \item source corpus
+      \bull{
+      de-glutinized version \citep{Borbely:2016d,Nemeskey:2017} of the
+      Hungarian National Corpus \citep{Oravecz:2014}}
+    \begin{center}
+        \resizebox{\textwidth} {!} {%
+      \begin{tabular}{rcll}
+         \texttt{jelmondatával} & $\rightarrow$ & \texttt{jelmondat <POSS> <CAS<INS>>} & `(with its) motto'\\
+    \texttt{akartak} & $\rightarrow$ & \texttt{akar <PAST> <PLUR>} & `(they)
+      want(ed)'\\
+      \end{tabular}
+      }
+    \end{center}
+    \item target embedding: GloVe 840B 300d \citep{Pennington:2014}
+    \item seed dictionary: wikt2dict \citep{Acs:2013}
+    \item training on the first meaning
+    \item target restricted to 20--62 K words
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Evaluation metrics}
+  \begin{itemize}
+    \item different vectors $ \xRightarrow ? $ different meanings
+    \item selection of parameters and target embedding
+      \bull{at least one meaning vector should have a good translation}
+    \item different sense vectors should have a different set of good
+      translations
+        \bull{ratio of such items among those predicted to be ambiguous}
+        % TODO cikket hozzáolvasni a Table 3-hoz tartozó szövegtől
+  \end{itemize}
+  \end{frame}
+    \begin{frame}{The resolution trade-off}
+      \begin{table}[allowframebreaks]
+        % \Resizebox {\columnwidth} {!} {%
+        \begin{tabular}{lcc}
+          \toprule
+                                    & any     & disamb \\
+          \midrule
+          \adagram                  & 73.3\%  & 18.53\% \\
+          \mutli~``sense vectors''  & 71.0\%  & 19.46\% \\
+          \mutli~``context vectors''& 69.9\%  & {\bf 20.76\%} \\
+          \bottomrule
+    \end{tabular}
+    %}
+  \end{table}
+      \[p(w_i\mid w_j) \, \propto \, \exp (u_i ^\top v_j)\]
+\end{frame}
+
 \begin{frame}{Problem: synonymous translations}
   \begin{figure}
     \centering
@@ -314,55 +371,6 @@
       % \emph{honor} is ambiguous between `honor 'and' estimate'.}
       % \label{fig: AdaGram}
   \end{figure}
-\end{frame}
-\begin{frame}{Data}
-  \begin{itemize}
-    \item source corpus
-      \bull{
-      de-glutinized version \citep{Borbely:2016d,Nemeskey:2017} of the
-      Hungarian National Corpus \citep{Oravecz:2014}}
-    \begin{center}
-        \resizebox{\textwidth} {!} {%
-      \begin{tabular}{rcll}
-         \texttt{jelmondatával} & $\rightarrow$ & \texttt{jelmondat <POSS> <CAS<INS>>} & `(with its) motto'\\
-    \texttt{akartak} & $\rightarrow$ & \texttt{akar <PAST> <PLUR>} & `(they)
-      want(ed)'\\
-      \end{tabular}
-      }
-    \end{center}
-    \item target embedding: GloVe 840B 300d \citep{Pennington:2014}
-    \item seed dictionary: wikt2dict \citep{Acs:2013}
-    \item training on the first meaning
-    \item target restricted to 20--62 K words
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Evaluation metrics}
-  \begin{itemize}
-    \item different vectors $ \xRightarrow ? $ different meanings
-    \item selection of parameters and target embedding
-      \bull{at least one meaning vector should have a good translation}
-    \item different sense vectors should have a different set of good
-      translations
-        \bull{ratio of such items among those predicted to be ambiguous}
-        % TODO cikket hozzáolvasni a Table 3-hoz tartozó szövegtől
-  \end{itemize}
-\end{frame}
-    \begin{frame}
-      \begin{table}[allowframebreaks]
-        % \Resizebox {\columnwidth} {!} {%
-        \begin{tabular}{lcc}
-          \toprule
-                                    & any     & disamb \\
-          \midrule
-          \adagram                  & 73.3\%  & 18.53\% \\
-          \mutli~``sense vectors''  & 71.0\%  & 19.46\% \\
-          \mutli~``context vectors''& 69.9\%  & {\bf 20.76\%} \\
-          \bottomrule
-    \end{tabular}
-    %}
-  \end{table}
-      \[p(w_i\mid w_j) \, \propto \, \exp (u_i ^\top v_j)\]
 \end{frame}
 
 \logo{}
