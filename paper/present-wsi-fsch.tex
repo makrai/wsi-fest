@@ -63,23 +63,20 @@
 
 \newcommand{\Ro}{\mathbb{R}^{d_1}}
 \newcommand{\Rt}{\mathbb{R}^{d_2}}
-\newcommand{\any}{\texttt{any}}
+\newcommand{\any}{\texttt{lax}}
 \newcommand{\disamb}{\texttt{disamb}}
 \newcommand{\e}{$^E$}
 \newcommand{\id}{$^I$}
 \newcommand{\s}{$^S$}
 
-%\newcommand{\logoheight}{1cm}
-
+\author{Márton Makrai}
 \title{%Do
   Multi-sense word embeddings}%learn more senses?}
-\author{Márton Makrai}
+\logo{\includegraphics[width=1cm]{../../paper/Common/Logo/nytud/nytud}}
 %[Makrai Márton]{
 %  Makrai Márton \\
 %\vspace{5mm}
-\logo{\includegraphics[width=1cm]{../../paper/Common/Logo/nytud}}
 %\hspace{5mm}
-%    \includegraphics[height=\logoheight]{../../paper/Common/Logo/hlt/blue_white_bg.png} \\
 %  }
 \date{K + K = 120 Workshop}
 %[Fiatal kutatók félidőben 2017]{
@@ -184,76 +181,96 @@
     \item polysemy: Hungarian \emph{nap} `Sun; day'
     \item evidence for differentiation
       \begin{itemize}
-        \item etymology:, common origin
+        \item etymology: common origin
           \begin{itemize}
             \item uncertain for many words
             \item how far back?
           \end{itemize}
         \item relatedness of meanings (intuition. Agreement?)
-        \item part-of-speech (Hungarian \emph{vár} `wait'; `castle')
+        %\item part-of-speech (Hungarian \emph{vár} `wait'; `castle')
       \end{itemize}
-    \item polysemy graphs, 
-      \begin{itemize}
-        \item which terms tend to be polysemous
-        \item similarities between languages  \cite{Youn:2016}
-        \item concept clusters
-      \end{itemize}
-    \item sup-types of polysemy
-      \begin{tabular}{llll}
-        \toprule
-        metonymy & regular    & \emph{school} (people, building -- both
-        literal) \\
-        metaphor & irregular  & \emph{eye} 
-        (lit `organ' $\leadsto$ fig `hole in needle') \\
-        \bottomrule
-      \end{tabular}
   \end{itemize}
-\end{frame}
-\begin{frame}{Word sense induction}
   \begin{tabular} {lll}
     \toprule
     disambiguation (WSD) & classification & supervised \\
     induction (WSI) \citep{Schutze:1998} & clustering & unsupervised \\
     \bottomrule
   \end{tabular}
-    \begin{itemize}
-      \item multi-``prototype'' embeddings \citep{Reisinger:2010}
-      \item with neural network \citep{Huang:2012}
-      \item open-source tool \citep{Neelakantan:2014}
-      \item as a Dirichlet Process \cite{Li:2015,Bartunov:2015}
-      \item still in the research phase
-      \item sense resolution is too fine (duplicates)
-      \item if the number of parameters is controlled \\
-        slight performance boost \\
-            only in semantics-related tasks \citep{Li:2015}
-    \end{itemize}
+      %\item polysemy graphs,
+      %\begin{itemize}
+      %\item which terms tend to be polysemous
+      %\item similarities between languages  \cite{Youn:2016}
+      %\item concept clusters
+      %\end{itemize}
+      %\item sup-types of polysemy
+      %\begin{tabular}{llll}
+      %\toprule
+      %metonymy & regular    & \emph{school} (people, building -- both
+      %literal) \\
+      %metaphor & irregular  & \emph{eye}
+      %(lit `organ' $\leadsto$ fig `hole in needle') \\
+      %\bottomrule
+      %\end{tabular}
 \end{frame}
+
+\begin{frame}{Multi-sense vector models}
+  \begin{itemize}
+    \item multi-``prototype'' embeddings \citep{Reisinger:2010}
+    \item with neural network \citep{Huang:2012}
+    \item multi-sense skip gram, open-source tools
+      \begin{itemize}
+        \item \cite{Neelakantan:2014}
+        \item as a Dirichlet Process
+          \begin{itemize}
+            \item \adagram~\citep{Bartunov:2015}
+            \item \mutli~\citep{Li:2015}
+          \end{itemize}
+      \end{itemize}
+      %\item still in the research phase
+    \item if the number of parameters is controlled \citep{Li:2015}
+      \begin{itemize}
+        \item slight performance boost in
+          \begin{itemize}
+            \item semantic similarity for words and sentences,
+            \item semantic relation identification,
+            \item part-of-speech tagging
+          \end{itemize}
+        \item no improvement in
+          \begin{itemize}
+            \item sentiment analysis
+            \item named entity extraction
+          \end{itemize}
+      \end{itemize}
+    \item sense resolution is too fine (duplicates)
+  \end{itemize}
+\end{frame}
+
 
 % TODO distribution of the number of senses
 
 \begin{frame}{Linear translation from multi-sense embedding}
   \begin{itemize}
     \item Borbély, Makrai, Nemeskey, and Kornai \citeyear{Borbely:2016}
-    \item principle: other meaning, other translation
+    \item principle: homonymous senses $\leadsto$ different translations
     \item target embedding remains single-sense \\
       \citep{Pennington:2014,Mikolov:2013f}
   \end{itemize}
-      \begin{figure}
-        \centering
-        \resizebox{\textwidth} {!} {%
-          \begin{tikzpicture}[line width=2pt] %[&gt;=stealth']
-            \tikzstyle{every node}=[font=\LARGE]
-            %\tikzset{every edge thick}
-            \node[text=hltdarkgreen] (hf) at (2, 2) {becsül};
-            \node (hf) at (1.7, 1.4)  {ünnepel};
-            \node[text=hltdarkgreen] (hs) at (5, 4)  {becsül};
-            \node (hs) at (4.5, 4.6)  {számol};
-            \node[text=hltdarkgreen] (gf) at (11, 2) {honor};
-            \node (gf) at (11, 1.4) {celebrate};
-            \node[text=hltdarkgreen] (gs) at (14, 4) {estimate};
-            \node (gs) at (12.5, 4.6) {calculate};
-            \node (ho) at (0, 0) {};
-            \node (hx) at (8, 0) {};
+          \begin{figure}
+            \centering
+            \resizebox{\textwidth} {!} {%
+              \begin{tikzpicture}[line width=2pt] %[&gt;=stealth']
+                \tikzstyle{every node}=[font=\LARGE]
+                %\tikzset{every edge thick}
+                \node[text=hltdarkgreen] (hf) at (2, 2) {becsül};
+                \node (hf) at (1.7, 1.4)  {ünnepel};
+                \node[text=hltdarkgreen] (hs) at (5, 4)  {becsül};
+                \node (hs) at (4.5, 4.6)  {számol};
+                \node[text=hltdarkgreen] (gf) at (11, 2) {honor};
+                \node (gf) at (11, 1.4) {celebrate};
+                \node[text=hltdarkgreen] (gs) at (14, 4) {estimate};
+                \node (gs) at (12.5, 4.6) {calculate};
+                \node (ho) at (0, 0) {};
+                \node (hx) at (8, 0) {};
             \node (hy) at (0, 6) {};
             \node (go) at (9,0) {};
             \node (gx) at (17,0) {};
@@ -271,28 +288,14 @@
       \end{figure}
 \end{frame}
 
-\begin{frame}{Reverse nearest neighbors}
-  \begin{itemize}
-    \item nearest neighbor (NN) search in high-dimensional spaces $\leadsto$
-    \item \emph{hubs}, data points that are NNs of many points
-      \bull{wrong in most of the cases  \citep{Radovanovic:2010}}
-    \item solution: reverse nearest neighbor (revNN) queries \\ \citep{Korn:2000}
-    \item reverse neighborhood rank
-      \bull{\emph{project} is a $k$th revNN of \emph{work}
-      $\xLeftrightarrow\Delta$
-      \emph{work} is the $k$th NN of \emph{project}}
-    \item there may be zero, one, or more $k$th revNNs of a word
-    \item revNN query: return the words with the lowest revNN ranks
-    \item less prone to hubs
-    \item in linear translation \citep{Dinu:2015,Lazaridou:2015}
-  \end{itemize}
-\end{frame}
+\section{Experiments}
 
 \begin{frame}{Data}
   \begin{itemize}
     \item source corpus
       \bull{
       de-glutinized version \citep{Borbely:2016d,Nemeskey:2017} of the
+      % Borbely Kornai Kracht Nemeskey
       Hungarian National Corpus \citep{Oravecz:2014}}
     \begin{center}
         \resizebox{\textwidth} {!} {%
@@ -306,35 +309,61 @@
     \item target embedding: GloVe 840B 300d \citep{Pennington:2014}
     \item seed dictionary: wikt2dict \citep{Acs:2013}
     \item training on the first meaning
-    \item target restricted to 20--62 K words
+    %\item target restricted to 20--62 K words
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Evaluation metrics}
+\begin{frame}{Examples}
+        \resizebox{\textwidth} {!} {%
+  \begin{tabular}{lllll}
+    \toprule
+       & sim & & covg \\
+    \midrule
+      S	& 0.0974	& kapcsolat	& affair, conjunction, linkage	& 0.33 \\
+      S	& 0.136	& futó	& runner, bishop	& 1.0 \\
+      I	& 0.1361	& kocsi	& coach, carriage	& 1.0 \\
+      S	& 0.1626	& fogad	& bet, greet	& 1.0 \\
+      S	& 0.1873	& induló	& march, candidate	& 1.0 \\
+      S	& 0.2052	& zavar	& disturbance, annoy, disturb, turmoil	& 0.57 \\
+      S	& 0.2206	& bemutató	& exhibition, presenter	& 0.67 \\
+      I	& 0.2494	& gazda	& farmer, boss	& 0.67 \\
+      I	& 0.2506	& kapu	& gate, portal	& 1.0 \\
+      I	& 0.2515	& előbbi	& anterior, preceding	& 0.67 \\
+      I	& 0.2558	& kötelezettség	& engagement, obligation	& 0.67 \\
+      S	& 0.2807	& sorozat	& suite, serial, succession	& 1.0 \\
+      S	& 0.2935	& durva	& coarse, gross	& 0.18 \\
+      I	& 0.3097	& megkülönböztetés	& discrimination, differentiation	& 0.5 \\
+      I	& 0.319	& hirdet	& advertise, proclaim	& 1.0 \\
+      I	& 0.3299	& aláírás	& signing, signature	& 0.67 \\
+    \bottomrule
+  \end{tabular}
+  }
+\end{frame}
+
+%\begin{frame}{Evaluation metrics}
+\begin{frame}{The resolution trade-off}
   \begin{itemize}
     \item different vectors $ \xRightarrow ? $ different meanings
-    \item selection of parameters and target embedding
+    \item \any: selection of parameters and target embedding
       \bull{at least one meaning vector should have a good translation}
-    \item different sense vectors should have a different set of good
+    \item \disamb: different sense vectors should have a different set of good
       translations
         \bull{ratio of such items among those predicted to be ambiguous}
         % TODO cikket hozzáolvasni a Table 3-hoz tartozó szövegtől
   \end{itemize}
-  \end{frame}
-    \begin{frame}{The resolution trade-off}
       \begin{table}[allowframebreaks]
         % \Resizebox {\columnwidth} {!} {%
         \begin{tabular}{lcc}
           \toprule
-                                    & any     & disamb \\
+                                    & \any     & \disamb \\
           \midrule
           \adagram                  & 73.3\%  & 18.53\% \\
           \mutli~``sense vectors''  & 71.0\%  & 19.46\% \\
           \mutli~``context vectors''& 69.9\%  & {\bf 20.76\%} \\
           \bottomrule
-    \end{tabular}
-    %}
-  \end{table}
+        \end{tabular}
+        %}
+      \end{table}
       \[p(w_i\mid w_j) \, \propto \, \exp (u_i ^\top v_j)\]
 \end{frame}
 
@@ -373,11 +402,10 @@
   \end{figure}
 \end{frame}
 
-\logo{}
-
-\begin{frame}{Samples from the most different senses}
-	\small
-		\begin{longtable}{lllll}
+\begin{frame}{Happy Birthday!}{Some of the most ambiguous 25 words}
+  % do head -25 $file|shuf -n 8|sort  -t'    ' -gk2
+        \resizebox{\textwidth} {!} {%
+		\begin{tabular}{lllll}
 			%\setlength{\tabcolsep}{3pt}
 			%\centering
 			\toprule
@@ -401,45 +429,51 @@
 			&függő	& 0.145	& dependent aerial addict	& 0.6 \\
 			&hangsúlyoz	& 0.1595	& stress accent	& 0.67 \\
 			&nyom	& 0.2582	& clue squeeze weigh hint push trace slot foil	& 0.62 \\
-			&mag	& 0.2634	& kernel seed	& 0.4 \\ 
+			&mag	& 0.2634	& kernel seed	& 0.4 \\
 			\bottomrule
-		\end{longtable}
+		\end{tabular}
+    }
 \end{frame}
+
 \begin{frame} [allowframebreaks] {Bibliography}
 	\printbibliography
 \end{frame}
-\end{document}
 
-%\begin{frame} { Conclusion}
-%  \begin{itemize}
-%    \item input: corpus in two languages + 5 thousand translation pairs
-%    \item resource: disambiguated translation of the corpus vocabulary
-%    \item research result: separating the types of polysemy
-%      cosine (we've verified words that are the same
-%      translations)
-%    \item move: the various multiplayer skip-gram models
-%      more systematic examination
-%  \end{itemize}
-%\end{frame}
-%\begin{frame} {Main Performer's Publications}
-%  \newcommand{\vspacelast}{\vspace{6mm}}
-%  \vspacelast
-%  \centering \url{https://github.com/makrai/wsi-fest}
-%  \vspacelast
-%  \begin{itemize}
-%    \item A \fl~conceptual dictionary \\ \citep{Kornai:2013,Kornai:2015a}
-%      \begin{itemize}
-%        \item igei roles \citep{Makrai:2014}
-%        \item is the defining vocabulary \citep{Makrai:2013a,Kornai:2015a}
-%        \item activation projection \citep{Nemeskey:2013}
-%      \end{itemize}
-%    \item wordings
-%      \begin{itemize}
-%        \item\alert{lexical relations} \citep{Makrai:2013b,Makrai:2014b}
-%        \item for European languages \citep{Makrai:2015,Makrai:2015b}% MSZNY, CogInfoCom
-%        \item vectors in the brain \citep{Makrai:2014p}
-%        \item ambiguity triangulation \citep{Makrai:2016l}
-%        \item multi-report embedding (MSEk) \\ (\cite{Borbely:2016},Makrai (under review))
-%      \end{itemize}
-%  \end{itemize}
-%\end{frame}
+\begin{frame}[allowframebreaks]{Number of senses against frequency}
+  %{Dirichlet Process}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{img/adagram.pdf}
+    \caption{\adagram~\citep{Bartunov:2015}}
+  \end{figure}
+  Ambiguity jumps at frequency 90.
+
+
+  \begin{figure}
+  \includegraphics[width=\textwidth]{img/mutli-full-vocab.pdf}
+    \caption{\mutli, Chinese Restaurant Process \citep{Li:2015}}
+  \end{figure}
+
+  \begin{figure}
+  \includegraphics[width=\textwidth]{img/mutli-top-10k.pdf}
+    \caption{\mutli, top 10 K word senses}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{Reverse nearest neighbors}
+  \begin{itemize}
+    \item nearest neighbor (NN) search in high-dimensional spaces $\leadsto$
+    \item \emph{hubs}, data points that are NNs of many points
+      \bull{wrong in most of the cases  \citep{Radovanovic:2010}}
+    \item solution: reverse nearest neighbor (revNN) queries \\ \citep{Korn:2000}
+    \item reverse neighborhood rank
+      \bull{\emph{project} is a $k$th revNN of \emph{work}
+      $\xLeftrightarrow\Delta$
+      \emph{work} is the $k$th NN of \emph{project}}
+    \item there may be zero, one, or more $k$th revNNs of a word
+    \item revNN query: return the words with the lowest revNN ranks
+    \item less prone to hubs
+    \item in linear translation \citep{Dinu:2015,Lazaridou:2015}
+  \end{itemize}
+\end{frame}
+
+\end{document}
